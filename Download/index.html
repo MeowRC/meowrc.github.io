@@ -8,7 +8,6 @@
 <title>下载 · MeowRc Blog</title>
 
 <script>
-/* 主题预设 + 兜底：5 秒后强制显示内容 */
 (function () {
   try {
     var stored = localStorage.getItem('theme');
@@ -430,6 +429,21 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   border: 1px solid var(--border);
 }
 
+/* 多个下载链接时的按钮组 */
+.dl-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.dl-links .dl-btn {
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: .8rem;
+}
+
 /* ============ 底部提示 ============ */
 .dl-note {
   margin-top: 28px;
@@ -534,7 +548,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   .main { padding-left: 20px; padding-right: 20px; }
 
   .dl-head { flex-direction: column; align-items: stretch; }
-  .dl-btn { justify-content: center; width: 100%; }
+  .dl-head > .dl-btn { justify-content: center; width: 100%; }
+
+  .dl-links .dl-btn { flex: 1 1 100%; }
 
   [data-reveal].from-below { translate: 0 44px; scale: .98; }
   [data-reveal].from-above { translate: 0 -44px; scale: .98; }
@@ -610,6 +626,44 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 <main class="main">
   <section class="section" aria-label="下载列表">
     <div class="downloads">
+
+      <!-- 新增：NCM 转 MP3 -->
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">🎵</div>
+            <div>
+              <div class="dl-name">NCM 转 MP3</div>
+              <div class="dl-version">v1.0.0</div>
+            </div>
+          </div>
+        </div>
+        <p class="dl-desc">网易云音乐 NCM 加密格式转换工具，一键导出为标准 MP3，支持批量处理。</p>
+        <div class="dl-info">
+          <span>💻 Windows</span>
+          <span>📦 小体积</span>
+        </div>
+        <div class="dl-links">
+          <a class="dl-btn" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-MSJK3" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            123 云盘
+          </a>
+          <a class="dl-btn" href="https://www.ilanzou.com/s/I1OuotAw" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            蓝奏云
+          </a>
+          <a class="dl-btn" href="https://github.com/MeowRC/-/releases/download/1/Ncm.mp3.exe" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </article>
 
       <article class="dl-card" data-reveal>
         <div class="dl-head">
@@ -857,7 +911,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
     initScrollUI();
     initMobileMenu();
   } catch (e) {
-    /* 出错也要保证内容可见 */
     $$('[data-reveal]').forEach(function (el) {
       el.classList.add('is-in');
     });
