@@ -1,42 +1,869 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
-  ... meta
-  <title>下载 · MeowRc Blog</title>
-  <style>...</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="下载 MeowRc 的开源软件与工具。" />
+<meta name="theme-color" content="#f5a0b8" />
+<title>下载 · MeowRc Blog</title>
+
+<script>
+/* 主题预设 + 兜底：5 秒后强制显示内容 */
+(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var t = (stored === 'dark' || stored === 'light')
+      ? stored
+      : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.dataset.theme = t;
+  } catch (e) {}
+})();
+
+setTimeout(function () {
+  document.querySelectorAll('[data-reveal]').forEach(function (el) {
+    el.classList.add('is-in');
+  });
+}, 5000);
+</script>
+
+<style>
+:root {
+  --bg: #fdfbfc;
+  --surface: #ffffff;
+  --surface-2: #fff7fa;
+  --text: #1f1d1e;
+  --text-2: #6b6567;
+  --accent: #f5a0b8;
+  --accent-strong: #e4708f;
+  --accent-soft: #fce8ee;
+  --accent-glow: rgba(245, 160, 184, .34);
+  --border: #f0e6e9;
+  --shadow-sm: 0 1px 3px rgba(180, 120, 140, .06);
+  --shadow-md: 0 6px 24px rgba(180, 120, 140, .10);
+  --shadow-lg: 0 18px 48px rgba(180, 120, 140, .16);
+  --radius: 16px;
+  --radius-pill: 999px;
+  --nav-h: 64px;
+  --maxw: 880px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-io: cubic-bezier(.4, 0, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-shift: cubic-bezier(.16, 1, .3, 1);
+  --ease-fade: cubic-bezier(.25, .46, .45, .94);
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #14121a;
+  --surface: #1c1923;
+  --surface-2: #241f2c;
+  --text: #f0eaf0;
+  --text-2: #a49aa6;
+  --accent-strong: #ffb8cc;
+  --accent-soft: #3a2733;
+  --accent-glow: rgba(245, 160, 184, .22);
+  --border: #2e2836;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, .45);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 24px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color .4s ease, color .4s ease;
+}
+
+a { color: inherit; }
+button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
+
+::selection { background: var(--accent); color: #fff; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============ 导航栏 ============ */
+.navbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--nav-h);
+  z-index: 100;
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow .3s ease, background-color .3s ease;
+}
+
+[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
+
+.navbar.scrolled {
+  background: rgba(255, 255, 255, .92);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
+
+.navbar-inner {
+  max-width: var(--maxw);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nav-brand {
+  font-size: 1.22rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-brand em { font-style: normal; color: var(--accent-strong); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+}
+
+.nav-links a {
+  display: block;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: .92rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-2);
+  transition: color .2s, background-color .2s;
+}
+
+.nav-links a:hover { color: var(--text); background: var(--accent-soft); }
+
+.nav-links a.active {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+.nav-actions { display: flex; align-items: center; gap: 4px; }
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text-2);
+  transition: background-color .2s, color .2s, transform .2s;
+}
+
+.icon-btn:hover { background: var(--accent-soft); color: var(--accent-strong); }
+.icon-btn:active { transform: scale(.92); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+.theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+
+.mobile-menu-btn { display: none; }
+
+/* ============ 页头 ============ */
+.page-hero {
+  position: relative;
+  padding: calc(var(--nav-h) + 72px) 24px 40px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(50% 60% at 20% 20%, var(--accent-glow), transparent 70%),
+    radial-gradient(40% 50% at 85% 80%, var(--accent-glow), transparent 70%);
+  opacity: .8;
+}
+
+.page-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: .35;
+  -webkit-mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+}
+
+.page-hero-inner {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: 22px;
+}
+
+.page-hero-inner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), #f7b8c8);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.page-eyebrow {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 6px;
+}
+
+.page-title {
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  background: linear-gradient(120deg, var(--text) 30%, var(--accent-strong));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-desc {
+  margin-top: 8px;
+  font-size: .96rem;
+  color: var(--text-2);
+  max-width: 52ch;
+}
+
+/* ============ 主体 ============ */
+.main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 8px 24px 80px;
+}
+
+.section { padding: 24px 0 36px; }
+
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* ============ 下载卡片 ============ */
+.dl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition:
+    transform .3s var(--ease-io),
+    box-shadow .3s ease,
+    border-color .3s ease,
+    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
+    translate .9s var(--ease-shift) var(--reveal-delay, 0ms),
+    scale .9s var(--ease-shift) var(--reveal-delay, 0ms);
+}
+
+.dl-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #f7b8c8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .42s var(--ease-io);
+}
+
+.dl-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.dl-card:hover::before { transform: scaleX(1); }
+
+.dl-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.dl-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dl-icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  transition: transform .35s var(--ease-spring);
+}
+
+.dl-card:hover .dl-icon { transform: scale(1.08) rotate(-6deg); }
+
+.dl-name {
+  font-size: 1.05rem;
+  font-weight: 680;
+  letter-spacing: -.012em;
+  line-height: 1.3;
+}
+
+.dl-version {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--accent-strong);
+  margin-top: 2px;
+}
+
+.dl-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: var(--radius-pill);
+  font-size: .86rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 4px 14px rgba(245, 160, 184, .35);
+  transition: transform .25s var(--ease-spring), box-shadow .25s, filter .25s;
+}
+
+.dl-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(245, 160, 184, .5);
+  filter: brightness(1.05);
+}
+
+.dl-btn:active { transform: translateY(0); }
+.dl-btn svg { width: 14px; height: 14px; }
+
+.dl-desc {
+  font-size: .9rem;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.dl-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dl-info span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .76rem;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+/* ============ 底部提示 ============ */
+.dl-note {
+  margin-top: 28px;
+  padding: 18px 24px;
+  text-align: center;
+  font-size: .88rem;
+  color: var(--text-2);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.dl-note a {
+  color: var(--accent-strong);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dl-note a:hover { text-decoration: underline; }
+
+/* ============ 页脚 & 回到顶部 ============ */
+.footer {
+  position: relative;
+  padding: 36px 24px 40px;
+  margin-top: 24px;
+  text-align: center;
+  font-size: .86rem;
+  color: var(--text-2);
+  border-top: 1px solid var(--border);
+}
+
+.footer em { font-style: normal; color: var(--accent-strong); font-weight: 600; }
+
+.to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition:
+    opacity .3s, transform .3s, visibility .3s,
+    background-color .2s, color .2s, border-color .2s;
+}
+
+.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.to-top:active { transform: scale(.94); }
+.to-top svg { width: 18px; height: 18px; }
+
+/* ============ 滚动显现 ============ */
+[data-reveal] {
+  opacity: 0;
+  transition:
+    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
+    translate .9s var(--ease-shift) var(--reveal-delay, 0ms),
+    scale .9s var(--ease-shift) var(--reveal-delay, 0ms);
+}
+
+[data-reveal].from-below { translate: 0 64px; scale: .97; }
+[data-reveal].from-above { translate: 0 -64px; scale: .97; }
+[data-reveal].is-in { opacity: 1; translate: 0 0; scale: 1; }
+[data-reveal].no-transition { transition: none !important; }
+
+/* ============ 响应式 ============ */
+@media (max-width: 720px) {
+  .mobile-menu-btn { display: grid; }
+
+  .nav-links {
+    position: fixed;
+    inset: var(--nav-h) 0 auto 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 12px 16px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    border-radius: 0 0 20px 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s;
+  }
+
+  .nav-links.open { opacity: 1; visibility: visible; transform: none; }
+  .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
+
+  .page-hero { padding: calc(var(--nav-h) + 56px) 20px 32px; }
+  .page-hero-inner { padding-left: 18px; }
+
+  .main { padding-left: 20px; padding-right: 20px; }
+
+  .dl-head { flex-direction: column; align-items: stretch; }
+  .dl-btn { justify-content: center; width: 100%; }
+
+  [data-reveal].from-below { translate: 0 44px; scale: .98; }
+  [data-reveal].from-above { translate: 0 -44px; scale: .98; }
+}
+
+@media (max-width: 400px) {
+  .dl-card { padding: 20px 22px; }
+}
+
+/* ============ 减少动效 ============ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    translate: 0 0 !important;
+    scale: 1 !important;
+  }
+}
+</style>
 </head>
+
 <body>
-  <nav class="navbar">...</nav>
-  <header class="page-hero">
-    <div class="page-hero-inner">
-      <div class="page-eyebrow">资源</div>
-      <h1 class="page-title">下载</h1>
-      <p class="page-desc">获取最新的软件与工具发布版本。</p>
+
+<h1 class="sr-only">下载 — MeowRc Blog</h1>
+
+<!-- 导航栏 -->
+<nav class="navbar" id="navbar" aria-label="主导航">
+  <div class="navbar-inner">
+    <a href="/" class="nav-brand"><em>MeowRc</em> Blog</a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/" class="nav-link">主页</a></li>
+      <li><a href="/#projects" class="nav-link">项目</a></li>
+      <li><a href="/#contact" class="nav-link">联系</a></li>
+      <li><a href="/Download" class="nav-link active" aria-current="page">下载</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="切换主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+
+      <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="菜单" aria-expanded="false" aria-controls="navLinks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
     </div>
-  </header>
-  <main class="main">
-    <section class="section">
-      <header class="section-head">...</header>
-      <div class="download-grid">
-        <article class="download-card">
-          <div class="dl-head">
-            <div class="dl-icon">🎮</div>
-            <div class="dl-meta">
-              <h3>OpenSteamTool</h3>
-              <span class="dl-version">v2.1.0</span>
+  </div>
+</nav>
+
+<!-- 页头 -->
+<header class="page-hero">
+  <div class="page-hero-inner">
+    <div class="page-eyebrow">资源</div>
+    <h2 class="page-title">下载</h2>
+    <p class="page-desc">获取最新的软件与工具发布版本，全部开源免费。</p>
+  </div>
+</header>
+
+<!-- 主体 -->
+<main class="main">
+  <section class="section" aria-label="下载列表">
+    <div class="downloads">
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">🎮</div>
+            <div>
+              <div class="dl-name">OpenSteamTool</div>
+              <div class="dl-version">v2.1.0</div>
             </div>
           </div>
-          <p class="dl-desc">Steam 工具箱，提供多种实用功能。</p>
-          <div class="dl-info">
-            <span>Windows</span>
-            <span>18.4 MB</span>
+          <a class="dl-btn" href="https://github.com/MeowRC/OpenSteamTool/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">Steam 工具箱，提供清单缓存、下载加速等多种实用功能。</p>
+        <div class="dl-info">
+          <span>💻 Windows</span>
+          <span>📦 18.4 MB</span>
+        </div>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">📋</div>
+            <div>
+              <div class="dl-name">ManifestHub</div>
+              <div class="dl-version">v1.8.3</div>
+            </div>
           </div>
-          <a href="..." class="dl-btn">下载</a>
-        </article>
-        ...
-      </div>
-    </section>
-  </main>
-  <footer>...</footer>
+          <a class="dl-btn" href="https://github.com/MeowRC/ManifestHub/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">蒸汽仓库清单缓存工具，快速获取与整理游戏清单信息。</p>
+        <div class="dl-info">
+          <span>💻 Windows</span>
+          <span>🐧 Linux</span>
+          <span>🍎 macOS</span>
+          <span>📦 6.2 MB</span>
+        </div>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">🐧</div>
+            <div>
+              <div class="dl-name">kernel_xiaomi_mt6785</div>
+              <div class="dl-version">v4.14.336</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://github.com/MeowRC/kernel_xiaomi_mt6785/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">小米 Redmi Note 8 Pro（Begonia）内核源码与编译产物。</p>
+        <div class="dl-info">
+          <span>🤖 Android</span>
+          <span>📦 24.7 MB</span>
+        </div>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">🌐</div>
+            <div>
+              <div class="dl-name">clash-verge-rev</div>
+              <div class="dl-version">v2.0.3</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://github.com/MeowRC/clash-verge-rev/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">Clash Verge Rev 分支，基于 Tauri 的现代代理客户端。</p>
+        <div class="dl-info">
+          <span>💻 Windows</span>
+          <span>🍎 macOS</span>
+          <span>🐧 Linux</span>
+          <span>📦 12.1 MB</span>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="dl-note" data-reveal>
+      需要历史版本或源码？前往
+      <a href="https://github.com/MeowRC" target="_blank" rel="noopener noreferrer">GitHub</a>
+      查看全部发布。
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  &copy; 2026 <em>MeowRc</em> Blog
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M18 15l-6-6-6 6"/>
+  </svg>
+</button>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 主题切换 ---------- */
+  var themeBtn = $('#themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+  }
+
+  /* ---------- 滚动显现（双向、可重复） ---------- */
+  function initReveal() {
+    var els = $$('[data-reveal]');
+
+    if (!('IntersectionObserver' in window) || prefersReduced) {
+      els.forEach(function (el) { el.classList.add('from-below', 'is-in'); });
+      return;
+    }
+
+    els.forEach(function (el, i) {
+      el.classList.add('from-below');
+      el.style.setProperty('--reveal-delay', ((i % 4) * 75) + 'ms');
+    });
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var el = entry.target;
+
+        if (entry.isIntersecting) {
+          if (el.classList.contains('is-in')) return;
+
+          var fromBelow = entry.boundingClientRect.top >= 0;
+          var wanted = fromBelow ? 'from-below' : 'from-above';
+          var current = el.classList.contains('from-below') ? 'from-below' :
+                       (el.classList.contains('from-above') ? 'from-above' : null);
+
+          if (current !== wanted) {
+            el.classList.add('no-transition');
+            el.classList.remove('from-below', 'from-above');
+            el.classList.add(wanted);
+            void el.offsetWidth;
+            el.classList.remove('no-transition');
+          }
+
+          el.classList.add('is-in');
+        } else {
+          if (el.classList.contains('is-in')) {
+            el.classList.add('no-transition');
+            el.classList.remove('is-in');
+            void el.offsetWidth;
+            el.classList.remove('no-transition');
+          }
+        }
+      });
+    }, { threshold: 0, rootMargin: '-60px 0px -60px 0px' });
+
+    els.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- 滚动 UI ---------- */
+  function initScrollUI() {
+    var navbar = $('#navbar');
+    var toTop = $('#toTop');
+    var ticking = false;
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        if (navbar) navbar.classList.toggle('scrolled', y > 10);
+        if (toTop) toTop.classList.toggle('show', y > 500);
+        ticking = false;
+      });
+    }, { passive: true });
+
+    if (toTop) {
+      toTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+      });
+    }
+  }
+
+  /* ---------- 移动端菜单 ---------- */
+  function initMobileMenu() {
+    var btn = $('#mobileMenuBtn');
+    var list = $('#navLinks');
+    if (!btn || !list) return;
+
+    function close() {
+      list.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = list.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+
+    list.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') close();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!list.classList.contains('open')) return;
+      if (list.contains(e.target) || btn.contains(e.target)) return;
+      close();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+  }
+
+  /* ---------- 启动 ---------- */
+  try {
+    initReveal();
+    initScrollUI();
+    initMobileMenu();
+  } catch (e) {
+    /* 出错也要保证内容可见 */
+    $$('[data-reveal]').forEach(function (el) {
+      el.classList.add('is-in');
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
