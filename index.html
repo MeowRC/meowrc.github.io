@@ -8,39 +8,29 @@
 <title>MeowRc Blog</title>
 
 <script>
+/* 主题预设 + 兜底：无论后面 JS 出什么问题，5 秒后强制显示内容 */
 (function () {
   try {
-    var stored = localStorage.getItem('theme');
-    var theme = (stored === 'dark' || stored === 'light')
-      ? stored
-      : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.dataset.theme = theme;
+    var t = localStorage.getItem('theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.dataset.theme = t;
   } catch (e) {}
 })();
+
+setTimeout(function () {
+  var blog = document.getElementById('blog');
+  if (blog && blog.hidden) {
+    var loader = document.getElementById('loader');
+    if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+    blog.hidden = false;
+    blog.classList.add('page-enter');
+  }
+}, 5000);
 </script>
 
 <style>
-/* ============================================================
-   # 目录
-   1. 设计令牌
-   2. 重置与基础
-   3. 加载页
-   4. 导航栏
-   5. Hero
-   6. 通用区块与卡片
-   7. 博客文章
-   8. 项目
-   9. 联系
-   10. 页脚 & 回到顶部
-   11. 维护模式
-   12. 滚动显现（双向）
-   13. 响应式
-   14. 无障碍
-   ============================================================ */
-
-/* ------------------------------------------------------------
-   1. 设计令牌
-   ------------------------------------------------------------ */
 :root {
   --bg: #fdfbfc;
   --surface: #ffffff;
@@ -52,33 +42,21 @@
   --accent-soft: #fce8ee;
   --accent-glow: rgba(245, 160, 184, .34);
   --border: #f0e6e9;
-
   --shadow-sm: 0 1px 3px rgba(180, 120, 140, .06);
   --shadow-md: 0 6px 24px rgba(180, 120, 140, .10);
   --shadow-lg: 0 18px 48px rgba(180, 120, 140, .16);
-
   --radius: 16px;
   --radius-pill: 999px;
   --nav-h: 64px;
   --maxw: 880px;
-
-  /* 过渡曲线 */
   --ease-out: cubic-bezier(.22, 1, .36, 1);
   --ease-io: cubic-bezier(.4, 0, .2, 1);
   --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
   --ease-slide: cubic-bezier(.77, 0, .175, 1);
-  /* 显现专用：位移用"急速到位、缓收尾"，透明度用柔和平滑 */
   --ease-shift: cubic-bezier(.16, 1, .3, 1);
   --ease-fade: cubic-bezier(.25, .46, .45, .94);
-
-  --t-fill: 2000ms;
-  --t-buffer: 120ms;
-  --t-slide: 720ms;
-  --t-enter: 180ms;
-
   --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
   --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
-
   color-scheme: light;
 }
 
@@ -98,9 +76,6 @@
   color-scheme: dark;
 }
 
-/* ------------------------------------------------------------
-   2. 重置与基础
-   ------------------------------------------------------------ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
@@ -124,8 +99,6 @@ a { color: inherit; }
 button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
 [hidden] { display: none !important; }
 
-body.is-loading { overflow: hidden; }
-
 ::selection { background: var(--accent); color: #fff; }
 
 :focus-visible {
@@ -144,9 +117,7 @@ body.is-loading { overflow: hidden; }
   border: 0;
 }
 
-/* ------------------------------------------------------------
-   3. 加载页
-   ------------------------------------------------------------ */
+/* ============ 加载页 ============ */
 #loader {
   position: fixed;
   inset: 0;
@@ -157,9 +128,9 @@ body.is-loading { overflow: hidden; }
   justify-content: center;
   gap: 22px;
   background: radial-gradient(circle at 50% 45%, var(--accent-soft) 0%, var(--bg) 65%);
-  transition: transform var(--t-slide) var(--ease-slide);
-  will-change: transform;
+  transition: transform .72s var(--ease-slide);
 }
+
 #loader.slide-out { transform: translateX(100%); }
 
 .loader-logo {
@@ -168,6 +139,7 @@ body.is-loading { overflow: hidden; }
   letter-spacing: -.025em;
   animation: logoIn .6s var(--ease-spring) both;
 }
+
 .loader-logo em {
   font-style: normal;
   background: linear-gradient(135deg, var(--accent), #f7b8c8);
@@ -178,7 +150,7 @@ body.is-loading { overflow: hidden; }
 
 @keyframes logoIn {
   from { opacity: 0; transform: translateY(12px) scale(.96); }
-  to   { opacity: 1; transform: none; }
+  to { opacity: 1; transform: none; }
 }
 
 .loader-bar {
@@ -189,6 +161,7 @@ body.is-loading { overflow: hidden; }
   background: var(--accent-soft);
   overflow: hidden;
 }
+
 .loader-bar > i {
   position: relative;
   display: block;
@@ -197,8 +170,9 @@ body.is-loading { overflow: hidden; }
   background: linear-gradient(90deg, var(--accent), #f7b8c8);
   transform-origin: left;
   overflow: hidden;
-  animation: barFill var(--t-fill) cubic-bezier(.55, 0, .35, 1) both;
+  animation: barFill 2s cubic-bezier(.55, 0, .35, 1) both;
 }
+
 .loader-bar > i::after {
   content: '';
   position: absolute;
@@ -209,13 +183,11 @@ body.is-loading { overflow: hidden; }
 
 @keyframes barFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes barSheen {
-  0%   { transform: translateX(-100%); }
+  0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
 
-/* ------------------------------------------------------------
-   4. 导航栏
-   ------------------------------------------------------------ */
+/* ============ 导航栏 ============ */
 .navbar {
   position: fixed;
   inset: 0 0 auto 0;
@@ -231,6 +203,7 @@ body.is-loading { overflow: hidden; }
     box-shadow .3s ease,
     background-color .3s ease;
 }
+
 [data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
 
 .page-enter .navbar { transform: translateY(0); }
@@ -239,6 +212,7 @@ body.is-loading { overflow: hidden; }
   background: rgba(255, 255, 255, .92);
   box-shadow: var(--shadow-sm);
 }
+
 [data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
 
 .navbar-inner {
@@ -259,6 +233,7 @@ body.is-loading { overflow: hidden; }
   text-decoration: none;
   white-space: nowrap;
 }
+
 .nav-brand em { font-style: normal; color: var(--accent-strong); }
 
 .nav-links {
@@ -267,6 +242,7 @@ body.is-loading { overflow: hidden; }
   gap: 4px;
   list-style: none;
 }
+
 .nav-links a {
   display: block;
   padding: 8px 18px;
@@ -277,6 +253,7 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
   transition: color .2s, background-color .2s;
 }
+
 .nav-links a:hover { color: var(--text); background: var(--accent-soft); }
 .nav-links a.active {
   color: var(--accent-strong);
@@ -295,19 +272,18 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
   transition: background-color .2s, color .2s, transform .2s;
 }
+
 .icon-btn:hover { background: var(--accent-soft); color: var(--accent-strong); }
 .icon-btn:active { transform: scale(.92); }
 .icon-btn svg { width: 18px; height: 18px; }
 
 .theme-toggle .icon-moon { display: none; }
 [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
-[data-theme="dark"] .theme-toggle .icon-sun  { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
 
 .mobile-menu-btn { display: none; }
 
-/* ------------------------------------------------------------
-   5. Hero
-   ------------------------------------------------------------ */
+/* ============ Hero ============ */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -328,6 +304,7 @@ body.is-loading { overflow: hidden; }
     radial-gradient(42% 40% at 82% 72%, var(--accent-glow), transparent 70%);
   opacity: 0;
 }
+
 .page-enter .hero::before {
   opacity: 1;
   transition: opacity .9s ease .1s;
@@ -347,12 +324,14 @@ body.is-loading { overflow: hidden; }
   -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
   mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
 }
+
 .page-enter .hero::after {
   opacity: .45;
   transition: opacity .95s ease .18s;
 }
 
 .hero-particles { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
+
 .hero-particles i {
   position: absolute;
   border-radius: 50%;
@@ -360,17 +339,18 @@ body.is-loading { overflow: hidden; }
   opacity: 0;
   animation: floatUp 9s ease-in-out infinite;
 }
-.hero-particles i:nth-child(1) { width: 7px;  height: 7px;  left: 8%;  top: 24%; animation-delay: 0s; }
-.hero-particles i:nth-child(2) { width: 5px;  height: 5px;  left: 82%; top: 18%; animation-delay: 1.6s; }
-.hero-particles i:nth-child(3) { width: 9px;  height: 9px;  left: 24%; top: 68%; animation-delay: 3.2s; }
-.hero-particles i:nth-child(4) { width: 6px;  height: 6px;  left: 68%; top: 76%; animation-delay: 4.8s; }
-.hero-particles i:nth-child(5) { width: 4px;  height: 4px;  left: 46%; top: 12%; animation-delay: 6.4s; }
-.hero-particles i:nth-child(6) { width: 8px;  height: 8px;  left: 90%; top: 58%; animation-delay: 7.6s; }
+
+.hero-particles i:nth-child(1) { width: 7px; height: 7px; left: 8%; top: 24%; animation-delay: 0s; }
+.hero-particles i:nth-child(2) { width: 5px; height: 5px; left: 82%; top: 18%; animation-delay: 1.6s; }
+.hero-particles i:nth-child(3) { width: 9px; height: 9px; left: 24%; top: 68%; animation-delay: 3.2s; }
+.hero-particles i:nth-child(4) { width: 6px; height: 6px; left: 68%; top: 76%; animation-delay: 4.8s; }
+.hero-particles i:nth-child(5) { width: 4px; height: 4px; left: 46%; top: 12%; animation-delay: 6.4s; }
+.hero-particles i:nth-child(6) { width: 8px; height: 8px; left: 90%; top: 58%; animation-delay: 7.6s; }
 
 @keyframes floatUp {
-  0%   { transform: translateY(0) scale(.4); opacity: 0; }
-  20%  { opacity: .65; }
-  60%  { transform: translateY(-52px) scale(1.15); opacity: .35; }
+  0% { transform: translateY(0) scale(.4); opacity: 0; }
+  20% { opacity: .65; }
+  60% { transform: translateY(-52px) scale(1.15); opacity: .35; }
   100% { transform: translateY(-108px) scale(.7); opacity: 0; }
 }
 
@@ -392,14 +372,10 @@ body.is-loading { overflow: hidden; }
   background: linear-gradient(180deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent);
   opacity: 0;
 }
+
 .page-enter .hero-inner::before {
   opacity: .5;
   transition: opacity .8s ease .3s;
-  animation: vPulse 4s ease-in-out 1.1s infinite;
-}
-@keyframes vPulse {
-  0%, 100% { filter: brightness(1); }
-  50%      { filter: brightness(1.5); }
 }
 
 .hero-eyebrow,
@@ -416,9 +392,8 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
   margin-bottom: .35rem;
 }
-.page-enter .hero-eyebrow {
-  animation: heroUp .7s var(--ease-io) .18s both;
-}
+
+.page-enter .hero-eyebrow { animation: heroUp .7s var(--ease-io) .18s both; }
 
 .hero-title {
   font-size: clamp(3rem, 12vw, 6.4rem);
@@ -432,11 +407,13 @@ body.is-loading { overflow: hidden; }
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 8px 24px rgba(245, 160, 184, .28));
 }
+
 .page-enter .hero-title {
   animation:
     heroUp .8s var(--ease-io) .3s both,
     shine 7s linear 1.35s infinite;
 }
+
 @keyframes shine { to { background-position: 220% center; } }
 
 .hero-subtitle {
@@ -446,9 +423,8 @@ body.is-loading { overflow: hidden; }
   line-height: 1.05;
   letter-spacing: -.045em;
 }
-.page-enter .hero-subtitle {
-  animation: heroUp .8s var(--ease-io) .42s both;
-}
+
+.page-enter .hero-subtitle { animation: heroUp .8s var(--ease-io) .42s both; }
 
 .hero-caret {
   display: inline-block;
@@ -460,11 +436,12 @@ body.is-loading { overflow: hidden; }
   background: var(--accent);
   animation: caret 1s steps(2, start) infinite;
 }
+
 @keyframes caret { 50% { opacity: 0; } }
 
 @keyframes heroUp {
   from { opacity: 0; transform: translateY(26px); }
-  to   { opacity: 1; transform: none; }
+  to { opacity: 1; transform: none; }
 }
 
 .scroll-hint {
@@ -487,44 +464,37 @@ body.is-loading { overflow: hidden; }
   opacity: 0;
   transition: background-color .25s, color .25s, transform .25s;
 }
+
 [data-theme="dark"] .scroll-hint { background: rgba(28, 25, 35, .62); }
 
-.scroll-hint:hover {
-  color: var(--accent-strong);
-  background: var(--accent-soft);
-}
-.scroll-hint:active { transform: translate(-50%, 2px); }
+.scroll-hint:hover { color: var(--accent-strong); background: var(--accent-soft); }
 
-.page-enter .scroll-hint {
-  animation: hintIn .6s ease 1.15s both;
-}
+.page-enter .scroll-hint { animation: hintIn .6s ease 1.15s both; }
 
 .scroll-hint svg {
   width: 15px;
   height: 15px;
   animation: bounce 1.9s ease-in-out infinite;
 }
+
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(5px); }
-}
-@keyframes hintIn {
-  from { opacity: 0; transform: translate(-50%, 12px); }
-  to   { opacity: 1; transform: translate(-50%, 0); }
+  50% { transform: translateY(5px); }
 }
 
-/* ------------------------------------------------------------
-   6. 通用区块与卡片
-   ------------------------------------------------------------ */
+@keyframes hintIn {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ============ 主体 ============ */
 .main {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 0 24px 80px;
 }
 
-.hero[id], .section[id] {
-  scroll-margin-top: calc(var(--nav-h) + 24px);
-}
+.hero[id], .section[id] { scroll-margin-top: calc(var(--nav-h) + 24px); }
 
 .section { padding: 36px 0; }
 
@@ -533,6 +503,7 @@ body.is-loading { overflow: hidden; }
   margin-bottom: 24px;
   padding-left: 18px;
 }
+
 .section-head::before {
   content: '';
   position: absolute;
@@ -553,11 +524,13 @@ body.is-loading { overflow: hidden; }
   color: var(--accent-strong);
   margin-bottom: 4px;
 }
+
 .section-title {
   font-size: clamp(1.35rem, 3vw, 1.7rem);
   font-weight: 750;
   letter-spacing: -.02em;
 }
+
 .section-desc {
   margin-top: 2px;
   font-size: .9rem;
@@ -577,14 +550,13 @@ body.is-loading { overflow: hidden; }
     translate .9s var(--ease-shift),
     scale .9s var(--ease-shift);
 }
+
 .card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
   border-color: var(--accent);
 }
-.card:active { transform: translateY(-1px); }
 
-/* 卡片同时是 [data-reveal] 时，合并两套过渡，加入 --reveal-delay */
 .card[data-reveal] {
   transition:
     transform .3s var(--ease-io),
@@ -595,9 +567,7 @@ body.is-loading { overflow: hidden; }
     scale .9s var(--ease-shift) var(--reveal-delay, 0ms);
 }
 
-/* ------------------------------------------------------------
-   7. 博客文章
-   ------------------------------------------------------------ */
+/* ============ 博客文章 ============ */
 .post-list { display: grid; gap: 12px; }
 
 .post {
@@ -607,6 +577,7 @@ body.is-loading { overflow: hidden; }
   text-decoration: none;
   overflow: hidden;
 }
+
 .post::before {
   content: '';
   position: absolute;
@@ -617,6 +588,7 @@ body.is-loading { overflow: hidden; }
   transform-origin: top;
   transition: transform .38s var(--ease-io);
 }
+
 .post:hover::before { transform: scaleY(1); }
 
 .post-date {
@@ -634,6 +606,7 @@ body.is-loading { overflow: hidden; }
   letter-spacing: -.012em;
   transition: color .2s;
 }
+
 .post:hover .post-title { color: var(--accent-strong); }
 
 .post-excerpt {
@@ -643,12 +616,8 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 13px;
-}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+
 .tag {
   font-size: .71rem;
   font-weight: 500;
@@ -659,15 +628,10 @@ body.is-loading { overflow: hidden; }
   border: 1px solid transparent;
   transition: background-color .2s, color .2s, border-color .2s;
 }
-.tag:hover {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
 
-/* ------------------------------------------------------------
-   8. 项目
-   ------------------------------------------------------------ */
+.tag:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ============ 项目 ============ */
 .projects {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
@@ -683,6 +647,7 @@ body.is-loading { overflow: hidden; }
   text-decoration: none;
   overflow: hidden;
 }
+
 .project::after {
   content: '';
   position: absolute;
@@ -694,6 +659,7 @@ body.is-loading { overflow: hidden; }
   transform-origin: left;
   transition: transform .42s var(--ease-io);
 }
+
 .project:hover::after { transform: scaleX(1); }
 
 .project-icon {
@@ -706,24 +672,21 @@ body.is-loading { overflow: hidden; }
   background: var(--accent-soft);
   transition: transform .35s var(--ease-spring);
 }
+
 .project:hover .project-icon { transform: scale(1.08) rotate(-6deg); }
 
-.project h3 {
-  font-size: 1rem;
-  font-weight: 680;
-  letter-spacing: -.012em;
-}
+.project h3 { font-size: 1rem; font-weight: 680; letter-spacing: -.012em; }
+
 .project p {
   flex-grow: 1;
   font-size: .87rem;
   line-height: 1.55;
   color: var(--text-2);
 }
+
 .project .tags { margin-top: 2px; }
 
-/* ------------------------------------------------------------
-   9. 联系
-   ------------------------------------------------------------ */
+/* ============ 联系 ============ */
 .contact { padding: 12px 28px 24px; }
 
 .contact-row {
@@ -733,6 +696,7 @@ body.is-loading { overflow: hidden; }
   padding: 15px 0;
   border-bottom: 1px solid var(--border);
 }
+
 .contact-row:last-of-type { border-bottom: none; }
 
 .contact-icon {
@@ -746,6 +710,7 @@ body.is-loading { overflow: hidden; }
   background: var(--accent-soft);
   transition: transform .3s var(--ease-spring);
 }
+
 .contact-row:hover .contact-icon { transform: scale(1.1); }
 
 .contact-label {
@@ -755,6 +720,7 @@ body.is-loading { overflow: hidden; }
   text-transform: uppercase;
   color: var(--text-2);
 }
+
 .contact-value { font-size: .96rem; font-weight: 500; }
 .contact-value a { color: var(--accent-strong); text-decoration: none; }
 .contact-value a:hover { text-decoration: underline; }
@@ -785,17 +751,15 @@ body.is-loading { overflow: hidden; }
     border-color .25s,
     transform .25s;
 }
+
 .social-link:hover {
   background: var(--accent-soft);
   color: var(--accent-strong);
   border-color: var(--accent);
   transform: translateY(-2px);
 }
-.social-link:active { transform: translateY(0); }
 
-/* ------------------------------------------------------------
-   10. 页脚 & 回到顶部
-   ------------------------------------------------------------ */
+/* ============ 页脚 & 回到顶部 ============ */
 .footer {
   position: relative;
   padding: 36px 24px 40px;
@@ -805,6 +769,7 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
   border-top: 1px solid var(--border);
 }
+
 .footer em { font-style: normal; color: var(--accent-strong); font-weight: 600; }
 
 .to-top {
@@ -825,159 +790,15 @@ body.is-loading { overflow: hidden; }
   visibility: hidden;
   transform: translateY(10px);
   transition:
-    opacity .3s,
-    transform .3s,
-    visibility .3s,
-    background-color .2s,
-    color .2s,
-    border-color .2s;
+    opacity .3s, transform .3s, visibility .3s,
+    background-color .2s, color .2s, border-color .2s;
 }
+
 .to-top.show { opacity: 1; visibility: visible; transform: none; }
 .to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.to-top:active { transform: scale(.94); }
 .to-top svg { width: 18px; height: 18px; }
 
-/* ------------------------------------------------------------
-   11. 维护模式
-   ------------------------------------------------------------ */
-.maintenance {
-  min-height: 100vh;
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background:
-    radial-gradient(circle at 18% 28%, var(--accent-glow), transparent 55%),
-    radial-gradient(circle at 82% 72%, var(--accent-glow), transparent 55%),
-    var(--bg);
-}
-
-.maintenance-card {
-  width: 100%;
-  max-width: 460px;
-  padding: 52px 44px;
-  text-align: center;
-  border-radius: 26px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
-  animation: cardIn .6s var(--ease-spring) both;
-}
-@keyframes cardIn {
-  from { opacity: 0; transform: scale(.94) translateY(24px); }
-  to   { opacity: 1; transform: none; }
-}
-
-.m-logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -.02em;
-  margin-bottom: 26px;
-}
-.m-logo em {
-  font-style: normal;
-  background: linear-gradient(135deg, var(--accent), #f7b8c8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.m-gear {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 26px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  position: relative;
-}
-.m-gear::after {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-  border: 1.5px solid var(--accent);
-  opacity: .5;
-  animation: pulseRing 2.6s ease-out infinite;
-}
-@keyframes pulseRing {
-  0%   { transform: scale(.85); opacity: .6; }
-  100% { transform: scale(1.25); opacity: 0; }
-}
-.m-gear svg {
-  width: 34px;
-  height: 34px;
-  animation: spin 6s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.maintenance-card h1 {
-  font-size: 1.65rem;
-  font-weight: 750;
-  letter-spacing: -.02em;
-  margin-bottom: 10px;
-}
-.maintenance-card > p {
-  font-size: .95rem;
-  color: var(--text-2);
-}
-
-.m-eta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin: 26px 0 24px;
-  padding: 12px 26px;
-  border-radius: var(--radius-pill);
-  font-size: .9rem;
-  font-weight: 600;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-.m-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #f6b54b;
-  animation: dotPulse 1.4s ease-in-out infinite;
-}
-@keyframes dotPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: .35; transform: scale(.82); }
-}
-
-.m-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.m-footer {
-  margin-top: 34px;
-  padding-top: 22px;
-  font-size: .8rem;
-  color: var(--text-2);
-  border-top: 1px solid var(--border);
-}
-
-/* ------------------------------------------------------------
-   12. 滚动显现（双向，可重复）
-
-   元素始终带有 .from-below 或 .from-above 之一作为"待命位置"，
-   由 JS 在 initReveal 里立即预置 .from-below。
-   .is-in 叠加到待命位置之上，触发过渡到最终位置。
-
-   位移与透明度用不同曲线与时长：
-     · 位移：.9s 的 ease-shift，起步快、收尾柔
-     · 透明：.6s 的 ease-fade，平滑淡入
-   两者叠加，看起来像"从远处飘入并渐渐清晰"。
-
-   .no-transition 用于切换方向/重置时临时禁用过渡，
-   避免播放不需要的中间动画。
-   ------------------------------------------------------------ */
+/* ============ 滚动显现 ============ */
 [data-reveal] {
   opacity: 0;
   transition:
@@ -986,30 +807,12 @@ body.is-loading { overflow: hidden; }
     scale .9s var(--ease-shift) var(--reveal-delay, 0ms);
 }
 
-[data-reveal].from-below {
-  translate: 0 64px;
-  scale: .97;
-}
+[data-reveal].from-below { translate: 0 64px; scale: .97; }
+[data-reveal].from-above { translate: 0 -64px; scale: .97; }
+[data-reveal].is-in { opacity: 1; translate: 0 0; scale: 1; }
+[data-reveal].no-transition { transition: none !important; }
 
-[data-reveal].from-above {
-  translate: 0 -64px;
-  scale: .97;
-}
-
-[data-reveal].is-in {
-  opacity: 1;
-  translate: 0 0;
-  scale: 1;
-}
-
-/* 切换方向或重置时，瞬时完成，不播放过渡 */
-[data-reveal].no-transition {
-  transition: none !important;
-}
-
-/* ------------------------------------------------------------
-   13. 响应式
-   ------------------------------------------------------------ */
+/* ============ 响应式 ============ */
 @media (max-width: 720px) {
   .mobile-menu-btn { display: grid; }
 
@@ -1029,6 +832,7 @@ body.is-loading { overflow: hidden; }
     transform: translateY(-10px);
     transition: opacity .25s ease, transform .25s ease, visibility .25s;
   }
+
   .nav-links.open { opacity: 1; visibility: visible; transform: none; }
   .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
 
@@ -1043,9 +847,7 @@ body.is-loading { overflow: hidden; }
   .main { padding-left: 20px; padding-right: 20px; }
   .section { padding: 28px 0; }
   .contact { padding: 8px 20px 20px; }
-  .maintenance-card { padding: 40px 26px; }
 
-  /* 小屏位移略减，双向保持对称 */
   [data-reveal].from-below { translate: 0 44px; scale: .98; }
   [data-reveal].from-above { translate: 0 -44px; scale: .98; }
 }
@@ -1053,13 +855,9 @@ body.is-loading { overflow: hidden; }
 @media (max-width: 400px) {
   .hero-title { font-size: 2.9rem; }
   .hero-subtitle { font-size: 2.4rem; }
-  .maintenance-card h1 { font-size: 1.4rem; }
-  .m-eta { padding: 10px 20px; font-size: .84rem; }
 }
 
-/* ------------------------------------------------------------
-   14. 无障碍：减少动效
-   ------------------------------------------------------------ */
+/* ============ 减少动效 ============ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
@@ -1084,16 +882,14 @@ body.is-loading { overflow: hidden; }
 </style>
 </head>
 
-<body class="is-loading">
+<body>
 
-<!-- ================= 加载页 ================= -->
 <div id="loader" role="status" aria-live="polite">
   <span class="sr-only">页面加载中</span>
   <div class="loader-logo"><em>MeowRc</em> Blog</div>
   <div class="loader-bar"><i></i></div>
 </div>
 
-<!-- ================= 博客内容 ================= -->
 <div id="blog" hidden>
 
   <h1 class="sr-only">MeowRc Blog — 个人技术博客</h1>
@@ -1103,30 +899,25 @@ body.is-loading { overflow: hidden; }
       <a href="#home" class="nav-brand"><em>MeowRc</em> Blog</a>
 
       <ul class="nav-links" id="navLinks">
-        <li><a href="#home"     class="nav-link active" data-section="home">主页</a></li>
-        <li><a href="#projects" class="nav-link"        data-section="projects">项目</a></li>
-        <li><a href="#contact"  class="nav-link"        data-section="contact">联系</a></li>
+        <li><a href="#home" class="nav-link active" data-section="home">主页</a></li>
+        <li><a href="#projects" class="nav-link" data-section="projects">项目</a></li>
+        <li><a href="#contact" class="nav-link" data-section="contact">联系</a></li>
+        <li><a href="/Download" class="nav-link">下载</a></li>
       </ul>
 
       <div class="nav-actions">
-        <button class="icon-btn theme-toggle" id="themeToggle"
-                type="button" aria-label="切换深色/浅色主题">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="切换主题">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <circle cx="12" cy="12" r="4"/>
             <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
           </svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
 
-        <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn"
-                type="button" aria-label="打开菜单" aria-expanded="false"
-                aria-controls="navLinks">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="菜单" aria-expanded="false" aria-controls="navLinks">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16"/>
           </svg>
         </button>
@@ -1149,8 +940,7 @@ body.is-loading { overflow: hidden; }
 
     <a class="scroll-hint" href="#blog-posts">
       <span>向下滚动探索</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M6 9l6 6 6-6"/>
       </svg>
     </a>
@@ -1166,9 +956,7 @@ body.is-loading { overflow: hidden; }
       </header>
 
       <div class="post-list">
-        <a class="post card" data-reveal
-           href="https://github.com/MeowRC/kernel_xiaomi_mt6785"
-           target="_blank" rel="noopener noreferrer">
+        <a class="post card" data-reveal href="https://github.com/MeowRC/kernel_xiaomi_mt6785" target="_blank" rel="noopener noreferrer">
           <time class="post-date" datetime="2026-06-01">2026-06-01</time>
           <h3 class="post-title">kernel_xiaomi_mt6785-Begonia</h3>
           <p class="post-excerpt">小米 Redmi Note 8 Pro 内核源码。</p>
@@ -1178,9 +966,7 @@ body.is-loading { overflow: hidden; }
           </div>
         </a>
 
-        <a class="post card" data-reveal
-           href="https://github.com/MeowRC/ManifestHub"
-           target="_blank" rel="noopener noreferrer">
+        <a class="post card" data-reveal href="https://github.com/MeowRC/ManifestHub" target="_blank" rel="noopener noreferrer">
           <time class="post-date" datetime="2026-05-24">2026-05-24</time>
           <h3 class="post-title">ManifestHub</h3>
           <p class="post-excerpt">蒸汽仓库清单缓存。</p>
@@ -1189,9 +975,7 @@ body.is-loading { overflow: hidden; }
           </div>
         </a>
 
-        <a class="post card" data-reveal
-           href="https://github.com/MeowRC/OpenSteamTool"
-           target="_blank" rel="noopener noreferrer">
+        <a class="post card" data-reveal href="https://github.com/MeowRC/OpenSteamTool" target="_blank" rel="noopener noreferrer">
           <time class="post-date" datetime="2026-07-10">2026-07-10</time>
           <h3 class="post-title">OpenSteamTool</h3>
           <p class="post-excerpt">Steam 工具箱，提供多种实用功能。</p>
@@ -1211,9 +995,7 @@ body.is-loading { overflow: hidden; }
       </header>
 
       <div class="projects">
-        <a class="project card" data-reveal
-           href="https://github.com/MeowRC/kernel_xiaomi_mt6785"
-           target="_blank" rel="noopener noreferrer">
+        <a class="project card" data-reveal href="https://github.com/MeowRC/kernel_xiaomi_mt6785" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">🐧</div>
           <h3>kernel_xiaomi_mt6785</h3>
           <p>Begonia 内核优化。</p>
@@ -1223,9 +1005,7 @@ body.is-loading { overflow: hidden; }
           </div>
         </a>
 
-        <a class="project card" data-reveal
-           href="https://github.com/MeowRC/ManifestHub"
-           target="_blank" rel="noopener noreferrer">
+        <a class="project card" data-reveal href="https://github.com/MeowRC/ManifestHub" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">📋</div>
           <h3>ManifestHub</h3>
           <p>清单管理工具。</p>
@@ -1234,9 +1014,7 @@ body.is-loading { overflow: hidden; }
           </div>
         </a>
 
-        <a class="project card" data-reveal
-           href="https://github.com/MeowRC/clash-verge-rev/tree/dev"
-           target="_blank" rel="noopener noreferrer">
+        <a class="project card" data-reveal href="https://github.com/MeowRC/clash-verge-rev/tree/dev" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">🌐</div>
           <h3>clash-verge-rev</h3>
           <p>Clash Verge Rev 分支。</p>
@@ -1246,9 +1024,7 @@ body.is-loading { overflow: hidden; }
           </div>
         </a>
 
-        <a class="project card" data-reveal
-           href="https://github.com/MeowRC/OpenSteamTool"
-           target="_blank" rel="noopener noreferrer">
+        <a class="project card" data-reveal href="https://github.com/MeowRC/OpenSteamTool" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">🎮</div>
           <h3>OpenSteamTool</h3>
           <p>Steam 工具箱。</p>
@@ -1293,12 +1069,10 @@ body.is-loading { overflow: hidden; }
         </div>
 
         <div class="contact-socials">
-          <a class="social-link" href="https://github.com/MeowRC"
-             target="_blank" rel="noopener noreferrer">
+          <a class="social-link" href="https://github.com/MeowRC" target="_blank" rel="noopener noreferrer">
             <span aria-hidden="true">🐙</span> GitHub
           </a>
-          <a class="social-link" href="https://space.bilibili.com/1530445970"
-             target="_blank" rel="noopener noreferrer">
+          <a class="social-link" href="https://space.bilibili.com/1530445970" target="_blank" rel="noopener noreferrer">
             <span aria-hidden="true">📺</span> Bilibili
           </a>
         </div>
@@ -1312,161 +1086,72 @@ body.is-loading { overflow: hidden; }
   </footer>
 
   <button class="to-top" id="toTop" type="button" aria-label="回到顶部">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M18 15l-6-6-6 6"/>
     </svg>
   </button>
 
 </div>
 
-<!-- ================= 维护模式 ================= -->
-<div id="maintenance" class="maintenance" hidden>
-  <div class="maintenance-card">
-    <div class="m-logo"><em>MeowRc</em> Blog</div>
-
-    <div class="m-gear" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
-      </svg>
-    </div>
-
-    <h1>网站维护中</h1>
-    <p>正在进行升级，请稍后再来。</p>
-
-    <div class="m-eta">
-      <span class="m-dot" aria-hidden="true"></span>预计 2 小时内恢复
-    </div>
-
-    <div class="m-actions">
-      <a class="social-link" href="mailto:rc_cat@qq.com">
-        <span aria-hidden="true">📧</span> 邮箱
-      </a>
-      <a class="social-link" href="https://github.com/MeowRC"
-         target="_blank" rel="noopener noreferrer">
-        <span aria-hidden="true">🐙</span> GitHub
-      </a>
-    </div>
-
-    <div class="m-footer">
-      &copy; 2026 <em style="color:var(--accent-strong);font-style:normal;font-weight:600">MeowRc</em> Blog
-    </div>
-  </div>
-</div>
-
-<!-- ================= 脚本 ================= -->
 <script>
 (function () {
   'use strict';
 
-  var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
-  var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); };
-  var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
-
-  var cs = getComputedStyle(document.documentElement);
-  var T = {
-    fill:   parseInt(cs.getPropertyValue('--t-fill'), 10)   || 2000,
-    buffer: parseInt(cs.getPropertyValue('--t-buffer'), 10) || 120,
-    slide:  parseInt(cs.getPropertyValue('--t-slide'), 10)  || 720,
-    enter:  parseInt(cs.getPropertyValue('--t-enter'), 10)  || 180
-  };
+  /* ============ 工具 ============ */
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
   var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ============================================================
-     主题切换
-     ============================================================ */
-  function initTheme() {
-    var btn = $('#themeToggle');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
+  var loader = document.getElementById('loader');
+  var blog = document.getElementById('blog');
+  var navbar = document.getElementById('navbar');
+  var toTop = document.getElementById('toTop');
+
+  /* ============ 主题切换 ============ */
+  var themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
       var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
       document.documentElement.dataset.theme = next;
       try { localStorage.setItem('theme', next); } catch (e) {}
     });
   }
 
-  /* ============================================================
-     维护模式
-     ============================================================ */
-  function initMaintenance() {
-    var params = new URLSearchParams(location.search);
-    if (params.get('maintenance') !== '1') return false;
-
-    var loader = $('#loader');
-    if (loader) loader.remove();
-
-    $('#maintenance').hidden = false;
-    $('#blog').hidden = true;
-    document.title = 'MeowRc Blog · 维护中';
-    document.body.classList.remove('is-loading');
-    return true;
-  }
-
-  /* ============================================================
-     锚点滚动
-     ============================================================ */
+  /* ============ 锚点滚动 ============ */
   function initAnchors() {
-    var navH = parseInt(cs.getPropertyValue('--nav-h'), 10) || 64;
+    var navH = 64;
     var offset = navH + 24;
 
     $$('a[href^="#"]').forEach(function (link) {
       link.addEventListener('click', function (e) {
         var href = link.getAttribute('href');
         if (!href || href === '#') return;
-
         var target = document.getElementById(href.slice(1));
         if (!target) return;
 
         e.preventDefault();
-
         var top = target.getBoundingClientRect().top + window.scrollY - offset;
-
         window.scrollTo({
           top: Math.max(0, top),
           behavior: prefersReduced ? 'auto' : 'smooth'
         });
-
-        if (history.replaceState) {
-          history.replaceState(null, '', href);
-        } else {
-          location.hash = href;
-        }
+        if (history.replaceState) history.replaceState(null, '', href);
       });
     });
   }
 
-  /* ============================================================
-     滚动显现 —— 双向、可重复
-
-     ★ 关键修复：initReveal 一开始就给所有元素预置 .from-below，
-       让它们从"页面加载完成"这一刻就处于正确的待命位置。
-       这样第一次滚动进入视口时，只需要叠加 .is-in，
-       过渡能真正从 64px 位移播放到 0 —— 首次动画不再丢失。
-
-     方向判断：
-       · 进入视口时若 rect.top >= 0 → 元素从下方进来 → from-below
-       · 进入视口时若 rect.top < 0  → 元素从上方进来 → from-above
-
-     切换方向或重置时，临时加 .no-transition 禁用过渡，
-     避免播放不需要的中间动画。
-     ============================================================ */
+  /* ============ 双向滚动显现 ============ */
   function initReveal() {
     var els = $$('[data-reveal]');
 
-    /* 减少动效 / 不支持观察器：直接展示 */
     if (!('IntersectionObserver' in window) || prefersReduced) {
-      els.forEach(function (el) {
-        el.classList.add('from-below', 'is-in');
-      });
+      els.forEach(function (el) { el.classList.add('from-below', 'is-in'); });
       return;
     }
 
-    /* ① 预置待命位置 —— 这是首次动画能正常播放的关键 */
     els.forEach(function (el, i) {
       el.classList.add('from-below');
-      /* 每组最多 6 个错开 75ms，形成波浪式入场 */
       el.style.setProperty('--reveal-delay', ((i % 6) * 75) + 'ms');
     });
 
@@ -1475,16 +1160,13 @@ body.is-loading { overflow: hidden; }
         var el = entry.target;
 
         if (entry.isIntersecting) {
-          /* 已在位则不重复处理 */
           if (el.classList.contains('is-in')) return;
 
-          /* 判断方向 */
           var fromBelow = entry.boundingClientRect.top >= 0;
           var wanted = fromBelow ? 'from-below' : 'from-above';
           var current = el.classList.contains('from-below') ? 'from-below' :
                        (el.classList.contains('from-above') ? 'from-above' : null);
 
-          /* 方向不一致时切换 —— 用 no-transition 确保瞬时完成 */
           if (current !== wanted) {
             el.classList.add('no-transition');
             el.classList.remove('from-below', 'from-above');
@@ -1492,12 +1174,8 @@ body.is-loading { overflow: hidden; }
             void el.offsetWidth;
             el.classList.remove('no-transition');
           }
-
-          /* 叠加 .is-in，触发过渡到最终位置 */
           el.classList.add('is-in');
-
         } else {
-          /* 离开视口 → 瞬时重置回待命位置 */
           if (el.classList.contains('is-in')) {
             el.classList.add('no-transition');
             el.classList.remove('is-in');
@@ -1506,28 +1184,17 @@ body.is-loading { overflow: hidden; }
           }
         }
       });
-    }, {
-      threshold: 0,
-      rootMargin: '-60px 0px -60px 0px'
-    });
+    }, { threshold: 0, rootMargin: '-60px 0px -60px 0px' });
 
     els.forEach(function (el) { io.observe(el); });
   }
 
-  /* ============================================================
-     打字机
-     ============================================================ */
+  /* ============ 打字机 ============ */
   function initTypewriter() {
-    var el = $('#typingTarget');
+    var el = document.getElementById('typingTarget');
     if (!el) return;
-
     var text = el.dataset.text || el.textContent || '';
-
-    if (prefersReduced) {
-      el.textContent = text;
-      return;
-    }
-
+    if (prefersReduced) { el.textContent = text; return; }
     el.textContent = '';
     var i = 0;
     (function step() {
@@ -1537,12 +1204,8 @@ body.is-loading { overflow: hidden; }
     })();
   }
 
-  /* ============================================================
-     导航 · 滚动 · 状态
-     ============================================================ */
+  /* ============ 滚动 UI ============ */
   function initScrollUI() {
-    var navbar = $('#navbar');
-    var toTop = $('#toTop');
     var navLinks = $$('.nav-link');
     var sections = $$('.hero[id], .section[id]');
     var ticking = false;
@@ -1554,6 +1217,7 @@ body.is-loading { overflow: hidden; }
         if (pos >= sec.offsetTop) current = sec.id;
       });
       navLinks.forEach(function (link) {
+        if (!link.dataset.section) return;
         link.classList.toggle('active', link.dataset.section === current);
       });
     }
@@ -1563,8 +1227,8 @@ body.is-loading { overflow: hidden; }
       ticking = true;
       requestAnimationFrame(function () {
         var y = window.scrollY;
-        navbar.classList.toggle('scrolled', y > 10);
-        toTop.classList.toggle('show', y > 500);
+        if (navbar) navbar.classList.toggle('scrolled', y > 10);
+        if (toTop) toTop.classList.toggle('show', y > 500);
         updateActive();
         ticking = false;
       });
@@ -1572,17 +1236,17 @@ body.is-loading { overflow: hidden; }
 
     updateActive();
 
-    toTop.addEventListener('click', function () {
-      window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
-    });
+    if (toTop) {
+      toTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+      });
+    }
   }
 
-  /* ============================================================
-     移动端菜单
-     ============================================================ */
+  /* ============ 移动端菜单 ============ */
   function initMobileMenu() {
-    var btn = $('#mobileMenuBtn');
-    var list = $('#navLinks');
+    var btn = document.getElementById('mobileMenuBtn');
+    var list = document.getElementById('navLinks');
     if (!btn || !list) return;
 
     function close() {
@@ -1611,18 +1275,30 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ============================================================
-     启动流程
-     ============================================================ */
-  function boot() {
-    var loader = $('#loader');
-    var blog = $('#blog');
+  /* ============ 加载流程 ============ */
+  function enterPage() {
+    if (!blog) return;
+    blog.hidden = false;
+    blog.classList.add('page-enter');
+  }
 
+  function boot() {
+    /* 维护模式 */
+    var params;
+    try { params = new URLSearchParams(location.search); } catch (e) { params = null; }
+    if (params && params.get('maintenance') === '1') {
+      if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+      var maint = document.getElementById('maintenance');
+      if (maint) maint.hidden = false;
+      if (blog) blog.hidden = true;
+      document.title = 'MeowRc Blog · 维护中';
+      return;
+    }
+
+    /* 减少动效：直接显示 */
     if (prefersReduced) {
-      if (loader) loader.remove();
-      blog.hidden = false;
-      blog.classList.add('page-enter');
-      document.body.classList.remove('is-loading');
+      if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+      enterPage();
       initReveal();
       initTypewriter();
       initScrollUI();
@@ -1631,34 +1307,32 @@ body.is-loading { overflow: hidden; }
       return;
     }
 
-    blog.hidden = false;
+    /* 常规：加载页 → 滑出 → 主内容入场 */
+    enterPage();
 
-    (async function run() {
-      await wait(T.fill + T.buffer);
+    setTimeout(function () {
+      if (loader) loader.classList.add('slide-out');
 
-      loader.classList.add('slide-out');
-
-      await wait(T.enter);
-      blog.classList.add('page-enter');
-      document.body.classList.remove('is-loading');
-
-      await wait(T.slide - T.enter);
-      if (loader.parentNode) loader.remove();
-
-      initReveal();
-      initTypewriter();
-    })();
+      setTimeout(function () {
+        if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+        initReveal();
+        initTypewriter();
+      }, 720);
+    }, 2240);
 
     initScrollUI();
     initMobileMenu();
     initAnchors();
   }
 
-  /* ============================================================
-     入口
-     ============================================================ */
-  initTheme();
-  if (!initMaintenance()) boot();
+  /* 启动 */
+  try {
+    boot();
+  } catch (e) {
+    /* 出错也要保证内容显示 */
+    if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+    if (blog) { blog.hidden = false; blog.classList.add('page-enter'); }
+  }
 })();
 </script>
 
