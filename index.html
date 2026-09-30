@@ -8,13 +8,13 @@
 <title>MeowRc Blog</title>
 
 <script>
-/* 主题预设 + 兜底：无论后面 JS 出什么问题，5 秒后强制显示内容 */
+/* 主题预设 + 兜底：5 秒后强制显示内容 */
 (function () {
   try {
-    var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light') {
-      t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
+    var stored = localStorage.getItem('theme');
+    var t = (stored === 'dark' || stored === 'light')
+      ? stored
+      : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.dataset.theme = t;
   } catch (e) {}
 })();
@@ -98,6 +98,8 @@ body {
 a { color: inherit; }
 button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
 [hidden] { display: none !important; }
+
+body.is-loading { overflow: hidden; }
 
 ::selection { background: var(--accent); color: #fff; }
 
@@ -255,6 +257,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 
 .nav-links a:hover { color: var(--text); background: var(--accent-soft); }
+
 .nav-links a.active {
   color: var(--accent-strong);
   background: var(--accent-soft);
@@ -882,7 +885,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 </style>
 </head>
 
-<body>
+<body class="is-loading">
 
 <div id="loader" role="status" aria-live="polite">
   <span class="sr-only">页面加载中</span>
@@ -902,7 +905,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
         <li><a href="#home" class="nav-link active" data-section="home">主页</a></li>
         <li><a href="#projects" class="nav-link" data-section="projects">项目</a></li>
         <li><a href="#contact" class="nav-link" data-section="contact">联系</a></li>
-        <li><a href="/Download" class="nav-link">下载</a></li>
+        <!-- ↓↓↓ 唯一改动：/Download → /Online，下载 → 在线 ↓↓↓ -->
+        <li><a href="/Online" class="nav-link">在线</a></li>
+        <!-- ↑↑↑ 唯一改动 ↑↑↑ -->
       </ul>
 
       <div class="nav-actions">
@@ -1097,7 +1102,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 (function () {
   'use strict';
 
-  /* ============ 工具 ============ */
   function $(sel) { return document.querySelector(sel); }
   function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
@@ -1283,7 +1287,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   }
 
   function boot() {
-    /* 维护模式 */
     var params;
     try { params = new URLSearchParams(location.search); } catch (e) { params = null; }
     if (params && params.get('maintenance') === '1') {
@@ -1295,7 +1298,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
       return;
     }
 
-    /* 减少动效：直接显示 */
     if (prefersReduced) {
       if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
       enterPage();
@@ -1307,7 +1309,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
       return;
     }
 
-    /* 常规：加载页 → 滑出 → 主内容入场 */
     enterPage();
 
     setTimeout(function () {
@@ -1325,11 +1326,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
     initAnchors();
   }
 
-  /* 启动 */
   try {
     boot();
   } catch (e) {
-    /* 出错也要保证内容显示 */
     if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
     if (blog) { blog.hidden = false; blog.classList.add('page-enter'); }
   }
