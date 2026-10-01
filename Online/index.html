@@ -10,6 +10,12 @@
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
 <script>
+/* ============================================================
+   主题预设（跟随系统时间）
+   · 白天 6:00 - 18:00 → 浅色
+   · 夜晚 18:00 - 6:00 → 深色
+   · 手动切换后优先保留 6 小时，过期后恢复自动
+   ============================================================ */
 (function () {
   var OVERRIDE_TTL = 6 * 60 * 60 * 1000;
 
@@ -1137,7 +1143,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
     });
   } catch (e) {}
 
-  /* ---------- 主题切换 ---------- */
+  /* ---------- 主题切换（与顶部脚本配合） ----------
+     点击后立即切换，并把「手动设置 + 时间戳」写入 localStorage。
+     顶部脚本每分钟检查一次，手动设置过期后自动恢复跟随时间。 */
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
