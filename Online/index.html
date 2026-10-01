@@ -449,6 +449,10 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 .dl-card:hover::before { transform: scaleX(1); }
 
+/* 展开状态的卡片：顶部渐变条常驻，边框高亮 */
+.dl-card.expanded::before { transform: scaleX(1); }
+.dl-card.expanded { border-color: var(--accent); }
+
 .dl-head {
   display: flex;
   align-items: flex-start;
@@ -534,6 +538,15 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   stroke-width: 2.2;
 }
 
+.dl-btn--sm {
+  padding: 6px 16px;
+  font-size: .78rem;
+  gap: 5px;
+  box-shadow: 0 3px 10px rgba(245, 160, 184, .3);
+}
+
+.dl-btn--sm .icon-svg { width: 12px; height: 12px; }
+
 .dl-desc {
   font-size: .9rem;
   line-height: 1.6;
@@ -578,6 +591,100 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   justify-content: center;
   padding: 8px 16px;
   font-size: .8rem;
+}
+
+/* ============ 可展开卡片（多版本） ============ */
+.dl-expand-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  border-radius: 12px;
+  transition: opacity .2s;
+}
+
+.dl-expand-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.dl-chevron {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 9px;
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition:
+    transform .4s var(--ease-spring),
+    background-color .25s,
+    color .25s,
+    border-color .25s;
+}
+
+.dl-expand-head:hover .dl-chevron {
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dl-card.expanded .dl-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* 版本列表容器：折叠动画 */
+.dl-versions {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height .5s var(--ease-out),
+    opacity .35s ease,
+    margin-top .35s ease;
+}
+
+.dl-card.expanded .dl-versions {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 4px;
+}
+
+/* 单个版本行 */
+.dl-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: border-color .2s ease, background-color .2s ease;
+}
+
+.dl-version-row + .dl-version-row { margin-top: 8px; }
+
+.dl-version-row:hover { border-color: var(--accent); }
+
+.dl-version-name {
+  font-size: .87rem;
+  font-weight: 550;
+  letter-spacing: -.005em;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ============ 页脚 & 回到顶部 ============ */
@@ -669,12 +776,17 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
   .dl-links .dl-btn { flex: 1 1 100%; }
 
+  .dl-version-row { padding: 10px 13px; gap: 8px; }
+  .dl-version-name { font-size: .82rem; }
+  .dl-btn--sm { padding: 6px 13px; font-size: .74rem; }
+
   [data-reveal].from-below { translate: 0 44px; scale: .98; }
   [data-reveal].from-above { translate: 0 -44px; scale: .98; }
 }
 
 @media (max-width: 400px) {
   .dl-card { padding: 20px 22px; }
+  .dl-version-name { font-size: .78rem; }
 }
 
 /* ============ 减少动效 ============ */
@@ -761,7 +873,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
     <div class="downloads">
 
-      <!-- 卡巴斯基小助手（新增） -->
+      <!-- 卡巴斯基小助手 -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -799,6 +911,78 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
             </svg>
             123 云盘
           </span>
+        </div>
+      </article>
+
+      <!-- Redmi Note 8 Pro 内核（可展开多版本） -->
+      <article class="dl-card dl-card--expand" id="kernelCard" data-reveal>
+        <button class="dl-expand-head" type="button"
+                aria-expanded="false" aria-controls="kernelVersions"
+                id="kernelToggle">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M12 2l9 5-9 5-9-5 9-5z"/>
+                <path d="M3 12l9 5 9-5"/>
+                <path d="M3 17l9 5 9-5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">Redmi Note 8 Pro 内核</div>
+              <div class="dl-version">4 个版本可选</div>
+            </div>
+          </div>
+          <span class="dl-chevron" aria-hidden="true">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </span>
+        </button>
+
+        <p class="dl-desc">小米 Redmi Note 8 Pro（Begonia）定制内核，支持 KernelSU 与多种优化。点击展开查看全部版本。</p>
+
+        <div class="dl-versions" id="kernelVersions" role="region" aria-label="内核版本列表">
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">KSU 4.14.336F</span>
+            <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-b04t3" target="_blank" rel="noopener noreferrer">
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">KSU 4.14.336</span>
+            <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-ppie3" target="_blank" rel="noopener noreferrer">
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">KSU 4.14.326</span>
+            <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-gNHu3" target="_blank" rel="noopener noreferrer">
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">AK3 KSUNEXT 4.14 olena</span>
+            <a class="dl-btn dl-btn--sm" href="https://www.ilanzou.com/s/0oG9weMx" target="_blank" rel="noopener noreferrer">
+              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
         </div>
       </article>
 
@@ -958,48 +1142,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
         </div>
       </article>
 
-      <!-- kernel -->
-      <article class="dl-card" data-reveal>
-        <div class="dl-head">
-          <div class="dl-title-wrap">
-            <div class="dl-icon" aria-hidden="true">
-              <svg class="icon-svg" viewBox="0 0 24 24">
-                <rect x="6" y="6" width="12" height="12" rx="2"/>
-                <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
-                <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>
-              </svg>
-            </div>
-            <div>
-              <div class="dl-name">kernel_xiaomi_mt6785</div>
-              <div class="dl-version">v4.14.336</div>
-            </div>
-          </div>
-          <a class="dl-btn" href="https://github.com/MeowRC/kernel_xiaomi_mt6785/releases/latest" target="_blank" rel="noopener noreferrer">
-            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
-            </svg>
-            下载
-          </a>
-        </div>
-        <p class="dl-desc">小米 Redmi Note 8 Pro（Begonia）内核源码与编译产物。</p>
-        <div class="dl-info">
-          <span>
-            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="5" y="2" width="14" height="20" rx="2"/>
-              <path d="M12 18h.01"/>
-            </svg>
-            Android
-          </span>
-          <span>
-            <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M21 8l-9 12-9-12 9-4z"/>
-              <path d="M3 8h18M12 4v16"/>
-            </svg>
-            24.7 MB
-          </span>
-        </div>
-      </article>
-
       <!-- clash-verge-rev -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
@@ -1080,7 +1222,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
   var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- 主题切换（与顶部脚本配合） ---------- */
+  /* ---------- 主题切换 ---------- */
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
@@ -1090,6 +1232,19 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
         localStorage.setItem('theme', next);
         localStorage.setItem('themeAt', String(Date.now()));
       } catch (e) {}
+    });
+  }
+
+  /* ---------- 可展开卡片 ---------- */
+  function initExpandCards() {
+    $$('.dl-card--expand').forEach(function (card) {
+      var head = card.querySelector('.dl-expand-head');
+      if (!head) return;
+
+      head.addEventListener('click', function () {
+        var expanded = card.classList.toggle('expanded');
+        head.setAttribute('aria-expanded', String(expanded));
+      });
     });
   }
 
@@ -1199,6 +1354,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   }
 
   try {
+    initExpandCards();
     initReveal();
     initScrollUI();
     initMobileMenu();
