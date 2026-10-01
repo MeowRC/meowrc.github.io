@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+
+<script>
+/* 反向检测：现代浏览器误入兼容版时，重定向回现代版 */
+(function () {
+  function isModern() {
+    if (!window.CSS || !CSS.supports) return false;
+    return CSS.supports('translate', '0 64px') &&
+           CSS.supports('inset', '0');
+  }
+
+  var cached;
+  try { cached = sessionStorage.getItem('modernBrowser'); } catch (e) {}
+
+  var modern;
+  if (cached === '1') modern = true;
+  else if (cached === '0') modern = false;
+  else {
+    modern = isModern();
+    try { sessionStorage.setItem('modernBrowser', modern ? '1' : '0'); } catch (e) {}
+  }
+
+  if (modern) {
+    location.replace('index.html' + location.search + location.hash);
+  }
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
+<meta name="theme-color" content="#f5a0b8" />
+<title>在线 · MeowRc Blog</title>
+
+<script>
+/* 主题跟随系统时间 */
+(function () {
+  var OVERRIDE_TTL = 6 * 60 * 60 * 1000;
+
+  function autoTheme() {
+    try {
+      var h = new Date().getHours();
+      return (h >= 6 && h < 18) ? 'light' : 'dark';
+    } catch (e) {
+      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+  }
+
+  function hasManualOverride() {
+    try {
+      var stored = localStorage.getItem('theme');
+      var at = parseInt(localStorage.getItem('themeAt') || '0', 10);
+      return (stored === 'dark' || stored === 'light') &&
+             (Date.now() - at < OVERRIDE_TTL);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function resolveTheme() {
+    if (hasManualOverride()) {
+      try { return localStorage.getItem('theme'); } catch (e) {}
+    }
+    return autoTheme();
+  }
+
+  try {
+    document.documentElement.dataset.theme = resolveTheme();
+  } catch (e) {
+    document.documentElement.dataset.theme = 'light';
+  }
+
+  setInterval(function () {
+    if (hasManualOverride()) return;
+    var next = autoTheme();
+    if (document.documentElement.dataset.theme !== next) {
+      document.documentElement.dataset.theme = next;
+    }
+  }, 60000);
+})();
+
+/* 兜底：5 秒后强制显示内容 */
+setTimeout(function () {
+  document.querySelectorAll('[data-reveal]').forEach(function (el) {
+    el.classList.add('is-in');
+  });
+}, 5000);
+</script>
+
+<style>
+:root {
+  --bg: #fdfbfc;
+  --surface: #ffffff;
+  --surface-2: #fff7fa;
+  --text: #1f1d1e;
+  --text-2: #6b6567;
+  --accent: #f5a0b8;
+  --accent-strong: #e4708f;
+  --accent-soft: #fce8ee;
+  --accent-glow: rgba(245, 160, 184, .34);
+  --border: #f0e6e9;
+  --shadow-sm: 0 1px 3px rgba(180, 120, 140, .06);
+  --shadow-md: 0 6px 24px rgba(180, 120, 140, .10);
+  --shadow-lg: 0 18px 48px rgba(180, 120, 140, .16);
+  --radius: 16px;
+  --radius-pill: 999px;
+  --nav-h: 64px;
+  --maxw: 880px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-io: cubic-bezier(.4, 0, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-shift: cubic-bezier(.16, 1, .3, 1);
+  --ease-fade: cubic-bezier(.25, .46, .45, .94);
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #14121a;
+  --surface: #1c1923;
+  --surface-2: #241f2c;
+  --text: #f0eaf0;
+  --text-2: #a49aa6;
+  --accent-strong: #ffb8cc;
+  --accent-soft: #3a2733;
+  --accent-glow: rgba(245, 160, 184, .22);
+  --border: #2e2836;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, .45);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color .4s ease, color .4s ease;
+}
+
+a { color: inherit; }
+button {
+  font: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+::selection { background: var(--accent); color: #fff; }
+
+:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============ 导航栏 ============ */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  z-index: 100;
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow .3s ease, background-color .3s ease;
+}
+
+[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
+
+.navbar.scrolled {
+  background: rgba(255, 255, 255, .92);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
+
+.navbar-inner {
+  max-width: var(--maxw);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-size: 1.22rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  margin-right: 16px;
+}
+
+.nav-brand em {
+  font-style: normal;
+  color: var(--accent-strong);
+}
+
+.nav-links {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 4px;
+  align-items: center;
+  list-style: none;
+}
+
+.nav-links a {
+  display: block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: .92rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-2);
+  transition: color .2s, background-color .2s;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  background: var(--accent-soft);
+}
+
+.nav-links a.active {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+.nav-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 4px;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border-radius: 50%;
+  color: var(--text-2);
+  transition: background-color .2s, color .2s, transform .2s;
+}
+
+.icon-btn:hover {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.icon-btn:active { transform: scale(.92); }
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] .theme-toggle .icon-sun  { display: none; }
+
+.mobile-menu-btn { display: none; }
+
+/* ============ 页头 ============ */
+.page-hero {
+  position: relative;
+  padding: 136px 24px 40px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -2;
+  background:
+    radial-gradient(50% 60% at 20% 20%, var(--accent-glow), transparent 70%),
+    radial-gradient(40% 50% at 85% 80%, var(--accent-glow), transparent 70%);
+  opacity: .8;
+}
+
+.page-hero::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: .35;
+  -webkit-mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+}
+
+.page-hero-inner {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: 22px;
+}
+
+.page-hero-inner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), #f7b8c8);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 6px;
+}
+
+.page-eyebrow svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  margin-right: 7px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.page-title {
+  font-size: 36px;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  background: linear-gradient(120deg, var(--text) 30%, var(--accent-strong));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-desc {
+  margin-top: 8px;
+  font-size: .96rem;
+  color: var(--text-2);
+  max-width: 52ch;
+}
+
+/* ============ 主体 ============ */
+.main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 8px 24px 80px;
+}
+
+.section { padding: 24px 0 36px; }
+
+.section-head {
+  position: relative;
+  margin-bottom: 20px;
+  padding-left: 18px;
+}
+
+.section-head::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), #f7b8c8);
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 4px;
+}
+
+.section-label svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  margin-right: 6px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.section-title {
+  font-size: 22px;
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-weight: 750;
+  letter-spacing: -.02em;
+}
+
+.section-desc {
+  margin-top: 2px;
+  font-size: .9rem;
+  color: var(--text-2);
+}
+
+/* ============ 下载卡片 ============ */
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.dl-card {
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition:
+    top .25s var(--ease-io),
+    box-shadow .3s ease,
+    border-color .3s ease;
+}
+
+.dl-card[data-reveal] {
+  transition:
+    top .25s var(--ease-io),
+    box-shadow .3s ease,
+    border-color .3s ease,
+    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
+    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
+}
+
+.dl-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #f7b8c8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .42s var(--ease-io);
+}
+
+.dl-card:hover {
+  top: -3px;
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.dl-card:hover::before { transform: scaleX(1); }
+
+.dl-card.expanded { border-color: var(--accent); }
+.dl-card.expanded::before { transform: scaleX(1); }
+
+.dl-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.dl-head > * + * { margin-left: 14px; }
+
+.dl-title-wrap {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.dl-title-wrap > * + * { margin-left: 12px; }
+
+.dl-icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  padding: 11px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-strong);
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(245, 160, 184, .12) 100%);
+  border: 1px solid rgba(245, 160, 184, .18);
+  box-shadow: 0 2px 8px rgba(245, 160, 184, .12);
+  transition: transform .4s var(--ease-spring), box-shadow .3s ease;
+}
+
+[data-theme="dark"] .dl-icon {
+  border-color: rgba(245, 160, 184, .12);
+  background: linear-gradient(135deg, rgba(245, 160, 184, .14) 0%, rgba(245, 160, 184, .06) 100%);
+}
+
+.dl-card:hover .dl-icon {
+  transform: scale(1.1) rotate(-6deg);
+  box-shadow: 0 6px 18px rgba(245, 160, 184, .3);
+}
+
+.dl-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-name {
+  font-size: 1.05rem;
+  font-weight: 680;
+  letter-spacing: -.012em;
+  line-height: 1.3;
+}
+
+.dl-version {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--accent-strong);
+  margin-top: 2px;
+}
+
+/* ============ 下载按钮 ============ */
+.dl-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: .86rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 4px 14px rgba(245, 160, 184, .35);
+  transition: transform .25s var(--ease-spring), box-shadow .25s, filter .25s;
+}
+
+.dl-btn svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin-right: 6px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(245, 160, 184, .5);
+  filter: brightness(1.05);
+}
+
+.dl-btn:active { transform: translateY(0); }
+
+.dl-btn--sm {
+  padding: 6px 16px;
+  font-size: .78rem;
+  box-shadow: 0 3px 10px rgba(245, 160, 184, .3);
+}
+
+.dl-btn--sm svg {
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+}
+
+/* ============ 描述、标签信息 ============ */
+.dl-desc {
+  margin-top: 14px;
+  font-size: .9rem;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.dl-info {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 10px -4px -4px;
+}
+
+.dl-info > * { margin: 4px; }
+
+.dl-info span {
+  display: inline-flex;
+  align-items: center;
+  font-size: .76rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.dl-info svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  margin-right: 5px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 多链接按钮组 */
+.dl-links {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 16px -4px -4px;
+}
+
+.dl-links > * { margin: 4px; }
+
+.dl-links .dl-btn {
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: .8rem;
+}
+
+/* ============ 可展开卡片 ============ */
+.dl-expand-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  border-radius: 12px;
+}
+
+.dl-expand-head > * + * { margin-left: 14px; }
+
+.dl-chevron {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 9px;
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition:
+    transform .4s var(--ease-spring),
+    background-color .25s,
+    color .25s,
+    border-color .25s;
+}
+
+.dl-chevron svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-expand-head:hover .dl-chevron {
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dl-card.expanded .dl-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dl-versions {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height .5s var(--ease-out),
+    opacity .35s ease,
+    margin-top .35s ease;
+}
+
+.dl-card.expanded .dl-versions {
+  max-height: 600px;
+  opacity: 1;
+  margin-top: 18px;
+}
+
+.dl-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: border-color .2s ease, background-color .2s ease;
+}
+
+.dl-version-row > * + * { margin-left: 12px; }
+
+.dl-version-row + .dl-version-row { margin-top: 8px; }
+
+.dl-version-row:hover { border-color: var(--accent); }
+
+.dl-version-name {
+  font-size: .87rem;
+  font-weight: 550;
+  letter-spacing: -.005em;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============ 页脚 & 回到顶部 ============ */
+.footer {
+  position: relative;
+  padding: 36px 24px 40px;
+  margin-top: 24px;
+  text-align: center;
+  font-size: .86rem;
+  color: var(--text-2);
+  border-top: 1px solid var(--border);
+}
+
+.footer em {
+  font-style: normal;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition:
+    opacity .3s, transform .3s, visibility .3s,
+    background-color .2s, color .2s, border-color .2s;
+}
+
+.to-top svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.to-top:active { transform: scale(.94); }
+
+/* ============ 滚动显现（兼容版） ============ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(64px) scale(.97);
+  transition:
+    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
+    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
+}
+
+[data-reveal].from-above {
+  transform: translateY(-64px) scale(.97);
+}
+
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+[data-reveal].no-transition { transition: none !important; }
+
+/* ============ 响应式 ============ */
+@media (max-width: 720px) {
+  .mobile-menu-btn { display: grid; }
+
+  .nav-links {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    grid-auto-flow: row;
+    grid-row-gap: 2px;
+    grid-column-gap: 0;
+    padding: 12px 16px 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    border-radius: 0 0 20px 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s;
+  }
+
+  .nav-links.open { opacity: 1; visibility: visible; transform: none; }
+  .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
+
+  .page-hero { padding: 120px 20px 32px; }
+  .page-hero-inner { padding-left: 18px; }
+
+  .main { padding-left: 20px; padding-right: 20px; }
+
+  .dl-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dl-head > * + * { margin-left: 0; margin-top: 14px; }
+  .dl-head > .dl-btn { justify-content: center; width: 100%; }
+
+  .dl-links .dl-btn { flex: 1 1 100%; }
+
+  .dl-version-row { padding: 10px 13px; }
+  .dl-version-name { font-size: .82rem; }
+  .dl-btn--sm { padding: 6px 13px; font-size: .74rem; }
+
+  [data-reveal] { transform: translateY(44px) scale(.98); }
+  [data-reveal].from-above { transform: translateY(-44px) scale(.98); }
+  [data-reveal].is-in { transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 400px) {
+  .dl-card { padding: 20px 22px; }
+  .dl-version-name { font-size: .78rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<h1 class="sr-only">在线 — MeowRc Blog</h1>
+
+<!-- 导航栏 -->
+<nav class="navbar" id="navbar" aria-label="主导航">
+  <div class="navbar-inner">
+    <a href="../index-legacy.html" class="nav-brand"><em>MeowRc</em> Blog</a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../index-legacy.html" class="nav-link">主页</a></li>
+      <li><a href="../index-legacy.html#projects" class="nav-link">项目</a></li>
+      <li><a href="../index-legacy.html#contact" class="nav-link">联系</a></li>
+      <li><a href="index-legacy.html" class="nav-link active">在线</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="切换主题">
+        <svg viewBox="0 0 24 24" class="icon-sun" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg viewBox="0 0 24 24" class="icon-moon" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+
+      <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="菜单" aria-expanded="false" aria-controls="navLinks">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- 页头 -->
+<header class="page-hero">
+  <div class="page-hero-inner">
+    <div class="page-eyebrow">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6L5.7 21 8 14 2 9.2h7.6z"/>
+      </svg>
+      在线
+    </div>
+    <h2 class="page-title">在线</h2>
+    <p class="page-desc">获取最新的软件与工具发布版本，全部开源免费。</p>
+  </div>
+</header>
+
+<!-- 主体 -->
+<main class="main">
+
+  <section class="section" id="download" aria-labelledby="download-title">
+    <header class="section-head" data-reveal>
+      <span class="section-label">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+        </svg>
+        下载
+      </span>
+      <h2 class="section-title" id="download-title">软件下载</h2>
+      <p class="section-desc">获取最新的软件与工具发布版本。</p>
+    </header>
+
+    <div class="downloads">
+
+      <!-- 卡巴斯基小助手 -->
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">卡巴斯基小助手</div>
+              <div class="dl-version">v1.0.0</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-704t3" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">卡巴斯基辅助工具，提供激活管理、配置优化等实用功能。</p>
+        <div class="dl-info">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Windows
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 8l-9 12-9-12 9-4z"/>
+              <path d="M3 8h18M12 4v16"/>
+            </svg>
+            123 云盘
+          </span>
+        </div>
+      </article>
+
+      <!-- Redmi Note 8 Pro 内核（可展开多版本） -->
+      <article class="dl-card dl-card--expand" id="kernelCard" data-reveal>
+        <button class="dl-expand-head" type="button"
+                aria-expanded="false" aria-controls="kernelVersions"
+                id="kernelToggle">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2l9 5-9 5-9-5 9-5z"/>
+                <path d="M3 12l9 5 9-5"/>
+                <path d="M3 17l9 5 9-5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">Redmi Note 8 Pro 内核</div>
+              <div class="dl-version">4 个版本可选</div>
+            </div>
+          </div>
+          <span class="dl-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </span>
+        </button>
+
+        <p class="dl-desc">小米 Redmi Note 8 Pro（Begonia）定制内核，支持 KernelSU 与多种优化。点击展开查看全部版本。</p>
+
+        <div class="dl-versions" id="kernelVersions" role="region" aria-label="内核版本列表">
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">KSU 4.14.336F</span>
+            <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-b04t3" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">KSU 4.14.336</span>
+            <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-ppie3" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">KSU 4.14.326</span>
+            <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-gNHu3" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+          <div class="dl-version-row">
+            <span class="dl-version-name">AK3 KSUNEXT 4.14 olena</span>
+            <a class="dl-btn dl-btn--sm" href="https://www.ilanzou.com/s/0oG9weMx" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+              </svg>
+              下载
+            </a>
+          </div>
+
+        </div>
+      </article>
+
+      <!-- NCM 转 MP3 -->
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">NCM 转 MP3</div>
+              <div class="dl-version">v1.0.0</div>
+            </div>
+          </div>
+        </div>
+        <p class="dl-desc">网易云音乐 NCM 加密格式转换工具，一键导出为标准 MP3，支持批量处理。</p>
+        <div class="dl-info">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Windows
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 8l-9 12-9-12 9-4z"/>
+              <path d="M3 8h18M12 4v16"/>
+            </svg>
+            小体积
+          </span>
+        </div>
+        <div class="dl-links">
+          <a class="dl-btn" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-MSJK3" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            123 云盘
+          </a>
+          <a class="dl-btn" href="https://www.ilanzou.com/s/I1OuotAw" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            蓝奏云
+          </a>
+          <a class="dl-btn" href="https://github.com/MeowRC/-/releases/download/1/Ncm.mp3.exe" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </article>
+
+      <!-- OpenSteamTool -->
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M6 8h4M8 6v4"/>
+                <circle cx="16" cy="10" r="1"/>
+                <circle cx="18" cy="13" r="1"/>
+                <path d="M17.3 4H6.7a4 4 0 0 0-4 3.5L2 15a3 3 0 0 0 3 3 3 3 0 0 0 2.4-1.2L9 15h6l1.6 1.8A3 3 0 0 0 19 18a3 3 0 0 0 3-3l-.7-7.5A4 4 0 0 0 17.3 4z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">OpenSteamTool</div>
+              <div class="dl-version">v2.1.0</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://github.com/MeowRC/OpenSteamTool/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">Steam 工具箱，提供清单缓存、下载加速等多种实用功能。</p>
+        <div class="dl-info">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Windows
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 8l-9 12-9-12 9-4z"/>
+              <path d="M3 8h18M12 4v16"/>
+            </svg>
+            18.4 MB
+          </span>
+        </div>
+      </article>
+
+      <!-- ManifestHub -->
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 6h11M9 12h11M9 18h11"/>
+                <circle cx="4.5" cy="6" r="1"/>
+                <circle cx="4.5" cy="12" r="1"/>
+                <circle cx="4.5" cy="18" r="1"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">ManifestHub</div>
+              <div class="dl-version">v1.8.3</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://github.com/MeowRC/ManifestHub/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">蒸汽仓库清单缓存工具，快速获取与整理游戏清单信息。</p>
+        <div class="dl-info">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Windows
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Linux
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            macOS
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 8l-9 12-9-12 9-4z"/>
+              <path d="M3 8h18M12 4v16"/>
+            </svg>
+            6.2 MB
+          </span>
+        </div>
+      </article>
+
+      <!-- clash-verge-rev -->
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M3 12h18"/>
+                <path d="M12 3a13.5 13.5 0 0 1 3.6 9 13.5 13.5 0 0 1-3.6 9 13.5 13.5 0 0 1-3.6-9A13.5 13.5 0 0 1 12 3z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">clash-verge-rev</div>
+              <div class="dl-version">v2.0.3</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://github.com/MeowRC/clash-verge-rev/releases/latest" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">Clash Verge Rev 分支，基于 Tauri 的现代代理客户端。</p>
+        <div class="dl-info">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Windows
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            macOS
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/>
+              <path d="M8 22h8M12 18v4"/>
+            </svg>
+            Linux
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 8l-9 12-9-12 9-4z"/>
+              <path d="M3 8h18M12 4v16"/>
+            </svg>
+            12.1 MB
+          </span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  &copy; 2026 <em>MeowRc</em> Blog
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M18 15l-6-6-6 6"/>
+  </svg>
+</button>
+
+<script>
+(function () {
+  'use strict';
+
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 主题切换 ---------- */
+  var themeBtn = $('#themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+        localStorage.setItem('themeAt', String(Date.now()));
+      } catch (e) {}
+    });
+  }
+
+  /* ---------- 可展开卡片 ---------- */
+  function initExpandCards() {
+    $$('.dl-card--expand').forEach(function (card) {
+      var head = card.querySelector('.dl-expand-head');
+      if (!head) return;
+
+      head.addEventListener('click', function () {
+        var expanded = card.classList.toggle('expanded');
+        head.setAttribute('aria-expanded', String(expanded));
+      });
+    });
+  }
+
+  /* ---------- 滚动显现 ---------- */
+  function initReveal() {
+    var els = $$('[data-reveal]');
+
+    if (!('IntersectionObserver' in window) || prefersReduced) {
+      els.forEach(function (el) { el.classList.add('from-below', 'is-in'); });
+      return;
+    }
+
+    els.forEach(function (el, i) {
+      el.classList.add('from-below');
+      el.style.setProperty('--reveal-delay', ((i % 4) * 75) + 'ms');
+    });
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var el = entry.target;
+
+        if (entry.isIntersecting) {
+          if (el.classList.contains('is-in')) return;
+
+          var fromBelow = entry.boundingClientRect.top >= 0;
+          var wanted = fromBelow ? 'from-below' : 'from-above';
+          var current = el.classList.contains('from-below') ? 'from-below' :
+                       (el.classList.contains('from-above') ? 'from-above' : null);
+
+          if (current !== wanted) {
+            el.classList.add('no-transition');
+            el.classList.remove('from-below', 'from-above');
+            el.classList.add(wanted);
+            void el.offsetWidth;
+            el.classList.remove('no-transition');
+          }
+          el.classList.add('is-in');
+        } else {
+          if (el.classList.contains('is-in')) {
+            el.classList.add('no-transition');
+            el.classList.remove('is-in');
+            void el.offsetWidth;
+            el.classList.remove('no-transition');
+          }
+        }
+      });
+    }, { threshold: 0, rootMargin: '-60px 0px -60px 0px' });
+
+    els.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- 滚动 UI ---------- */
+  function initScrollUI() {
+    var navbar = $('#navbar');
+    var toTop = $('#toTop');
+    var ticking = false;
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        if (navbar) navbar.classList.toggle('scrolled', y > 10);
+        if (toTop) toTop.classList.toggle('show', y > 500);
+        ticking = false;
+      });
+    }, { passive: true });
+
+    if (toTop) {
+      toTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+      });
+    }
+  }
+
+  /* ---------- 移动端菜单 ---------- */
+  function initMobileMenu() {
+    var btn = $('#mobileMenuBtn');
+    var list = $('#navLinks');
+    if (!btn || !list) return;
+
+    function close() {
+      list.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = list.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+
+    list.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') close();
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!list.classList.contains('open')) return;
+      if (list.contains(e.target) || btn.contains(e.target)) return;
+      close();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+  }
+
+  /* ---------- 启动 ---------- */
+  try {
+    initExpandCards();
+    initReveal();
+    initScrollUI();
+    initMobileMenu();
+  } catch (e) {
+    $$('[data-reveal]').forEach(function (el) {
+      el.classList.add('is-in');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
