@@ -2,29 +2,50 @@
 <html lang="zh-CN" data-theme="light">
 <script>
 (function () {
-  /* 检测是否为现代浏览器 */
+  /* ---------- 1. 环境判定 ---------- */
+  function isSafariFamily() {
+    var ua = navigator.userAgent;
+
+    // iOS / iPadOS（含 CriOS / FxiOS / EdgiOS，底层全是 WebKit）
+    if (/iPad|iPhone|iPod/.test(ua)) return true;
+
+    // iPadOS 13+ 桌面模式（伪装成 Mac，但有触屏）
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+
+    // macOS Safari（排除 Chrome / Edge / Opera / Firefox）
+    if (/Safari/.test(ua) &&
+        !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)) return true;
+
+    return false;
+  }
+
   function isModern() {
     if (!window.CSS || !CSS.supports) return false;
-    return CSS.supports('translate', '0 64px') &&
-           CSS.supports('inset', '0');
+    try {
+      return CSS.supports('translate', '0 64px') &&
+             CSS.supports('inset', '0');
+    } catch (e) {
+      return false;
+    }
   }
 
-  /* 缓存检测结果，避免每次访问都检测 */
-  var cached;
-  try { cached = sessionStorage.getItem('modernBrowser'); } catch (e) {}
+  /* ---------- 2. 目标版本 ---------- */
+  var target;
+  if (isSafariFamily())  target = 'index-apple.html';
+  else if (isModern())   target = 'index.html';
+  else                   target = 'index-legacy.html';
 
-  var modern;
-  if (cached === '1') modern = true;
-  else if (cached === '0') modern = false;
-  else {
-    modern = isModern();
-    try { sessionStorage.setItem('modernBrowser', modern ? '1' : '0'); } catch (e) {}
-  }
+  /* ---------- 3. 当前文件（每份文件只改这一行） ---------- */
+  var current = 'index-apple.html';
+  /* index.html        → 'index.html'
+     index-legacy.html → 'index-legacy.html'
+     index-apple.html  → 'index-apple.html' */
 
-  /* 老浏览器 → 重定向到兼容版 */
-  if (!modern) {
-    location.replace('index-legacy.html' + location.search + location.hash);
-  }
+  /* ---------- 4. 已在正确版本 → 不做任何事 ---------- */
+  if (current === target) return;
+
+  /* ---------- 5. 跳走 ---------- */
+  location.replace(target + location.search + location.hash);
 })();
 </script>
 <head>
