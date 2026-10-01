@@ -4,21 +4,17 @@
 <meta charset="UTF-8" />
 
 <script>
+/* 三向分流：Safari 家族 → 本版；现代 → 现代版；否则 → Legacy 版 */
 (function () {
-  /* ---------- 1. 环境判定 ---------- */
   function isSafariFamily() {
     var ua = navigator.userAgent;
-
     // iOS / iPadOS（含 CriOS / FxiOS / EdgiOS，底层全是 WebKit）
     if (/iPad|iPhone|iPod/.test(ua)) return true;
-
     // iPadOS 13+ 桌面模式（伪装成 Mac，但有触屏）
     if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
-
     // macOS Safari（排除 Chrome / Edge / Opera / Firefox）
     if (/Safari/.test(ua) &&
         !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)) return true;
-
     return false;
   }
 
@@ -32,28 +28,24 @@
     }
   }
 
-  /* ---------- 2. 目标版本 ---------- */
   var target;
   if (isSafariFamily())  target = 'index-apple.html';
   else if (isModern())   target = 'index.html';
   else                   target = 'index-legacy.html';
 
-  /* ---------- 3. 当前文件（每份文件只改这一行） ---------- */
   var current = 'index-apple.html';
-  /* index.html        → 'index.html'
-     index-legacy.html → 'index-legacy.html'
-     index-apple.html  → 'index-apple.html' */
-
-  /* ---------- 4. 已在正确版本 → 不做任何事 ---------- */
   if (current === target) return;
 
-  /* ---------- 5. 跳走 ---------- */
   location.replace(target + location.search + location.hash);
 })();
 </script>
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="MeowRc" />
+<meta name="format-detection" content="telephone=no" />
 <meta name="description" content="MeowRc Blog — 记录技术思考与生活点滴。" />
 <meta name="theme-color" content="#f5a0b8" />
 <title>MeowRc Blog</title>
@@ -67,7 +59,11 @@
       var h = new Date().getHours();
       return (h >= 6 && h < 18) ? 'light' : 'dark';
     } catch (e) {
-      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      try {
+        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (err) {
+        return 'light';
+      }
     }
   }
 
@@ -89,18 +85,28 @@
     return autoTheme();
   }
 
-  try {
-    document.documentElement.dataset.theme = resolveTheme();
-  } catch (e) {
-    document.documentElement.dataset.theme = 'light';
+  /* Safari 10 的 dataset 兼容度不好，统一用 setAttribute */
+  function setThemeAttr(val) {
+    try {
+      document.documentElement.dataset.theme = val;
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', val);
+    }
   }
+  function getThemeAttr() {
+    var el = document.documentElement;
+    try {
+      if (el.dataset && el.dataset.theme) return el.dataset.theme;
+    } catch (e) {}
+    return el.getAttribute('data-theme');
+  }
+
+  setThemeAttr(resolveTheme());
 
   setInterval(function () {
     if (hasManualOverride()) return;
     var next = autoTheme();
-    if (document.documentElement.dataset.theme !== next) {
-      document.documentElement.dataset.theme = next;
-    }
+    if (getThemeAttr() !== next) setThemeAttr(next);
   }, 60000);
 })();
 
@@ -158,6 +164,7 @@ setTimeout(function () {
 html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -208,7 +215,10 @@ body.is-loading { overflow: hidden; }
   transition: transform .72s cubic-bezier(.77, 0, .175, 1);
 }
 
-#loader.slide-out { transform: translateX(100%); }
+#loader.slide-out {
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+}
 
 .loader-logo {
   font-size: 32px;
@@ -234,8 +244,8 @@ body.is-loading { overflow: hidden; }
 }
 
 @keyframes logoIn {
-  from { opacity: 0; transform: translateY(12px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; -webkit-transform: translateY(12px) scale(.96); transform: translateY(12px) scale(.96); }
+  to { opacity: 1; -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
 }
 
 .loader-bar {
@@ -283,7 +293,10 @@ body.is-loading { overflow: hidden; }
   top: 0; left: 0; right: 0;
   height: var(--nav-h);
   z-index: 100;
-  background: rgba(255, 255, 255, .94);
+  /* Safari 支持 -webkit-backdrop-filter，磨砂玻璃加回来 */
+  background: rgba(255, 255, 255, .78);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
   border-bottom: 1px solid var(--border);
   -webkit-transform: translateY(-100%);
   transform: translateY(-100%);
@@ -293,16 +306,16 @@ body.is-loading { overflow: hidden; }
     background-color .3s ease;
 }
 
-[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .94); }
+[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
 
 .page-enter .navbar { -webkit-transform: translateY(0); transform: translateY(0); }
 
 .navbar.scrolled {
-  background: rgba(255, 255, 255, .98);
+  background: rgba(255, 255, 255, .92);
   box-shadow: var(--shadow-sm);
 }
 
-[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .98); }
+[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
 
 .navbar-inner {
   max-width: var(--maxw);
@@ -388,10 +401,15 @@ body.is-loading { overflow: hidden; }
 .hero {
   position: relative;
   min-height: 100vh;
+  min-height: -webkit-fill-available; /* iOS 地址栏修正 */
   display: flex;
   align-items: center;
   overflow: hidden;
   isolation: isolate;
+}
+
+@supports (height: 100dvh) {
+  .hero { min-height: 100dvh; }
 }
 
 .hero::before {
@@ -422,6 +440,7 @@ body.is-loading { overflow: hidden; }
   background-size: 64px 64px;
   opacity: 0;
   -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
 }
 
 .page-enter .hero::after {
@@ -586,13 +605,15 @@ body.is-loading { overflow: hidden; }
   font-size: .82rem;
   text-decoration: none;
   color: var(--text-2);
-  background: rgba(255, 255, 255, .92);
+  background: rgba(255, 255, 255, .62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   opacity: 0;
   transition: background-color .25s, color .25s;
 }
 
-[data-theme="dark"] .scroll-hint { background: rgba(28, 25, 35, .92); }
+[data-theme="dark"] .scroll-hint { background: rgba(28, 25, 35, .62); }
 
 .scroll-hint:hover { color: var(--accent-strong); background: var(--accent-soft); }
 
@@ -667,7 +688,6 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
-/* 卡片：用 top 做悬停位移，与入场的 transform 完全分离 */
 .card {
   position: relative;
   top: 0;
@@ -686,8 +706,8 @@ body.is-loading { overflow: hidden; }
     top .25s cubic-bezier(.4, 0, .2, 1),
     box-shadow .3s ease,
     border-color .3s ease,
-    opacity .6s cubic-bezier(.25, .46, .45, .94) var(--reveal-delay, 0ms),
-    transform .9s cubic-bezier(.16, 1, .3, 1) var(--reveal-delay, 0ms);
+    opacity .6s cubic-bezier(.25, .46, .45, .94),
+    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 .card:hover {
@@ -752,7 +772,6 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
-/* 标签：负 margin 模拟 gap */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -1024,8 +1043,8 @@ body.is-loading { overflow: hidden; }
   -webkit-transform: translateY(64px) scale(.97);
   transform: translateY(64px) scale(.97);
   transition:
-    opacity .6s cubic-bezier(.25, .46, .45, .94) var(--reveal-delay, 0ms),
-    transform .9s cubic-bezier(.16, 1, .3, 1) var(--reveal-delay, 0ms);
+    opacity .6s cubic-bezier(.25, .46, .45, .94),
+    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 [data-reveal].from-above {
@@ -1126,6 +1145,56 @@ body.is-loading { overflow: hidden; }
   .hero::after { opacity: 1 !important; -webkit-transform: none !important; transform: none !important; }
   .navbar { -webkit-transform: none !important; transform: none !important; }
 }
+
+/* ============ Apple 专属补丁 ============ */
+
+/* 1. 关闭卡片类元素长按弹出系统菜单 */
+.card, .post, .project, .dl-card, .dl-btn, .social-link, .icon-btn,
+.nav-brand, .nav-links a, .tag, .to-top {
+  -webkit-touch-callout: none;
+}
+
+/* 2. 刘海屏安全区（iOS 11+；Safari 10 不认识 env() 会忽略整条声明，无副作用） */
+.navbar {
+  padding-top: constant(safe-area-inset-top);  /* iOS 11.0–11.2 */
+  padding-top: env(safe-area-inset-top);       /* iOS 11.2+ */
+  height: calc(64px + env(safe-area-inset-top));
+}
+
+.navbar-inner { height: 64px; }
+
+.main {
+  padding-left:  calc(24px + env(safe-area-inset-left));
+  padding-right: calc(24px + env(safe-area-inset-right));
+}
+
+.footer {
+  padding-left:  calc(24px + env(safe-area-inset-left));
+  padding-right: calc(24px + env(safe-area-inset-right));
+}
+
+.to-top {
+  right:  calc(22px + env(safe-area-inset-right));
+  bottom: calc(22px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 720px) {
+  .main {
+    padding-left:  calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+  }
+}
+
+/* 3. 关闭原生平滑滚动（Safari 15.4 才支持；用 JS 接管更稳） */
+html { scroll-behavior: auto; }
+
+/* 4. 移动端菜单展开时避开安全区 */
+@media (max-width: 720px) {
+  .nav-links {
+    padding-left:  calc(16px + env(safe-area-inset-left));
+    padding-right: calc(16px + env(safe-area-inset-right));
+  }
+}
 </style>
 </head>
 
@@ -1149,7 +1218,7 @@ body.is-loading { overflow: hidden; }
         <li><a href="#home" class="nav-link active" data-section="home">主页</a></li>
         <li><a href="#projects" class="nav-link" data-section="projects">项目</a></li>
         <li><a href="#contact" class="nav-link" data-section="contact">联系</a></li>
-        <li><a href="/Online/index-legacy.html" class="nav-link">在线</a></li>
+        <li><a href="/Online/index-apple.html" class="nav-link">在线</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -1404,12 +1473,32 @@ body.is-loading { overflow: hidden; }
   var navbar = document.getElementById('navbar');
   var toTop = document.getElementById('toTop');
 
+  var raf = window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            function (fn) { return setTimeout(fn, 16); };
+
+  /* ---------- 主题读写（Safari 10 dataset 兼容） ---------- */
+  function setThemeAttr(val) {
+    try {
+      document.documentElement.dataset.theme = val;
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', val);
+    }
+  }
+  function getThemeAttr() {
+    var el = document.documentElement;
+    try {
+      if (el.dataset && el.dataset.theme) return el.dataset.theme;
+    } catch (e) {}
+    return el.getAttribute('data-theme');
+  }
+
   /* ---------- 主题切换 ---------- */
   var themeBtn = document.getElementById('themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
+      var next = getThemeAttr() === 'dark' ? 'light' : 'dark';
+      setThemeAttr(next);
       try {
         localStorage.setItem('theme', next);
         localStorage.setItem('themeAt', String(Date.now()));
@@ -1417,11 +1506,7 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ---------- 平滑滚动（Chrome 49 无 scrollTo(options)） ---------- */
-  var raf = window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            function (fn) { return setTimeout(fn, 16); };
-
+  /* ---------- 平滑滚动 ---------- */
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -1470,7 +1555,7 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ---------- 滚动显现（降级 IntersectionObserver） ---------- */
+  /* ---------- 滚动显现 ---------- */
   function initReveal() {
     var els = $$('[data-reveal]');
     if (!els.length) return;
@@ -1507,7 +1592,6 @@ body.is-loading { overflow: hidden; }
             el.classList.remove('from-below');
             el.classList.remove('from-above');
             el.classList.add(wanted);
-            /* 强制 reflow */
             void el.offsetWidth;
             el.classList.remove('no-transition');
           }
@@ -1553,7 +1637,7 @@ body.is-loading { overflow: hidden; }
     })();
   }
 
-  /* ---------- 滚动 UI（导航阴影 / 回到顶部 / 当前分节） ---------- */
+  /* ---------- 滚动 UI ---------- */
   function initScrollUI() {
     var navLinks = $$('.nav-link');
     var sections = $$('.hero[id], .section[id]');
@@ -1567,8 +1651,9 @@ body.is-loading { overflow: hidden; }
       }
       for (var j = 0; j < navLinks.length; j++) {
         var link = navLinks[j];
-        if (!link.getAttribute('data-section')) continue;
-        if (link.getAttribute('data-section') === current) {
+        var sec = link.getAttribute('data-section');
+        if (!sec) continue;
+        if (sec === current) {
           if (!link.classList.contains('active')) link.classList.add('active');
         } else {
           link.classList.remove('active');
