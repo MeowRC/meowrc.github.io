@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="MeowRc 在线 —— 视频、音乐与下载。" />
+<meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
 <meta name="theme-color" content="#f5a0b8" />
 <title>在线 · MeowRc Blog</title>
-
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
 <script>
 /* ============================================================
@@ -404,45 +402,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   color: var(--text-2);
 }
 
-/* ============ 播放器容器 ============ */
-.player-wrap {
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  background: #000;
-  margin-bottom: 8px;
-  border: 1px solid var(--border);
-}
-
-.player-wrap::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), #f7b8c8);
-  z-index: 5;
-  pointer-events: none;
-}
-
-.player-wrap video,
-.player-wrap audio {
-  width: 100%;
-  display: block;
-}
-
-[data-theme="dark"] .plyr--video .plyr__controls {
-  background: rgba(20, 18, 26, .85);
-}
-
-.plyr--audio .plyr__controls {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
 /* ============ 下载卡片 ============ */
 .downloads {
   display: grid;
@@ -781,59 +740,13 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
       在线
     </div>
     <h2 class="page-title">在线</h2>
-    <p class="page-desc">在线视频、音乐播放与软件下载，全部整合在一处。</p>
+    <p class="page-desc">获取最新的软件与工具发布版本，全部开源免费。</p>
   </div>
 </header>
 
 <!-- 主体 -->
 <main class="main">
 
-  <!-- ============ 视频 ============ -->
-  <section class="section" id="video" aria-labelledby="video-title">
-    <header class="section-head" data-reveal>
-      <span class="section-label">
-        <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M22 8l-6 4 6 4V8z"/>
-          <rect x="2" y="6" width="14" height="12" rx="2"/>
-        </svg>
-        视频
-      </span>
-      <h2 class="section-title" id="video-title">在线视频</h2>
-      <p class="section-desc">直接播放，支持全屏与画中画。</p>
-    </header>
-
-    <div class="player-wrap" data-reveal>
-      <video id="videoPlayer" playsinline controls>
-        <source src="https://your-video-url.mp4" type="video/mp4" />
-        你的浏览器不支持 HTML5 视频。
-      </video>
-    </div>
-  </section>
-
-  <!-- ============ 音乐 ============ -->
-  <section class="section" id="music" aria-labelledby="music-title">
-    <header class="section-head" data-reveal>
-      <span class="section-label">
-        <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M9 18V5l12-2v13"/>
-          <circle cx="6" cy="18" r="3"/>
-          <circle cx="18" cy="16" r="3"/>
-        </svg>
-        音乐
-      </span>
-      <h2 class="section-title" id="music-title">在线音乐</h2>
-      <p class="section-desc">随时播放，享受音乐。</p>
-    </header>
-
-    <div class="player-wrap" data-reveal>
-      <audio id="audioPlayer" controls>
-        <source src="https://your-audio-url.mp3" type="audio/mp3" />
-        你的浏览器不支持 HTML5 音频。
-      </audio>
-    </div>
-  </section>
-
-  <!-- ============ 下载 ============ -->
   <section class="section" id="download" aria-labelledby="download-title">
     <header class="section-head" data-reveal>
       <span class="section-label">
@@ -1117,8 +1030,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   </svg>
 </button>
 
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
 <script>
 (function () {
   'use strict';
@@ -1128,24 +1039,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
   var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- Plyr 播放器 ---------- */
-  try {
-    new Plyr('#videoPlayer', {
-      controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
-      settings: ['speed'],
-      speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
-      tooltips: { controls: true, seek: true }
-    });
-
-    new Plyr('#audioPlayer', {
-      controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume'],
-      tooltips: { controls: true, seek: true }
-    });
-  } catch (e) {}
-
-  /* ---------- 主题切换（与顶部脚本配合） ----------
-     点击后立即切换，并把「手动设置 + 时间戳」写入 localStorage。
-     顶部脚本每分钟检查一次，手动设置过期后自动恢复跟随时间。 */
+  /* ---------- 主题切换（与顶部脚本配合） ---------- */
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
