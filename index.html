@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+
 <script>
+/* 三向分流：Safari 家族 → Apple 版；现代 → 本版；否则 → Legacy 版 */
 (function () {
-  /* ---------- 1. 环境判定 ---------- */
   function isSafariFamily() {
     var ua = navigator.userAgent;
-
     // iOS / iPadOS（含 CriOS / FxiOS / EdgiOS，底层全是 WebKit）
     if (/iPad|iPhone|iPod/.test(ua)) return true;
-
     // iPadOS 13+ 桌面模式（伪装成 Mac，但有触屏）
     if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
-
     // macOS Safari（排除 Chrome / Edge / Opera / Firefox）
     if (/Safari/.test(ua) &&
         !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)) return true;
-
     return false;
   }
 
@@ -29,27 +28,18 @@
     }
   }
 
-  /* ---------- 2. 目标版本 ---------- */
   var target;
   if (isSafariFamily())  target = 'index-apple.html';
   else if (isModern())   target = 'index.html';
   else                   target = 'index-legacy.html';
 
-  /* ---------- 3. 当前文件（每份文件只改这一行） ---------- */
-  var current = 'index-apple.html';
-  /* index.html        → 'index.html'
-     index-legacy.html → 'index-legacy.html'
-     index-apple.html  → 'index-apple.html' */
-
-  /* ---------- 4. 已在正确版本 → 不做任何事 ---------- */
+  var current = 'index.html';
   if (current === target) return;
 
-  /* ---------- 5. 跳走 ---------- */
   location.replace(target + location.search + location.hash);
 })();
 </script>
-<head>
-<meta charset="UTF-8" />
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="MeowRc Blog — 记录技术思考与生活点滴。" />
 <meta name="theme-color" content="#f5a0b8" />
@@ -163,7 +153,7 @@ setTimeout(function () {
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--nav-h) + 24px);
+  scroll-padding-top: 88px;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -185,11 +175,12 @@ body.is-loading { overflow: hidden; }
 
 ::selection { background: var(--accent); color: #fff; }
 
-:focus-visible {
+:focus {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 6px;
 }
+:focus:not(:focus-visible) { outline: none; }
 
 .sr-only {
   position: absolute;
@@ -201,20 +192,6 @@ body.is-loading { overflow: hidden; }
   border: 0;
 }
 
-/* ============ 通用图标样式 ============ */
-.icon-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.icon-svg.fill { fill: currentColor; stroke: none; }
-
 /* ============ 加载页 ============ */
 #loader {
   position: fixed;
@@ -224,7 +201,6 @@ body.is-loading { overflow: hidden; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 22px;
   background: radial-gradient(circle at 50% 45%, var(--accent-soft) 0%, var(--bg) 65%);
   transition: transform .72s var(--ease-slide);
 }
@@ -235,6 +211,7 @@ body.is-loading { overflow: hidden; }
   font-size: clamp(2rem, 6vw, 2.7rem);
   font-weight: 800;
   letter-spacing: -.025em;
+  margin-bottom: 22px;
   animation: logoIn .6s var(--ease-spring) both;
 }
 
@@ -255,7 +232,7 @@ body.is-loading { overflow: hidden; }
   position: relative;
   width: min(200px, 58vw);
   height: 3px;
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   background: var(--accent-soft);
   overflow: hidden;
 }
@@ -288,7 +265,7 @@ body.is-loading { overflow: hidden; }
 /* ============ 导航栏 ============ */
 .navbar {
   position: fixed;
-  inset: 0 0 auto 0;
+  top: 0; left: 0; right: 0;
   height: var(--nav-h);
   z-index: 100;
   background: rgba(255, 255, 255, .78);
@@ -321,7 +298,6 @@ body.is-loading { overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
 }
 
 .nav-brand {
@@ -330,21 +306,23 @@ body.is-loading { overflow: hidden; }
   letter-spacing: -.02em;
   text-decoration: none;
   white-space: nowrap;
+  margin-right: 16px;
 }
 
 .nav-brand em { font-style: normal; color: var(--accent-strong); }
 
 .nav-links {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 4px;
   align-items: center;
-  gap: 4px;
   list-style: none;
 }
 
 .nav-links a {
   display: block;
   padding: 8px 18px;
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   font-size: .92rem;
   font-weight: 500;
   text-decoration: none;
@@ -360,13 +338,20 @@ body.is-loading { overflow: hidden; }
   font-weight: 600;
 }
 
-.nav-actions { display: flex; align-items: center; gap: 4px; }
+.nav-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 4px;
+  align-items: center;
+  margin-left: 16px;
+}
 
 .icon-btn {
   width: 38px;
   height: 38px;
   display: grid;
   place-items: center;
+  padding: 10px;
   border-radius: 50%;
   color: var(--text-2);
   transition: background-color .2s, color .2s, transform .2s;
@@ -386,7 +371,6 @@ body.is-loading { overflow: hidden; }
 .hero {
   position: relative;
   min-height: 100vh;
-  min-height: 100svh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -429,7 +413,12 @@ body.is-loading { overflow: hidden; }
   transition: opacity .95s ease .18s;
 }
 
-.hero-particles { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
 
 .hero-particles i {
   position: absolute;
@@ -458,14 +447,14 @@ body.is-loading { overflow: hidden; }
   width: 100%;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: calc(var(--nav-h) + 48px) 24px 96px;
+  padding: 112px 24px 96px;
 }
 
 .hero-inner::before {
   content: '';
   position: absolute;
   left: 24px;
-  top: calc(var(--nav-h) + 80px);
+  top: 144px;
   bottom: 110px;
   width: 1px;
   background: linear-gradient(180deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent);
@@ -550,9 +539,8 @@ body.is-loading { overflow: hidden; }
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   padding: 9px 20px;
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   font-size: .82rem;
   text-decoration: none;
   color: var(--text-2);
@@ -561,7 +549,7 @@ body.is-loading { overflow: hidden; }
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   opacity: 0;
-  transition: background-color .25s, color .25s, transform .25s;
+  transition: background-color .25s, color .25s;
 }
 
 [data-theme="dark"] .scroll-hint { background: rgba(28, 25, 35, .62); }
@@ -573,6 +561,7 @@ body.is-loading { overflow: hidden; }
 .scroll-hint svg {
   width: 15px;
   height: 15px;
+  margin-left: 8px;
   animation: bounce 1.9s ease-in-out infinite;
 }
 
@@ -593,7 +582,9 @@ body.is-loading { overflow: hidden; }
   padding: 0 24px 80px;
 }
 
-.hero[id], .section[id] { scroll-margin-top: calc(var(--nav-h) + 24px); }
+.hero[id], .section[id] {
+  scroll-margin-top: 88px;
+}
 
 .section { padding: 36px 0; }
 
@@ -636,35 +627,36 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
+/* 卡片：用 top 做悬停位移，与入场的 transform 完全分离 */
 .card {
+  position: relative;
+  top: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   transition:
-    transform .3s var(--ease-io),
+    top .25s var(--ease-io),
     box-shadow .3s ease,
-    border-color .3s ease,
-    opacity .6s var(--ease-fade),
-    translate .9s var(--ease-shift),
-    scale .9s var(--ease-shift);
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent);
+    border-color .3s ease;
 }
 
 .card[data-reveal] {
   transition:
-    transform .3s var(--ease-io),
+    top .25s var(--ease-io),
     box-shadow .3s ease,
     border-color .3s ease,
     opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
-    translate .9s var(--ease-shift) var(--reveal-delay, 0ms),
-    scale .9s var(--ease-shift) var(--reveal-delay, 0ms);
+    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
 }
+
+.card:hover {
+  top: -3px;
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.card:active { top: -1px; }
 
 /* ============ 博客文章 ============ */
 .post-list { display: grid; gap: 12px; }
@@ -715,13 +707,19 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 10px -3px 0;
+}
+
+.tags > * { margin: 3px; }
 
 .tag {
   font-size: .71rem;
   font-weight: 500;
   padding: 3px 12px;
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   color: var(--accent-strong);
   background: var(--accent-soft);
   border: 1px solid transparent;
@@ -740,7 +738,6 @@ body.is-loading { overflow: hidden; }
 .project {
   display: flex;
   flex-direction: column;
-  gap: 9px;
   position: relative;
   padding: 22px 24px;
   text-decoration: none;
@@ -761,7 +758,6 @@ body.is-loading { overflow: hidden; }
 
 .project:hover::after { transform: scaleX(1); }
 
-/* 项目图标：更精致的样式 */
 .project-icon {
   width: 46px;
   height: 46px;
@@ -786,16 +782,22 @@ body.is-loading { overflow: hidden; }
   box-shadow: 0 6px 18px rgba(245, 160, 184, .3);
 }
 
-.project h3 { font-size: 1rem; font-weight: 680; letter-spacing: -.012em; }
+.project h3 {
+  margin-top: 9px;
+  font-size: 1rem;
+  font-weight: 680;
+  letter-spacing: -.012em;
+}
 
 .project p {
+  margin-top: 4px;
   flex-grow: 1;
   font-size: .87rem;
   line-height: 1.55;
   color: var(--text-2);
 }
 
-.project .tags { margin-top: 2px; }
+.project .tags { margin-top: -4px; }
 
 /* ============ 联系 ============ */
 .contact { padding: 12px 28px 24px; }
@@ -803,14 +805,13 @@ body.is-loading { overflow: hidden; }
 .contact-row {
   display: flex;
   align-items: center;
-  gap: 15px;
   padding: 15px 0;
   border-bottom: 1px solid var(--border);
 }
 
+.contact-row > * + * { margin-left: 15px; }
 .contact-row:last-of-type { border-bottom: none; }
 
-/* 联系图标 */
 .contact-icon {
   flex: none;
   width: 42px;
@@ -851,35 +852,37 @@ body.is-loading { overflow: hidden; }
 .contact-socials {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  margin: 6px -5px -5px;
   padding-top: 20px;
-  margin-top: 6px;
   border-top: 1px solid var(--border);
 }
 
-/* 社交链接图标 */
+.contact-socials > * { margin: 5px; }
+
 .social-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   padding: 9px 20px;
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   font-size: .86rem;
   font-weight: 500;
   text-decoration: none;
   background: var(--surface-2);
   border: 1px solid var(--border);
+  position: relative;
+  top: 0;
   transition:
     background-color .25s,
     color .25s,
     border-color .25s,
-    transform .25s;
+    top .25s;
 }
 
 .social-link .social-icon {
   width: 16px;
   height: 16px;
   flex: none;
+  margin-right: 8px;
   color: currentColor;
 }
 
@@ -887,7 +890,7 @@ body.is-loading { overflow: hidden; }
   background: var(--accent-soft);
   color: var(--accent-strong);
   border-color: var(--accent);
-  transform: translateY(-2px);
+  top: -2px;
 }
 
 /* ============ 页脚 & 回到顶部 ============ */
@@ -912,6 +915,7 @@ body.is-loading { overflow: hidden; }
   height: 44px;
   display: grid;
   place-items: center;
+  padding: 12px;
   border-radius: 50%;
   background: var(--surface);
   color: var(--text-2);
@@ -933,15 +937,21 @@ body.is-loading { overflow: hidden; }
 /* ============ 滚动显现 ============ */
 [data-reveal] {
   opacity: 0;
+  transform: translateY(64px) scale(.97);
   transition:
     opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
-    translate .9s var(--ease-shift) var(--reveal-delay, 0ms),
-    scale .9s var(--ease-shift) var(--reveal-delay, 0ms);
+    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
 }
 
-[data-reveal].from-below { translate: 0 64px; scale: .97; }
-[data-reveal].from-above { translate: 0 -64px; scale: .97; }
-[data-reveal].is-in { opacity: 1; translate: 0 0; scale: 1; }
+[data-reveal].from-above {
+  transform: translateY(-64px) scale(.97);
+}
+
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 [data-reveal].no-transition { transition: none !important; }
 
 /* ============ 响应式 ============ */
@@ -950,10 +960,12 @@ body.is-loading { overflow: hidden; }
 
   .nav-links {
     position: fixed;
-    inset: var(--nav-h) 0 auto 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    grid-auto-flow: row;
+    grid-row-gap: 2px;
+    grid-column-gap: 0;
     padding: 12px 16px 18px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -969,7 +981,7 @@ body.is-loading { overflow: hidden; }
   .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
 
   .hero-inner { padding-left: 20px; padding-right: 20px; }
-  .hero-inner::before { left: 20px; top: calc(var(--nav-h) + 64px); bottom: 96px; }
+  .hero-inner::before { left: 20px; top: 128px; bottom: 96px; }
   .hero-eyebrow,
   .hero-title,
   .hero-subtitle { padding-left: 20px; }
@@ -980,8 +992,9 @@ body.is-loading { overflow: hidden; }
   .section { padding: 28px 0; }
   .contact { padding: 8px 20px 20px; }
 
-  [data-reveal].from-below { translate: 0 44px; scale: .98; }
-  [data-reveal].from-above { translate: 0 -44px; scale: .98; }
+  [data-reveal] { transform: translateY(44px) scale(.98); }
+  [data-reveal].from-above { transform: translateY(-44px) scale(.98); }
+  [data-reveal].is-in { transform: translateY(0) scale(1); }
 }
 
 @media (max-width: 400px) {
@@ -989,7 +1002,6 @@ body.is-loading { overflow: hidden; }
   .hero-subtitle { font-size: 2.4rem; }
 }
 
-/* ============ 减少动效 ============ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
@@ -999,8 +1011,7 @@ body.is-loading { overflow: hidden; }
   }
   [data-reveal] {
     opacity: 1 !important;
-    translate: 0 0 !important;
-    scale: 1 !important;
+    transform: none !important;
   }
   .hero-eyebrow,
   .hero-title,
@@ -1034,22 +1045,22 @@ body.is-loading { overflow: hidden; }
         <li><a href="#home" class="nav-link active" data-section="home">主页</a></li>
         <li><a href="#projects" class="nav-link" data-section="projects">项目</a></li>
         <li><a href="#contact" class="nav-link" data-section="contact">联系</a></li>
-        <li><a href="/Online" class="nav-link">在线</a></li>
+        <li><a href="/Online/index.html" class="nav-link">在线</a></li>
       </ul>
 
       <div class="nav-actions">
         <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="切换主题">
-          <svg class="icon-svg icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="icon-sun" aria-hidden="true">
             <circle cx="12" cy="12" r="4"/>
             <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
           </svg>
-          <svg class="icon-svg icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-moon" aria-hidden="true">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
 
         <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="菜单" aria-expanded="false" aria-controls="navLinks">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16"/>
           </svg>
         </button>
@@ -1072,7 +1083,7 @@ body.is-loading { overflow: hidden; }
 
     <a class="scroll-hint" href="#blog-posts">
       <span>向下滚动探索</span>
-      <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M6 9l6 6 6-6"/>
       </svg>
     </a>
@@ -1129,8 +1140,7 @@ body.is-loading { overflow: hidden; }
       <div class="projects">
         <a class="project card" data-reveal href="https://github.com/MeowRC/kernel_xiaomi_mt6785" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">
-            <!-- CPU / 内核图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="6" y="6" width="12" height="12" rx="2"/>
               <rect x="9.5" y="9.5" width="5" height="5" rx="1"/>
               <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>
@@ -1146,8 +1156,7 @@ body.is-loading { overflow: hidden; }
 
         <a class="project card" data-reveal href="https://github.com/MeowRC/ManifestHub" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">
-            <!-- 列表 / 清单图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 6h11M9 12h11M9 18h11"/>
               <circle cx="4.5" cy="6" r="1"/>
               <circle cx="4.5" cy="12" r="1"/>
@@ -1163,8 +1172,7 @@ body.is-loading { overflow: hidden; }
 
         <a class="project card" data-reveal href="https://github.com/MeowRC/clash-verge-rev/tree/dev" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">
-            <!-- 地球 / 网络图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="9"/>
               <path d="M3 12h18"/>
               <path d="M12 3a13.5 13.5 0 0 1 3.6 9 13.5 13.5 0 0 1-3.6 9 13.5 13.5 0 0 1-3.6-9A13.5 13.5 0 0 1 12 3z"/>
@@ -1180,8 +1188,7 @@ body.is-loading { overflow: hidden; }
 
         <a class="project card" data-reveal href="https://github.com/MeowRC/OpenSteamTool" target="_blank" rel="noopener noreferrer">
           <div class="project-icon" aria-hidden="true">
-            <!-- 游戏手柄图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 8h4M8 6v4"/>
               <circle cx="16" cy="10" r="1"/>
               <circle cx="18" cy="13" r="1"/>
@@ -1208,8 +1215,7 @@ body.is-loading { overflow: hidden; }
       <div class="contact card" data-reveal>
         <div class="contact-row">
           <div class="contact-icon" aria-hidden="true">
-            <!-- 信封图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2.5" y="5" width="19" height="14" rx="2"/>
               <path d="M3 7l9 6 9-6"/>
             </svg>
@@ -1222,8 +1228,7 @@ body.is-loading { overflow: hidden; }
 
         <div class="contact-row">
           <div class="contact-icon" aria-hidden="true">
-            <!-- 聊天气泡图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/>
             </svg>
           </div>
@@ -1235,8 +1240,7 @@ body.is-loading { overflow: hidden; }
 
         <div class="contact-row">
           <div class="contact-icon" aria-hidden="true">
-            <!-- 定位标记图标 -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 10c0 6.5-8 12-8 12s-8-5.5-8-12a8 8 0 0 1 16 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
@@ -1249,15 +1253,13 @@ body.is-loading { overflow: hidden; }
 
         <div class="contact-socials">
           <a class="social-link" href="https://github.com/MeowRC" target="_blank" rel="noopener noreferrer">
-            <!-- GitHub 图标 -->
-            <svg class="social-icon icon-svg fill" viewBox="0 0 24 24" aria-hidden="true">
+            <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.3 2.8.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3"/>
             </svg>
             GitHub
           </a>
           <a class="social-link" href="https://space.bilibili.com/1530445970" target="_blank" rel="noopener noreferrer">
-            <!-- Bilibili 图标（简化版） -->
-            <svg class="social-icon icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M7 3l2 3M17 3l-2 3"/>
               <rect x="3" y="7" width="18" height="13" rx="3"/>
               <path d="M9 11.5v4M15 11.5v4"/>
@@ -1275,7 +1277,7 @@ body.is-loading { overflow: hidden; }
   </footer>
 
   <button class="to-top" id="toTop" type="button" aria-label="回到顶部">
-    <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M18 15l-6-6-6 6"/>
     </svg>
   </button>
@@ -1286,8 +1288,8 @@ body.is-loading { overflow: hidden; }
 (function () {
   'use strict';
 
-  var $ = function (s) { return document.querySelector(s); };
-  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
   var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1296,7 +1298,6 @@ body.is-loading { overflow: hidden; }
   var navbar = document.getElementById('navbar');
   var toTop = document.getElementById('toTop');
 
-  /* ============ 主题切换 ============ */
   var themeBtn = document.getElementById('themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
@@ -1309,7 +1310,6 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ============ 锚点滚动 ============ */
   function initAnchors() {
     var offset = 64 + 24;
 
@@ -1331,7 +1331,6 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ============ 双向滚动显现 ============ */
   function initReveal() {
     var els = $$('[data-reveal]');
 
@@ -1379,7 +1378,6 @@ body.is-loading { overflow: hidden; }
     els.forEach(function (el) { io.observe(el); });
   }
 
-  /* ============ 打字机 ============ */
   function initTypewriter() {
     var el = document.getElementById('typingTarget');
     if (!el) return;
@@ -1394,7 +1392,6 @@ body.is-loading { overflow: hidden; }
     })();
   }
 
-  /* ============ 滚动 UI ============ */
   function initScrollUI() {
     var navLinks = $$('.nav-link');
     var sections = $$('.hero[id], .section[id]');
@@ -1433,7 +1430,6 @@ body.is-loading { overflow: hidden; }
     }
   }
 
-  /* ============ 移动端菜单 ============ */
   function initMobileMenu() {
     var btn = document.getElementById('mobileMenuBtn');
     var list = document.getElementById('navLinks');
@@ -1465,7 +1461,6 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ============ 加载流程 ============ */
   function enterPage() {
     if (!blog) return;
     blog.hidden = false;
@@ -1473,17 +1468,6 @@ body.is-loading { overflow: hidden; }
   }
 
   function boot() {
-    var params;
-    try { params = new URLSearchParams(location.search); } catch (e) { params = null; }
-    if (params && params.get('maintenance') === '1') {
-      if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-      var maint = document.getElementById('maintenance');
-      if (maint) maint.hidden = false;
-      if (blog) blog.hidden = true;
-      document.title = 'MeowRc Blog · 维护中';
-      return;
-    }
-
     if (prefersReduced) {
       if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
       enterPage();
