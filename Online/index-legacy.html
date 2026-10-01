@@ -8,8 +8,12 @@
 (function () {
   function isModern() {
     if (!window.CSS || !CSS.supports) return false;
-    return CSS.supports('translate', '0 64px') &&
-           CSS.supports('inset', '0');
+    try {
+      return CSS.supports('translate', '0 64px') &&
+             CSS.supports('inset', '0');
+    } catch (e) {
+      return false;
+    }
   }
 
   var cached;
@@ -29,6 +33,7 @@
 })();
 </script>
 
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
 <meta name="theme-color" content="#f5a0b8" />
@@ -44,7 +49,11 @@
       var h = new Date().getHours();
       return (h >= 6 && h < 18) ? 'light' : 'dark';
     } catch (e) {
-      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      try {
+        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (err) {
+        return 'light';
+      }
     }
   }
 
@@ -69,7 +78,7 @@
   try {
     document.documentElement.dataset.theme = resolveTheme();
   } catch (e) {
-    document.documentElement.dataset.theme = 'light';
+    document.documentElement.setAttribute('data-theme', 'light');
   }
 
   setInterval(function () {
@@ -81,11 +90,12 @@
   }, 60000);
 })();
 
-/* 兜底：5 秒后强制显示内容 */
+/* 兜底：5 秒后强制显示内容（Chrome 49 的 NodeList 没有 forEach） */
 setTimeout(function () {
-  document.querySelectorAll('[data-reveal]').forEach(function (el) {
-    el.classList.add('is-in');
-  });
+  var els = document.querySelectorAll('[data-reveal]');
+  for (var i = 0; i < els.length; i++) {
+    els[i].classList.add('is-in');
+  }
 }, 5000);
 </script>
 
@@ -108,14 +118,8 @@ setTimeout(function () {
   --radius-pill: 999px;
   --nav-h: 64px;
   --maxw: 880px;
-  --ease-out: cubic-bezier(.22, 1, .36, 1);
-  --ease-io: cubic-bezier(.4, 0, .2, 1);
-  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
-  --ease-shift: cubic-bezier(.16, 1, .3, 1);
-  --ease-fade: cubic-bezier(.25, .46, .45, .94);
-  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
   --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
-  color-scheme: light;
 }
 
 [data-theme="dark"] {
@@ -131,15 +135,12 @@ setTimeout(function () {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, .35);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, .45);
   --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
-  color-scheme: dark;
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
   overflow-x: hidden;
-  scroll-behavior: smooth;
-  scroll-padding-top: 88px;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -162,6 +163,7 @@ button {
   color: inherit;
 }
 
+::-webkit-selection { background: var(--accent); color: #fff; }
 ::selection { background: var(--accent); color: #fff; }
 
 :focus {
@@ -169,7 +171,6 @@ button {
   outline-offset: 3px;
   border-radius: 6px;
 }
-:focus:not(:focus-visible) { outline: none; }
 
 .sr-only {
   position: absolute;
@@ -189,21 +190,19 @@ button {
   right: 0;
   height: var(--nav-h);
   z-index: 100;
-  background: rgba(255, 255, 255, .78);
-  backdrop-filter: blur(18px) saturate(1.6);
-  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  background: rgba(255, 255, 255, .94);
   border-bottom: 1px solid var(--border);
   transition: box-shadow .3s ease, background-color .3s ease;
 }
 
-[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
+[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .94); }
 
 .navbar.scrolled {
-  background: rgba(255, 255, 255, .92);
+  background: rgba(255, 255, 255, .98);
   box-shadow: var(--shadow-sm);
 }
 
-[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
+[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .98); }
 
 .navbar-inner {
   max-width: var(--maxw);
@@ -230,12 +229,13 @@ button {
 }
 
 .nav-links {
-  display: grid;
-  grid-auto-flow: column;
-  grid-column-gap: 4px;
+  display: flex;
   align-items: center;
   list-style: none;
 }
+
+.nav-links li { margin-left: 4px; }
+.nav-links li:first-child { margin-left: 0; }
 
 .nav-links a {
   display: block;
@@ -260,18 +260,20 @@ button {
 }
 
 .nav-actions {
-  display: grid;
-  grid-auto-flow: column;
-  grid-column-gap: 4px;
+  display: flex;
   align-items: center;
   margin-left: 16px;
 }
 
+.nav-actions > * { margin-left: 4px; }
+.nav-actions > *:first-child { margin-left: 0; }
+
 .icon-btn {
   width: 38px;
   height: 38px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px;
   border-radius: 50%;
   color: var(--text-2);
@@ -283,7 +285,7 @@ button {
   color: var(--accent-strong);
 }
 
-.icon-btn:active { transform: scale(.92); }
+.icon-btn:active { -webkit-transform: scale(.92); transform: scale(.92); }
 
 .icon-btn svg {
   width: 18px;
@@ -378,8 +380,7 @@ button {
 }
 
 .page-title {
-  font-size: 36px;
-  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-size: 2.2rem;
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -.035em;
@@ -387,6 +388,13 @@ button {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+@media (min-width: 480px) {
+  .page-title { font-size: 2.8rem; }
+}
+@media (min-width: 720px) {
+  .page-title { font-size: 3.4rem; }
 }
 
 .page-desc {
@@ -446,10 +454,13 @@ button {
 }
 
 .section-title {
-  font-size: 22px;
-  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-size: 1.35rem;
   font-weight: 750;
   letter-spacing: -.02em;
+}
+
+@media (min-width: 560px) {
+  .section-title { font-size: 1.7rem; }
 }
 
 .section-desc {
@@ -460,9 +471,9 @@ button {
 
 /* ============ 下载卡片 ============ */
 .downloads {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: -8px;
 }
 
 .dl-card {
@@ -470,6 +481,9 @@ button {
   top: 0;
   display: flex;
   flex-direction: column;
+  flex: 0 0 calc(50% - 16px);
+  max-width: calc(50% - 16px);
+  margin: 8px;
   padding: 24px 26px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -477,18 +491,25 @@ button {
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition:
-    top .25s var(--ease-io),
+    top .25s cubic-bezier(.4, 0, .2, 1),
     box-shadow .3s ease,
     border-color .3s ease;
 }
 
+@media (max-width: 640px) {
+  .dl-card {
+    flex: 0 0 calc(100% - 16px);
+    max-width: calc(100% - 16px);
+  }
+}
+
 .dl-card[data-reveal] {
   transition:
-    top .25s var(--ease-io),
+    top .25s cubic-bezier(.4, 0, .2, 1),
     box-shadow .3s ease,
     border-color .3s ease,
-    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
-    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
+    opacity .6s cubic-bezier(.25, .46, .45, .94),
+    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 .dl-card::before {
@@ -498,9 +519,11 @@ button {
   width: 100%;
   height: 3px;
   background: linear-gradient(90deg, var(--accent), #f7b8c8);
+  -webkit-transform: scaleX(0);
   transform: scaleX(0);
+  -webkit-transform-origin: left;
   transform-origin: left;
-  transition: transform .42s var(--ease-io);
+  transition: transform .42s cubic-bezier(.4, 0, .2, 1);
 }
 
 .dl-card:hover {
@@ -509,10 +532,10 @@ button {
   border-color: var(--accent);
 }
 
-.dl-card:hover::before { transform: scaleX(1); }
+.dl-card:hover::before { -webkit-transform: scaleX(1); transform: scaleX(1); }
 
 .dl-card.expanded { border-color: var(--accent); }
-.dl-card.expanded::before { transform: scaleX(1); }
+.dl-card.expanded::before { -webkit-transform: scaleX(1); transform: scaleX(1); }
 
 .dl-head {
   display: flex;
@@ -535,14 +558,15 @@ button {
   width: 46px;
   height: 46px;
   padding: 11px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--accent-strong);
   border-radius: 13px;
   background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(245, 160, 184, .12) 100%);
   border: 1px solid rgba(245, 160, 184, .18);
   box-shadow: 0 2px 8px rgba(245, 160, 184, .12);
-  transition: transform .4s var(--ease-spring), box-shadow .3s ease;
+  transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease;
 }
 
 [data-theme="dark"] .dl-icon {
@@ -551,6 +575,7 @@ button {
 }
 
 .dl-card:hover .dl-icon {
+  -webkit-transform: scale(1.1) rotate(-6deg);
   transform: scale(1.1) rotate(-6deg);
   box-shadow: 0 6px 18px rgba(245, 160, 184, .3);
 }
@@ -594,7 +619,10 @@ button {
   color: #fff;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   box-shadow: 0 4px 14px rgba(245, 160, 184, .35);
-  transition: transform .25s var(--ease-spring), box-shadow .25s, filter .25s;
+  transition:
+    transform .25s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow .25s,
+    filter .25s;
 }
 
 .dl-btn svg {
@@ -610,12 +638,14 @@ button {
 }
 
 .dl-btn:hover {
+  -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(245, 160, 184, .5);
+  -webkit-filter: brightness(1.05);
   filter: brightness(1.05);
 }
 
-.dl-btn:active { transform: translateY(0); }
+.dl-btn:active { -webkit-transform: translateY(0); transform: translateY(0); }
 
 .dl-btn--sm {
   padding: 6px 16px;
@@ -702,14 +732,15 @@ button {
   width: 34px;
   height: 34px;
   padding: 9px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-2);
   border-radius: 50%;
   background: var(--surface-2);
   border: 1px solid var(--border);
   transition:
-    transform .4s var(--ease-spring),
+    transform .4s cubic-bezier(.34, 1.56, .64, 1),
     background-color .25s,
     color .25s,
     border-color .25s;
@@ -733,6 +764,7 @@ button {
 }
 
 .dl-card.expanded .dl-chevron {
+  -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
   color: var(--accent-strong);
   border-color: var(--accent);
@@ -744,7 +776,7 @@ button {
   overflow: hidden;
   opacity: 0;
   transition:
-    max-height .5s var(--ease-out),
+    max-height .5s cubic-bezier(.22, 1, .36, 1),
     opacity .35s ease,
     margin-top .35s ease;
 }
@@ -807,8 +839,9 @@ button {
   z-index: 90;
   width: 44px;
   height: 44px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 12px;
   border-radius: 50%;
   background: var(--surface);
@@ -817,10 +850,15 @@ button {
   box-shadow: var(--shadow-md);
   opacity: 0;
   visibility: hidden;
+  -webkit-transform: translateY(10px);
   transform: translateY(10px);
   transition:
-    opacity .3s, transform .3s, visibility .3s,
-    background-color .2s, color .2s, border-color .2s;
+    opacity .3s,
+    transform .3s,
+    visibility .3s,
+    background-color .2s,
+    color .2s,
+    border-color .2s;
 }
 
 .to-top svg {
@@ -834,25 +872,33 @@ button {
   stroke-linejoin: round;
 }
 
-.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top.show {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
 .to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.to-top:active { transform: scale(.94); }
+.to-top:active { -webkit-transform: scale(.94); transform: scale(.94); }
 
-/* ============ 滚动显现（兼容版） ============ */
+/* ============ 滚动显现 ============ */
 [data-reveal] {
   opacity: 0;
+  -webkit-transform: translateY(64px) scale(.97);
   transform: translateY(64px) scale(.97);
   transition:
-    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
-    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
+    opacity .6s cubic-bezier(.25, .46, .45, .94),
+    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 [data-reveal].from-above {
+  -webkit-transform: translateY(-64px) scale(.97);
   transform: translateY(-64px) scale(.97);
 }
 
 [data-reveal].is-in {
   opacity: 1;
+  -webkit-transform: translateY(0) scale(1);
   transform: translateY(0) scale(1);
 }
 
@@ -860,16 +906,15 @@ button {
 
 /* ============ 响应式 ============ */
 @media (max-width: 720px) {
-  .mobile-menu-btn { display: grid; }
+  .mobile-menu-btn { display: flex; }
 
   .nav-links {
     position: fixed;
     top: var(--nav-h);
     left: 0;
     right: 0;
-    grid-auto-flow: row;
-    grid-row-gap: 2px;
-    grid-column-gap: 0;
+    display: flex;
+    flex-direction: column;
     padding: 12px 16px 18px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -877,11 +922,20 @@ button {
     border-radius: 0 0 20px 20px;
     opacity: 0;
     visibility: hidden;
+    -webkit-transform: translateY(-10px);
     transform: translateY(-10px);
     transition: opacity .25s ease, transform .25s ease, visibility .25s;
   }
 
-  .nav-links.open { opacity: 1; visibility: visible; transform: none; }
+  .nav-links li { margin: 1px 0; }
+
+  .nav-links.open {
+    opacity: 1;
+    visibility: visible;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+
   .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
 
   .page-hero { padding: 120px 20px 32px; }
@@ -902,9 +956,18 @@ button {
   .dl-version-name { font-size: .82rem; }
   .dl-btn--sm { padding: 6px 13px; font-size: .74rem; }
 
-  [data-reveal] { transform: translateY(44px) scale(.98); }
-  [data-reveal].from-above { transform: translateY(-44px) scale(.98); }
-  [data-reveal].is-in { transform: translateY(0) scale(1); }
+  [data-reveal] {
+    -webkit-transform: translateY(44px) scale(.98);
+    transform: translateY(44px) scale(.98);
+  }
+  [data-reveal].from-above {
+    -webkit-transform: translateY(-44px) scale(.98);
+    transform: translateY(-44px) scale(.98);
+  }
+  [data-reveal].is-in {
+    -webkit-transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (max-width: 400px) {
@@ -917,10 +980,10 @@ button {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
-    scroll-behavior: auto !important;
   }
   [data-reveal] {
     opacity: 1 !important;
+    -webkit-transform: none !important;
     transform: none !important;
   }
 }
@@ -1106,7 +1169,8 @@ button {
 
         </div>
       </article>
-            <!-- 第三方 ROM（可展开多版本） -->
+
+      <!-- 第三方 ROM（可展开多版本） -->
       <article class="dl-card dl-card--expand" id="romCard" data-reveal>
         <button class="dl-expand-head" type="button"
                 aria-expanded="false" aria-controls="romVersions"
@@ -1402,7 +1466,14 @@ button {
   function $(sel) { return document.querySelector(sel); }
   function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
-  var prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var prefersReduced = false;
+  try {
+    prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (e) { prefersReduced = false; }
+
+  var raf = window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            function (fn) { return setTimeout(fn, 16); };
 
   /* ---------- 主题切换 ---------- */
   var themeBtn = $('#themeToggle');
@@ -1424,41 +1495,53 @@ button {
       if (!head) return;
 
       head.addEventListener('click', function () {
-        var expanded = card.classList.toggle('expanded');
-        head.setAttribute('aria-expanded', String(expanded));
+        var expanded = card.classList.contains('expanded');
+        if (expanded) {
+          card.classList.remove('expanded');
+        } else {
+          card.classList.add('expanded');
+        }
+        head.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       });
     });
   }
 
-  /* ---------- 滚动显现 ---------- */
+  /* ---------- 滚动显现（降级 IntersectionObserver） ---------- */
   function initReveal() {
     var els = $$('[data-reveal]');
+    if (!els.length) return;
 
-    if (!('IntersectionObserver' in window) || prefersReduced) {
+    if (prefersReduced) {
       els.forEach(function (el) { el.classList.add('from-below', 'is-in'); });
       return;
     }
 
-    els.forEach(function (el, i) {
+    els.forEach(function (el) {
       el.classList.add('from-below');
-      el.style.setProperty('--reveal-delay', ((i % 4) * 75) + 'ms');
     });
 
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var el = entry.target;
+    function check() {
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var triggerTop = 60;
+      var triggerBottom = vh - 60;
 
-        if (entry.isIntersecting) {
-          if (el.classList.contains('is-in')) return;
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        var r = el.getBoundingClientRect();
+        var inView = r.top < triggerBottom && r.bottom > triggerTop;
 
-          var fromBelow = entry.boundingClientRect.top >= 0;
+        if (inView) {
+          if (el.classList.contains('is-in')) continue;
+
+          var fromBelow = r.top >= 0;
           var wanted = fromBelow ? 'from-below' : 'from-above';
           var current = el.classList.contains('from-below') ? 'from-below' :
                        (el.classList.contains('from-above') ? 'from-above' : null);
 
           if (current !== wanted) {
             el.classList.add('no-transition');
-            el.classList.remove('from-below', 'from-above');
+            el.classList.remove('from-below');
+            el.classList.remove('from-above');
             el.classList.add(wanted);
             void el.offsetWidth;
             el.classList.remove('no-transition');
@@ -1472,10 +1555,46 @@ button {
             el.classList.remove('no-transition');
           }
         }
-      });
-    }, { threshold: 0, rootMargin: '-60px 0px -60px 0px' });
+      }
+    }
 
-    els.forEach(function (el) { io.observe(el); });
+    var ticking = false;
+    function onScrollOrResize() {
+      if (ticking) return;
+      ticking = true;
+      raf(function () {
+        check();
+        ticking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScrollOrResize);
+    window.addEventListener('resize', onScrollOrResize);
+    check();
+  }
+
+  /* ---------- 平滑滚动（Chrome 49 无 scrollTo(options)） ---------- */
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function smoothScrollTo(targetY, duration) {
+    if (duration == null) duration = 500;
+    var startY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var distance = targetY - startY;
+    var startTime = null;
+
+    function step(ts) {
+      if (startTime === null) startTime = ts;
+      var elapsed = ts - startTime;
+      var progress = elapsed / duration;
+      if (progress > 1) progress = 1;
+      var eased = easeInOutCubic(progress);
+      window.scrollTo(0, Math.round(startY + distance * eased));
+      if (progress < 1) raf(step);
+    }
+
+    raf(step);
   }
 
   /* ---------- 滚动 UI ---------- */
@@ -1487,17 +1606,24 @@ button {
     window.addEventListener('scroll', function () {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(function () {
-        var y = window.scrollY;
-        if (navbar) navbar.classList.toggle('scrolled', y > 10);
-        if (toTop) toTop.classList.toggle('show', y > 500);
+      raf(function () {
+        var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        if (navbar) {
+          if (y > 10) navbar.classList.add('scrolled');
+          else navbar.classList.remove('scrolled');
+        }
+        if (toTop) {
+          if (y > 500) toTop.classList.add('show');
+          else toTop.classList.remove('show');
+        }
         ticking = false;
       });
-    }, { passive: true });
+    });
 
     if (toTop) {
       toTop.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+        if (prefersReduced) window.scrollTo(0, 0);
+        else smoothScrollTo(0, 500);
       });
     }
   }
@@ -1515,8 +1641,13 @@ button {
 
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      var open = list.classList.toggle('open');
-      btn.setAttribute('aria-expanded', String(open));
+      var open = list.classList.contains('open');
+      if (open) {
+        close();
+      } else {
+        list.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
     });
 
     list.addEventListener('click', function (e) {
@@ -1530,7 +1661,8 @@ button {
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') close();
+      var key = e.key || e.keyCode;
+      if (key === 'Escape' || key === 'Esc' || key === 27) close();
     });
   }
 
@@ -1541,9 +1673,8 @@ button {
     initScrollUI();
     initMobileMenu();
   } catch (e) {
-    $$('[data-reveal]').forEach(function (el) {
-      el.classList.add('is-in');
-    });
+    var fb = $$('[data-reveal]');
+    for (var i = 0; i < fb.length; i++) fb[i].classList.add('is-in');
   }
 })();
 </script>
