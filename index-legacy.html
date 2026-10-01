@@ -4,21 +4,17 @@
 <meta charset="UTF-8" />
 
 <script>
+/* 三向分流：Safari 家族 → Apple 版；现代 → 现代版；否则 → 本版 */
 (function () {
-  /* ---------- 1. 环境判定 ---------- */
   function isSafariFamily() {
     var ua = navigator.userAgent;
-
     // iOS / iPadOS（含 CriOS / FxiOS / EdgiOS，底层全是 WebKit）
     if (/iPad|iPhone|iPod/.test(ua)) return true;
-
     // iPadOS 13+ 桌面模式（伪装成 Mac，但有触屏）
     if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
-
     // macOS Safari（排除 Chrome / Edge / Opera / Firefox）
     if (/Safari/.test(ua) &&
         !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)) return true;
-
     return false;
   }
 
@@ -32,22 +28,14 @@
     }
   }
 
-  /* ---------- 2. 目标版本 ---------- */
   var target;
   if (isSafariFamily())  target = 'index-apple.html';
   else if (isModern())   target = 'index.html';
   else                   target = 'index-legacy.html';
 
-  /* ---------- 3. 当前文件（每份文件只改这一行） ---------- */
-  var current = 'index-apple.html';
-  /* index.html        → 'index.html'
-     index-legacy.html → 'index-legacy.html'
-     index-apple.html  → 'index-apple.html' */
-
-  /* ---------- 4. 已在正确版本 → 不做任何事 ---------- */
+  var current = 'index-legacy.html';
   if (current === target) return;
 
-  /* ---------- 5. 跳走 ---------- */
   location.replace(target + location.search + location.hash);
 })();
 </script>
@@ -67,7 +55,11 @@
       var h = new Date().getHours();
       return (h >= 6 && h < 18) ? 'light' : 'dark';
     } catch (e) {
-      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      try {
+        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (err) {
+        return 'light';
+      }
     }
   }
 
@@ -92,14 +84,20 @@
   try {
     document.documentElement.dataset.theme = resolveTheme();
   } catch (e) {
-    document.documentElement.dataset.theme = 'light';
+    document.documentElement.setAttribute('data-theme', resolveTheme());
   }
 
   setInterval(function () {
     if (hasManualOverride()) return;
     var next = autoTheme();
-    if (document.documentElement.dataset.theme !== next) {
-      document.documentElement.dataset.theme = next;
+    var cur = document.documentElement.dataset.theme ||
+              document.documentElement.getAttribute('data-theme');
+    if (cur !== next) {
+      try {
+        document.documentElement.dataset.theme = next;
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', next);
+      }
     }
   }, 60000);
 })();
@@ -208,7 +206,10 @@ body.is-loading { overflow: hidden; }
   transition: transform .72s cubic-bezier(.77, 0, .175, 1);
 }
 
-#loader.slide-out { transform: translateX(100%); }
+#loader.slide-out {
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+}
 
 .loader-logo {
   font-size: 32px;
@@ -234,8 +235,8 @@ body.is-loading { overflow: hidden; }
 }
 
 @keyframes logoIn {
-  from { opacity: 0; transform: translateY(12px) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; -webkit-transform: translateY(12px) scale(.96); transform: translateY(12px) scale(.96); }
+  to { opacity: 1; -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
 }
 
 .loader-bar {
@@ -686,8 +687,8 @@ body.is-loading { overflow: hidden; }
     top .25s cubic-bezier(.4, 0, .2, 1),
     box-shadow .3s ease,
     border-color .3s ease,
-    opacity .6s cubic-bezier(.25, .46, .45, .94) var(--reveal-delay, 0ms),
-    transform .9s cubic-bezier(.16, 1, .3, 1) var(--reveal-delay, 0ms);
+    opacity .6s cubic-bezier(.25, .46, .45, .94),
+    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 .card:hover {
@@ -1024,8 +1025,8 @@ body.is-loading { overflow: hidden; }
   -webkit-transform: translateY(64px) scale(.97);
   transform: translateY(64px) scale(.97);
   transition:
-    opacity .6s cubic-bezier(.25, .46, .45, .94) var(--reveal-delay, 0ms),
-    transform .9s cubic-bezier(.16, 1, .3, 1) var(--reveal-delay, 0ms);
+    opacity .6s cubic-bezier(.25, .46, .45, .94),
+    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 [data-reveal].from-above {
@@ -1404,12 +1405,22 @@ body.is-loading { overflow: hidden; }
   var navbar = document.getElementById('navbar');
   var toTop = document.getElementById('toTop');
 
+  var raf = window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            function (fn) { return setTimeout(fn, 16); };
+
   /* ---------- 主题切换 ---------- */
   var themeBtn = document.getElementById('themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
+      var cur = document.documentElement.dataset.theme ||
+                document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      try {
+        document.documentElement.dataset.theme = next;
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', next);
+      }
       try {
         localStorage.setItem('theme', next);
         localStorage.setItem('themeAt', String(Date.now()));
@@ -1417,11 +1428,7 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ---------- 平滑滚动（Chrome 49 无 scrollTo(options)） ---------- */
-  var raf = window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            function (fn) { return setTimeout(fn, 16); };
-
+  /* ---------- 平滑滚动 ---------- */
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -1507,7 +1514,6 @@ body.is-loading { overflow: hidden; }
             el.classList.remove('from-below');
             el.classList.remove('from-above');
             el.classList.add(wanted);
-            /* 强制 reflow */
             void el.offsetWidth;
             el.classList.remove('no-transition');
           }
@@ -1553,7 +1559,7 @@ body.is-loading { overflow: hidden; }
     })();
   }
 
-  /* ---------- 滚动 UI（导航阴影 / 回到顶部 / 当前分节） ---------- */
+  /* ---------- 滚动 UI ---------- */
   function initScrollUI() {
     var navLinks = $$('.nav-link');
     var sections = $$('.hero[id], .section[id]');
@@ -1567,8 +1573,9 @@ body.is-loading { overflow: hidden; }
       }
       for (var j = 0; j < navLinks.length; j++) {
         var link = navLinks[j];
-        if (!link.getAttribute('data-section')) continue;
-        if (link.getAttribute('data-section') === current) {
+        var sec = link.getAttribute('data-section');
+        if (!sec) continue;
+        if (sec === current) {
           if (!link.classList.contains('active')) link.classList.add('active');
         } else {
           link.classList.remove('active');
