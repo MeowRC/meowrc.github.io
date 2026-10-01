@@ -1,5 +1,32 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
+<script>
+(function () {
+  /* 检测是否为现代浏览器 */
+  function isModern() {
+    if (!window.CSS || !CSS.supports) return false;
+    return CSS.supports('translate', '0 64px') &&
+           CSS.supports('inset', '0');
+  }
+
+  /* 缓存检测结果，避免每次访问都检测 */
+  var cached;
+  try { cached = sessionStorage.getItem('modernBrowser'); } catch (e) {}
+
+  var modern;
+  if (cached === '1') modern = true;
+  else if (cached === '0') modern = false;
+  else {
+    modern = isModern();
+    try { sessionStorage.setItem('modernBrowser', modern ? '1' : '0'); } catch (e) {}
+  }
+
+  /* 老浏览器 → 重定向到兼容版 */
+  if (!modern) {
+    location.replace('index-legacy.html' + location.search + location.hash);
+  }
+})();
+</script>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
