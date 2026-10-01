@@ -4,21 +4,14 @@
 <meta charset="UTF-8" />
 
 <script>
+/* 三向分流：Safari 家族 → 本版；现代 → 现代版；否则 → Legacy 版 */
 (function () {
-  /* ---------- 1. 环境判定 ---------- */
   function isSafariFamily() {
     var ua = navigator.userAgent;
-
-    // iOS / iPadOS（含 CriOS / FxiOS / EdgiOS，底层全是 WebKit）
     if (/iPad|iPhone|iPod/.test(ua)) return true;
-
-    // iPadOS 13+ 桌面模式（伪装成 Mac，但有触屏）
     if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
-
-    // macOS Safari（排除 Chrome / Edge / Opera / Firefox）
     if (/Safari/.test(ua) &&
         !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)) return true;
-
     return false;
   }
 
@@ -32,28 +25,24 @@
     }
   }
 
-  /* ---------- 2. 目标版本 ---------- */
   var target;
   if (isSafariFamily())  target = 'index-apple.html';
   else if (isModern())   target = 'index.html';
   else                   target = 'index-legacy.html';
 
-  /* ---------- 3. 当前文件（每份文件只改这一行） ---------- */
   var current = 'index-apple.html';
-  /* index.html        → 'index.html'
-     index-legacy.html → 'index-legacy.html'
-     index-apple.html  → 'index-apple.html' */
-
-  /* ---------- 4. 已在正确版本 → 不做任何事 ---------- */
   if (current === target) return;
 
-  /* ---------- 5. 跳走 ---------- */
   location.replace(target + location.search + location.hash);
 })();
 </script>
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="MeowRc" />
+<meta name="format-detection" content="telephone=no" />
 <meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
 <meta name="theme-color" content="#f5a0b8" />
 <title>在线 · MeowRc Blog</title>
@@ -94,22 +83,32 @@
     return autoTheme();
   }
 
-  try {
-    document.documentElement.dataset.theme = resolveTheme();
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'light');
+  /* Safari 10 的 dataset 兼容度不好，统一用 setAttribute */
+  function setThemeAttr(val) {
+    try {
+      document.documentElement.dataset.theme = val;
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', val);
+    }
   }
+  function getThemeAttr() {
+    var el = document.documentElement;
+    try {
+      if (el.dataset && el.dataset.theme) return el.dataset.theme;
+    } catch (e) {}
+    return el.getAttribute('data-theme');
+  }
+
+  setThemeAttr(resolveTheme());
 
   setInterval(function () {
     if (hasManualOverride()) return;
     var next = autoTheme();
-    if (document.documentElement.dataset.theme !== next) {
-      document.documentElement.dataset.theme = next;
-    }
+    if (getThemeAttr() !== next) setThemeAttr(next);
   }, 60000);
 })();
 
-/* 兜底：5 秒后强制显示内容（Chrome 49 的 NodeList 没有 forEach） */
+/* 兜底：5 秒后强制显示内容 */
 setTimeout(function () {
   var els = document.querySelectorAll('[data-reveal]');
   for (var i = 0; i < els.length; i++) {
@@ -161,6 +160,7 @@ setTimeout(function () {
 html {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -209,19 +209,22 @@ button {
   right: 0;
   height: var(--nav-h);
   z-index: 100;
-  background: rgba(255, 255, 255, .94);
+  /* Safari 支持 -webkit-backdrop-filter，磨砂玻璃加回来 */
+  background: rgba(255, 255, 255, .78);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
   border-bottom: 1px solid var(--border);
   transition: box-shadow .3s ease, background-color .3s ease;
 }
 
-[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .94); }
+[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
 
 .navbar.scrolled {
-  background: rgba(255, 255, 255, .98);
+  background: rgba(255, 255, 255, .92);
   box-shadow: var(--shadow-sm);
 }
 
-[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .98); }
+[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
 
 .navbar-inner {
   max-width: var(--maxw);
@@ -354,6 +357,7 @@ button {
   background-size: 64px 64px;
   opacity: .35;
   -webkit-mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
 }
 
 .page-hero-inner {
@@ -1006,6 +1010,57 @@ button {
     transform: none !important;
   }
 }
+
+/* ============ Apple 专属补丁 ============ */
+
+/* 1. 关闭卡片类元素长按弹出系统菜单 */
+.card, .post, .project, .dl-card, .dl-btn, .social-link, .icon-btn,
+.nav-brand, .nav-links a, .tag, .to-top, .dl-expand-head, .dl-chevron,
+.dl-version-row {
+  -webkit-touch-callout: none;
+}
+
+/* 2. 刘海屏安全区（iOS 11+；Safari 10 不认识 env() 会忽略整条声明，无副作用） */
+.navbar {
+  padding-top: constant(safe-area-inset-top);  /* iOS 11.0–11.2 */
+  padding-top: env(safe-area-inset-top);       /* iOS 11.2+ */
+  height: calc(64px + env(safe-area-inset-top));
+}
+
+.navbar-inner { height: 64px; }
+
+.main {
+  padding-left:  calc(24px + env(safe-area-inset-left));
+  padding-right: calc(24px + env(safe-area-inset-right));
+}
+
+.footer {
+  padding-left:  calc(24px + env(safe-area-inset-left));
+  padding-right: calc(24px + env(safe-area-inset-right));
+}
+
+.to-top {
+  right:  calc(22px + env(safe-area-inset-right));
+  bottom: calc(22px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 720px) {
+  .main {
+    padding-left:  calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+  }
+}
+
+/* 3. 关闭原生平滑滚动（Safari 15.4 才支持；用 JS 接管更稳） */
+html { scroll-behavior: auto; }
+
+/* 4. 移动端菜单展开时避开安全区 */
+@media (max-width: 720px) {
+  .nav-links {
+    padding-left:  calc(16px + env(safe-area-inset-left));
+    padding-right: calc(16px + env(safe-area-inset-right));
+  }
+}
 </style>
 </head>
 
@@ -1016,13 +1071,13 @@ button {
 <!-- 导航栏 -->
 <nav class="navbar" id="navbar" aria-label="主导航">
   <div class="navbar-inner">
-    <a href="../index-legacy.html" class="nav-brand"><em>MeowRc</em> Blog</a>
+    <a href="../index-apple.html" class="nav-brand"><em>MeowRc</em> Blog</a>
 
     <ul class="nav-links" id="navLinks">
-      <li><a href="../index-legacy.html" class="nav-link">主页</a></li>
-      <li><a href="../index-legacy.html#projects" class="nav-link">项目</a></li>
-      <li><a href="../index-legacy.html#contact" class="nav-link">联系</a></li>
-      <li><a href="index-legacy.html" class="nav-link active">在线</a></li>
+      <li><a href="../index-apple.html" class="nav-link">主页</a></li>
+      <li><a href="../index-apple.html#projects" class="nav-link">项目</a></li>
+      <li><a href="../index-apple.html#contact" class="nav-link">联系</a></li>
+      <li><a href="index-apple.html" class="nav-link active">在线</a></li>
     </ul>
 
     <div class="nav-actions">
@@ -1494,12 +1549,28 @@ button {
             window.webkitRequestAnimationFrame ||
             function (fn) { return setTimeout(fn, 16); };
 
+  /* ---------- 主题读写（Safari 10 dataset 兼容） ---------- */
+  function setThemeAttr(val) {
+    try {
+      document.documentElement.dataset.theme = val;
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', val);
+    }
+  }
+  function getThemeAttr() {
+    var el = document.documentElement;
+    try {
+      if (el.dataset && el.dataset.theme) return el.dataset.theme;
+    } catch (e) {}
+    return el.getAttribute('data-theme');
+  }
+
   /* ---------- 主题切换 ---------- */
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
+      var next = getThemeAttr() === 'dark' ? 'light' : 'dark';
+      setThemeAttr(next);
       try {
         localStorage.setItem('theme', next);
         localStorage.setItem('themeAt', String(Date.now()));
@@ -1525,7 +1596,7 @@ button {
     });
   }
 
-  /* ---------- 滚动显现（降级 IntersectionObserver） ---------- */
+  /* ---------- 滚动显现 ---------- */
   function initReveal() {
     var els = $$('[data-reveal]');
     if (!els.length) return;
@@ -1592,7 +1663,7 @@ button {
     check();
   }
 
-  /* ---------- 平滑滚动（Chrome 49 无 scrollTo(options)） ---------- */
+  /* ---------- 平滑滚动 ---------- */
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
