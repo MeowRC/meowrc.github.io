@@ -1,5 +1,29 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
+<script>
+(function () {
+  function isModern() {
+    if (!window.CSS || !CSS.supports) return false;
+    return CSS.supports('translate', '0 64px') &&
+           CSS.supports('inset', '0');
+  }
+
+  var cached;
+  try { cached = sessionStorage.getItem('modernBrowser'); } catch (e) {}
+
+  var modern;
+  if (cached === '1') modern = true;
+  else if (cached === '0') modern = false;
+  else {
+    modern = isModern();
+    try { sessionStorage.setItem('modernBrowser', modern ? '1' : '0'); } catch (e) {}
+  }
+
+  if (!modern) {
+    location.replace('index-legacy.html' + location.search + location.hash);
+  }
+})();
+</script>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
