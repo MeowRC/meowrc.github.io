@@ -4,53 +4,36 @@
 <meta charset="UTF-8" />
 
 <script>
-/* 三向分流：Safari 家族 → Apple 版；现代 → 现代版；否则 → 本版 */
 (function () {
-  function isSafariFamily() {
-    var ua = navigator.userAgent;
-    // iOS / iPadOS（含 CriOS / FxiOS / EdgiOS，底层全是 WebKit）
-    if (/iPad|iPhone|iPod/.test(ua)) return true;
-    // iPadOS 13+ 桌面模式（伪装成 Mac，但有触屏）
-    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
-    // macOS Safari（排除 Chrome / Edge / Opera / Firefox）
-    if (/Safari/.test(ua) &&
-        !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua)) return true;
-    return false;
+  var ua = navigator.userAgent;
+
+  var safariFamily =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+    (/Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua));
+
+  var isModern = false;
+  try {
+    isModern = !!(window.CSS && CSS.supports &&
+      CSS.supports('translate', '0 64px') &&
+      CSS.supports('inset', '0'));
+  } catch (e) {}
+
+  var target = safariFamily ? 'index-apple.html'
+             : isModern     ? 'index.html'
+             :                'index-legacy.html';
+
+  if (!location.pathname.endsWith('/' + target)) {
+    location.replace(target + location.search + location.hash);
   }
-
-  function isModern() {
-    if (!window.CSS || !CSS.supports) return false;
-    try {
-      return CSS.supports('translate', '0 64px') &&
-             CSS.supports('inset', '0');
-    } catch (e) {
-      return false;
-    }
-  }
-
-  var target;
-  if (isSafariFamily())  target = 'index-apple.html';
-  else if (isModern())   target = 'index.html';
-  else                   target = 'index-legacy.html';
-
-  var current = 'index-legacy.html';
-  if (current === target) return;
-
-  location.replace(target + location.search + location.hash);
 })();
-</script>
 
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="MeowRc Blog — 记录技术思考与生活点滴。" />
-<meta name="theme-color" content="#f5a0b8" />
-<title>MeowRc Blog</title>
-
-<script>
 (function () {
-  var OVERRIDE_TTL = 6 * 60 * 60 * 1000;
+  var TTL = 6 * 60 * 60 * 1000;
+  var root = document.documentElement;
+  var colors = { light: '#fdfbfc', dark: '#14121a' };
 
-  function autoTheme() {
+  function auto() {
     try {
       var h = new Date().getHours();
       return (h >= 6 && h < 18) ? 'light' : 'dark';
@@ -63,55 +46,35 @@
     }
   }
 
-  function hasManualOverride() {
+  function stored() {
     try {
-      var stored = localStorage.getItem('theme');
+      var v = localStorage.getItem('theme');
       var at = parseInt(localStorage.getItem('themeAt') || '0', 10);
-      return (stored === 'dark' || stored === 'light') &&
-             (Date.now() - at < OVERRIDE_TTL);
-    } catch (e) {
-      return false;
-    }
+      if ((v === 'dark' || v === 'light') && Date.now() - at < TTL) return v;
+    } catch (e) {}
+    return null;
   }
 
-  function resolveTheme() {
-    if (hasManualOverride()) {
-      try { return localStorage.getItem('theme'); } catch (e) {}
-    }
-    return autoTheme();
+  function set(theme) {
+    if (root.getAttribute('data-theme') === theme) return;
+    root.setAttribute('data-theme', theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = colors[theme];
   }
 
-  try {
-    document.documentElement.dataset.theme = resolveTheme();
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', resolveTheme());
-  }
+  set(stored() || auto());
 
   setInterval(function () {
-    if (hasManualOverride()) return;
-    var next = autoTheme();
-    var cur = document.documentElement.dataset.theme ||
-              document.documentElement.getAttribute('data-theme');
-    if (cur !== next) {
-      try {
-        document.documentElement.dataset.theme = next;
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', next);
-      }
-    }
+    if (!stored()) set(auto());
   }, 60000);
 })();
-
-setTimeout(function () {
-  var blog = document.getElementById('blog');
-  if (blog && blog.hidden) {
-    var loader = document.getElementById('loader');
-    if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-    blog.hidden = false;
-    blog.classList.add('page-enter');
-  }
-}, 5000);
 </script>
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MeowRc Blog — 记录技术思考与生活点滴。" />
+<meta name="theme-color" content="#f5a0b8" />
+<title>MeowRc Blog</title>
 
 <style>
 :root {
@@ -172,8 +135,6 @@ a { color: inherit; }
 button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
 [hidden] { display: none !important; }
 
-body.is-loading { overflow: hidden; }
-
 ::-webkit-selection { background: var(--accent); color: #fff; }
 ::selection { background: var(--accent); color: #fff; }
 
@@ -193,7 +154,7 @@ body.is-loading { overflow: hidden; }
   border: 0;
 }
 
-/* ============ 加载页 ============ */
+/* ===== 加载页 ===== */
 #loader {
   position: fixed;
   top: 0; right: 0; bottom: 0; left: 0;
@@ -203,20 +164,26 @@ body.is-loading { overflow: hidden; }
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at 50% 45%, var(--accent-soft) 0%, var(--bg) 65%);
-  transition: transform .72s cubic-bezier(.77, 0, .175, 1);
+  transition:
+    opacity 1.15s cubic-bezier(.16, 1, .3, 1),
+    -webkit-transform 1.15s cubic-bezier(.16, 1, .3, 1),
+    transform 1.15s cubic-bezier(.16, 1, .3, 1);
+  will-change: opacity, transform;
 }
 
 #loader.slide-out {
-  -webkit-transform: translateX(100%);
-  transform: translateX(100%);
+  opacity: 0;
+  -webkit-transform: translateY(-30px);
+  transform: translateY(-30px);
+  pointer-events: none;
 }
 
 .loader-logo {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -.025em;
-  margin-bottom: 22px;
-  animation: logoIn .6s cubic-bezier(.34, 1.56, .64, 1) both;
+  margin-bottom: 26px;
+  animation: logoIn 1.25s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 @media (min-width: 480px) {
@@ -235,8 +202,20 @@ body.is-loading { overflow: hidden; }
 }
 
 @keyframes logoIn {
-  from { opacity: 0; -webkit-transform: translateY(12px) scale(.96); transform: translateY(12px) scale(.96); }
-  to { opacity: 1; -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(18px) scale(.94);
+    transform: translateY(18px) scale(.94);
+    filter: blur(6px);
+    -webkit-filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    -webkit-filter: blur(0);
+  }
 }
 
 .loader-bar {
@@ -258,7 +237,7 @@ body.is-loading { overflow: hidden; }
   -webkit-transform-origin: left center;
   transform-origin: left center;
   overflow: hidden;
-  animation: barFill 2s cubic-bezier(.55, 0, .35, 1) both;
+  animation: barFill 2.4s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 .loader-bar > i::after {
@@ -266,7 +245,7 @@ body.is-loading { overflow: hidden; }
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
-  animation: barSheen 1.6s ease-in-out infinite;
+  animation: barSheen 2s ease-in-out infinite;
 }
 
 @keyframes barFill {
@@ -278,7 +257,7 @@ body.is-loading { overflow: hidden; }
   100% { -webkit-transform: translateX(100%); transform: translateX(100%); }
 }
 
-/* ============ 导航栏 ============ */
+/* ===== 导航栏 ===== */
 .navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -289,6 +268,7 @@ body.is-loading { overflow: hidden; }
   -webkit-transform: translateY(-100%);
   transform: translateY(-100%);
   transition:
+    -webkit-transform .75s cubic-bezier(.22, 1, .36, 1),
     transform .75s cubic-bezier(.22, 1, .36, 1),
     box-shadow .3s ease,
     background-color .3s ease;
@@ -296,7 +276,10 @@ body.is-loading { overflow: hidden; }
 
 [data-theme="dark"] .navbar { background: rgba(20, 18, 26, .94); }
 
-.page-enter .navbar { -webkit-transform: translateY(0); transform: translateY(0); }
+.page-enter .navbar {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
 
 .navbar.scrolled {
   background: rgba(255, 255, 255, .98);
@@ -372,7 +355,7 @@ body.is-loading { overflow: hidden; }
   padding: 10px;
   border-radius: 50%;
   color: var(--text-2);
-  transition: background-color .2s, color .2s, transform .2s;
+  transition: background-color .2s, color .2s, -webkit-transform .2s, transform .2s;
 }
 
 .icon-btn:hover { background: var(--accent-soft); color: var(--accent-strong); }
@@ -385,7 +368,7 @@ body.is-loading { overflow: hidden; }
 
 .mobile-menu-btn { display: none; }
 
-/* ============ Hero ============ */
+/* ===== Hero ===== */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -616,7 +599,7 @@ body.is-loading { overflow: hidden; }
   to { opacity: 1; -webkit-transform: translate(-50%, 0); transform: translate(-50%, 0); }
 }
 
-/* ============ 主体 ============ */
+/* ===== 主体 ===== */
 .main {
   max-width: var(--maxw);
   margin: 0 auto;
@@ -654,7 +637,7 @@ body.is-loading { overflow: hidden; }
 
 .section-title {
   font-size: 1.35rem;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: -.02em;
 }
 
@@ -668,7 +651,6 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
-/* 卡片：用 top 做悬停位移，与入场的 transform 完全分离 */
 .card {
   position: relative;
   top: 0;
@@ -688,6 +670,7 @@ body.is-loading { overflow: hidden; }
     box-shadow .3s ease,
     border-color .3s ease,
     opacity .6s cubic-bezier(.25, .46, .45, .94),
+    -webkit-transform .9s cubic-bezier(.16, 1, .3, 1),
     transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
@@ -699,7 +682,7 @@ body.is-loading { overflow: hidden; }
 
 .card:active { top: -1px; }
 
-/* ============ 博客文章 ============ */
+/* ===== 文章 ===== */
 .post-list { display: block; }
 
 .post {
@@ -723,7 +706,7 @@ body.is-loading { overflow: hidden; }
   transform: scaleY(0);
   -webkit-transform-origin: top;
   transform-origin: top;
-  transition: transform .38s cubic-bezier(.4, 0, .2, 1);
+  transition: -webkit-transform .38s cubic-bezier(.4, 0, .2, 1), transform .38s cubic-bezier(.4, 0, .2, 1);
 }
 
 .post:hover::before { -webkit-transform: scaleY(1); transform: scaleY(1); }
@@ -739,7 +722,7 @@ body.is-loading { overflow: hidden; }
 .post-title {
   margin-top: 3px;
   font-size: 1.08rem;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: -.012em;
   transition: color .2s;
 }
@@ -753,7 +736,6 @@ body.is-loading { overflow: hidden; }
   color: var(--text-2);
 }
 
-/* 标签：负 margin 模拟 gap */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -775,7 +757,7 @@ body.is-loading { overflow: hidden; }
 
 .tag:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-/* ============ 项目 ============ */
+/* ===== 项目 ===== */
 .projects {
   display: flex;
   flex-wrap: wrap;
@@ -819,7 +801,7 @@ body.is-loading { overflow: hidden; }
   transform: scaleX(0);
   -webkit-transform-origin: left;
   transform-origin: left;
-  transition: transform .42s cubic-bezier(.4, 0, .2, 1);
+  transition: -webkit-transform .42s cubic-bezier(.4, 0, .2, 1), transform .42s cubic-bezier(.4, 0, .2, 1);
 }
 
 .project:hover::after { -webkit-transform: scaleX(1); transform: scaleX(1); }
@@ -836,7 +818,10 @@ body.is-loading { overflow: hidden; }
   background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(245, 160, 184, .12) 100%);
   border: 1px solid rgba(245, 160, 184, .18);
   box-shadow: 0 2px 8px rgba(245, 160, 184, .12);
-  transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease;
+  transition:
+    -webkit-transform .4s cubic-bezier(.34, 1.56, .64, 1),
+    transform .4s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow .3s ease;
 }
 
 .project-icon svg { width: 100%; height: 100%; }
@@ -855,7 +840,7 @@ body.is-loading { overflow: hidden; }
 .project h3 {
   margin-top: 9px;
   font-size: 1rem;
-  font-weight: 680;
+  font-weight: 700;
   letter-spacing: -.012em;
 }
 
@@ -869,7 +854,7 @@ body.is-loading { overflow: hidden; }
 
 .project .tags { margin-top: -4px; }
 
-/* ============ 联系 ============ */
+/* ===== 联系 ===== */
 .contact { padding: 12px 28px 24px; }
 
 .contact-row {
@@ -895,7 +880,10 @@ body.is-loading { overflow: hidden; }
   background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(245, 160, 184, .12) 100%);
   border: 1px solid rgba(245, 160, 184, .18);
   box-shadow: 0 2px 8px rgba(245, 160, 184, .1);
-  transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease;
+  transition:
+    -webkit-transform .35s cubic-bezier(.34, 1.56, .64, 1),
+    transform .35s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow .3s ease;
 }
 
 .contact-icon svg { width: 100%; height: 100%; }
@@ -967,7 +955,7 @@ body.is-loading { overflow: hidden; }
   top: -2px;
 }
 
-/* ============ 页脚 & 回到顶部 ============ */
+/* ===== 页脚 / 回到顶部 ===== */
 .footer {
   position: relative;
   padding: 36px 24px 40px;
@@ -1002,6 +990,7 @@ body.is-loading { overflow: hidden; }
   transform: translateY(10px);
   transition:
     opacity .3s,
+    -webkit-transform .3s,
     transform .3s,
     visibility .3s,
     background-color .2s,
@@ -1019,19 +1008,15 @@ body.is-loading { overflow: hidden; }
 .to-top:active { -webkit-transform: scale(.94); transform: scale(.94); }
 .to-top svg { width: 18px; height: 18px; }
 
-/* ============ 滚动显现 ============ */
+/* ===== 滚动显现 ===== */
 [data-reveal] {
   opacity: 0;
   -webkit-transform: translateY(64px) scale(.97);
   transform: translateY(64px) scale(.97);
   transition:
     opacity .6s cubic-bezier(.25, .46, .45, .94),
+    -webkit-transform .9s cubic-bezier(.16, 1, .3, 1),
     transform .9s cubic-bezier(.16, 1, .3, 1);
-}
-
-[data-reveal].from-above {
-  -webkit-transform: translateY(-64px) scale(.97);
-  transform: translateY(-64px) scale(.97);
 }
 
 [data-reveal].is-in {
@@ -1040,9 +1025,7 @@ body.is-loading { overflow: hidden; }
   transform: translateY(0) scale(1);
 }
 
-[data-reveal].no-transition { transition: none !important; }
-
-/* ============ 响应式 ============ */
+/* ===== 响应式 ===== */
 @media (max-width: 720px) {
   .mobile-menu-btn { display: flex; }
 
@@ -1062,7 +1045,7 @@ body.is-loading { overflow: hidden; }
     visibility: hidden;
     -webkit-transform: translateY(-10px);
     transform: translateY(-10px);
-    transition: opacity .25s ease, transform .25s ease, visibility .25s;
+    transition: opacity .25s ease, -webkit-transform .25s ease, transform .25s ease, visibility .25s;
   }
 
   .nav-links li { margin: 1px 0; }
@@ -1091,10 +1074,6 @@ body.is-loading { overflow: hidden; }
   [data-reveal] {
     -webkit-transform: translateY(44px) scale(.98);
     transform: translateY(44px) scale(.98);
-  }
-  [data-reveal].from-above {
-    -webkit-transform: translateY(-44px) scale(.98);
-    transform: translateY(-44px) scale(.98);
   }
   [data-reveal].is-in {
     -webkit-transform: translateY(0) scale(1);
@@ -1130,7 +1109,7 @@ body.is-loading { overflow: hidden; }
 </style>
 </head>
 
-<body class="is-loading">
+<body>
 
 <div id="loader" role="status" aria-live="polite">
   <span class="sr-only">页面加载中</span>
@@ -1393,34 +1372,34 @@ body.is-loading { overflow: hidden; }
 (function () {
   'use strict';
 
-  function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+  function $$(sel) {
+    return Array.prototype.slice.call(document.querySelectorAll(sel));
+  }
 
   var prefersReduced = false;
   try {
     prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch (e) { prefersReduced = false; }
+  } catch (e) {}
 
-  var loader = document.getElementById('loader');
-  var blog = document.getElementById('blog');
-  var navbar = document.getElementById('navbar');
-  var toTop = document.getElementById('toTop');
+  var loader  = document.getElementById('loader');
+  var blog    = document.getElementById('blog');
+  var navbar  = document.getElementById('navbar');
+  var toTop   = document.getElementById('toTop');
+  var body    = document.body;
 
   var raf = window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
             function (fn) { return setTimeout(fn, 16); };
 
-  /* ---------- 主题切换 ---------- */
   var themeBtn = document.getElementById('themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var cur = document.documentElement.dataset.theme ||
-                document.documentElement.getAttribute('data-theme');
+      var cur = document.documentElement.getAttribute('data-theme');
       var next = cur === 'dark' ? 'light' : 'dark';
-      try {
-        document.documentElement.dataset.theme = next;
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', next);
-      }
+      document.documentElement.setAttribute('data-theme', next);
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = next === 'dark' ? '#14121a' : '#fdfbfc';
       try {
         localStorage.setItem('theme', next);
         localStorage.setItem('themeAt', String(Date.now()));
@@ -1428,31 +1407,27 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ---------- 平滑滚动 ---------- */
   function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
   function smoothScrollTo(targetY, duration) {
-    if (duration == null) duration = 500;
+    if (duration == null) duration = 520;
     var startY = window.pageYOffset || document.documentElement.scrollTop || 0;
-    var distance = targetY - startY;
+    var delta = targetY - startY;
     var startTime = null;
 
     function step(ts) {
       if (startTime === null) startTime = ts;
-      var elapsed = ts - startTime;
-      var progress = elapsed / duration;
-      if (progress > 1) progress = 1;
-      var eased = easeInOutCubic(progress);
-      window.scrollTo(0, Math.round(startY + distance * eased));
-      if (progress < 1) raf(step);
+      var p = (ts - startTime) / duration;
+      if (p > 1) p = 1;
+      window.scrollTo(0, Math.round(startY + delta * easeInOutCubic(p)));
+      if (p < 1) raf(step);
     }
 
     raf(step);
   }
 
-  /* ---------- 内部锚点 ---------- */
   function initAnchors() {
     var offset = 64 + 24;
 
@@ -1470,67 +1445,39 @@ body.is-loading { overflow: hidden; }
         if (prefersReduced) {
           window.scrollTo(0, Math.max(0, top));
         } else {
-          smoothScrollTo(Math.max(0, top), 500);
+          smoothScrollTo(Math.max(0, top), 520);
         }
         if (history.replaceState) history.replaceState(null, '', href);
       });
     });
   }
 
-  /* ---------- 滚动显现（降级 IntersectionObserver） ---------- */
   function initReveal() {
     var els = $$('[data-reveal]');
     if (!els.length) return;
 
     if (prefersReduced) {
-      els.forEach(function (el) { el.classList.add('from-below', 'is-in'); });
+      els.forEach(function (el) { el.classList.add('is-in'); });
       return;
     }
 
-    els.forEach(function (el) {
-      el.classList.add('from-below');
-    });
+    var ticking = false;
 
     function check() {
       var vh = window.innerHeight || document.documentElement.clientHeight;
-      var triggerTop = 60;
-      var triggerBottom = vh - 60;
+      var trigger = vh - 60;
 
       for (var i = 0; i < els.length; i++) {
         var el = els[i];
+        if (el.classList.contains('is-in')) continue;
         var r = el.getBoundingClientRect();
-        var inView = r.top < triggerBottom && r.bottom > triggerTop;
-
-        if (inView) {
-          if (el.classList.contains('is-in')) continue;
-
-          var fromBelow = r.top >= 0;
-          var wanted = fromBelow ? 'from-below' : 'from-above';
-          var current = el.classList.contains('from-below') ? 'from-below' :
-                       (el.classList.contains('from-above') ? 'from-above' : null);
-
-          if (current !== wanted) {
-            el.classList.add('no-transition');
-            el.classList.remove('from-below');
-            el.classList.remove('from-above');
-            el.classList.add(wanted);
-            void el.offsetWidth;
-            el.classList.remove('no-transition');
-          }
+        if (r.top < trigger && r.bottom > 0) {
           el.classList.add('is-in');
-        } else {
-          if (el.classList.contains('is-in')) {
-            el.classList.add('no-transition');
-            el.classList.remove('is-in');
-            void el.offsetWidth;
-            el.classList.remove('no-transition');
-          }
         }
       }
     }
 
-    var ticking = false;
-    function onScrollOrResize() {
+    function onScroll() {
       if (ticking) return;
       ticking = true;
       raf(function () {
@@ -1539,12 +1486,11 @@ body.is-loading { overflow: hidden; }
       });
     }
 
-    window.addEventListener('scroll', onScrollOrResize);
-    window.addEventListener('resize', onScrollOrResize);
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
     check();
   }
 
-  /* ---------- 打字机 ---------- */
   function initTypewriter() {
     var el = document.getElementById('typingTarget');
     if (!el) return;
@@ -1559,7 +1505,6 @@ body.is-loading { overflow: hidden; }
     })();
   }
 
-  /* ---------- 滚动 UI ---------- */
   function initScrollUI() {
     var navLinks = $$('.nav-link');
     var sections = $$('.hero[id], .section[id]');
@@ -1575,11 +1520,8 @@ body.is-loading { overflow: hidden; }
         var link = navLinks[j];
         var sec = link.getAttribute('data-section');
         if (!sec) continue;
-        if (sec === current) {
-          if (!link.classList.contains('active')) link.classList.add('active');
-        } else {
-          link.classList.remove('active');
-        }
+        if (sec === current) link.classList.add('active');
+        else link.classList.remove('active');
       }
     }
 
@@ -1606,12 +1548,11 @@ body.is-loading { overflow: hidden; }
     if (toTop) {
       toTop.addEventListener('click', function () {
         if (prefersReduced) window.scrollTo(0, 0);
-        else smoothScrollTo(0, 500);
+        else smoothScrollTo(0, 520);
       });
     }
   }
 
-  /* ---------- 移动菜单 ---------- */
   function initMobileMenu() {
     var btn = document.getElementById('mobileMenuBtn');
     var list = document.getElementById('navLinks');
@@ -1624,8 +1565,7 @@ body.is-loading { overflow: hidden; }
 
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      var open = list.classList.contains('open');
-      if (open) {
+      if (list.classList.contains('open')) {
         close();
       } else {
         list.classList.add('open');
@@ -1649,11 +1589,13 @@ body.is-loading { overflow: hidden; }
     });
   }
 
-  /* ---------- 页面进入 ---------- */
   function enterPage() {
     if (!blog) return;
     blog.hidden = false;
     blog.classList.add('page-enter');
+    if (body.classList.contains('is-loading')) {
+      body.classList.remove('is-loading');
+    }
   }
 
   function boot() {
@@ -1677,8 +1619,8 @@ body.is-loading { overflow: hidden; }
         if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
         initReveal();
         initTypewriter();
-      }, 720);
-    }, 2240);
+      }, 1200);
+    }, 2600);
 
     initScrollUI();
     initMobileMenu();
@@ -1690,6 +1632,7 @@ body.is-loading { overflow: hidden; }
   } catch (e) {
     if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
     if (blog) { blog.hidden = false; blog.classList.add('page-enter'); }
+    if (body.classList.contains('is-loading')) body.classList.remove('is-loading');
   }
 })();
 </script>
