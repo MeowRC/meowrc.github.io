@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 
 <script>
-/* 三向分流：Safari 家族 → 本版；现代 → 现代版；否则 → Legacy 版 */
 (function () {
   function isSafariFamily() {
     var ua = navigator.userAgent;
@@ -48,7 +47,6 @@
 <title>在线 · MeowRc Blog</title>
 
 <script>
-/* 主题跟随系统时间 */
 (function () {
   var OVERRIDE_TTL = 6 * 60 * 60 * 1000;
 
@@ -83,7 +81,6 @@
     return autoTheme();
   }
 
-  /* Safari 10 的 dataset 兼容度不好，统一用 setAttribute */
   function setThemeAttr(val) {
     try {
       document.documentElement.dataset.theme = val;
@@ -107,14 +104,6 @@
     if (getThemeAttr() !== next) setThemeAttr(next);
   }, 60000);
 })();
-
-/* 兜底：5 秒后强制显示内容 */
-setTimeout(function () {
-  var els = document.querySelectorAll('[data-reveal]');
-  for (var i = 0; i < els.length; i++) {
-    els[i].classList.add('is-in');
-  }
-}, 5000);
 </script>
 
 <style>
@@ -201,7 +190,6 @@ button {
   border: 0;
 }
 
-/* ============ 导航栏 ============ */
 .navbar {
   position: fixed;
   top: 0;
@@ -209,7 +197,6 @@ button {
   right: 0;
   height: var(--nav-h);
   z-index: 100;
-  /* Safari 支持 -webkit-backdrop-filter，磨砂玻璃加回来 */
   background: rgba(255, 255, 255, .78);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
   backdrop-filter: blur(18px) saturate(1.6);
@@ -326,7 +313,6 @@ button {
 
 .mobile-menu-btn { display: none; }
 
-/* ============ 页头 ============ */
 .page-hero {
   position: relative;
   padding: 136px 24px 40px;
@@ -427,7 +413,6 @@ button {
   max-width: 52ch;
 }
 
-/* ============ 主体 ============ */
 .main {
   max-width: var(--maxw);
   margin: 0 auto;
@@ -492,7 +477,6 @@ button {
   color: var(--text-2);
 }
 
-/* ============ 下载卡片 ============ */
 .downloads {
   display: flex;
   flex-wrap: wrap;
@@ -629,7 +613,6 @@ button {
   margin-top: 2px;
 }
 
-/* ============ 下载按钮 ============ */
 .dl-btn {
   flex: none;
   display: inline-flex;
@@ -682,7 +665,6 @@ button {
   margin-right: 5px;
 }
 
-/* ============ 描述、标签信息 ============ */
 .dl-desc {
   margin-top: 14px;
   font-size: .9rem;
@@ -721,7 +703,6 @@ button {
   stroke-linejoin: round;
 }
 
-/* 多链接按钮组 */
 .dl-links {
   display: flex;
   flex-wrap: wrap;
@@ -737,7 +718,6 @@ button {
   font-size: .8rem;
 }
 
-/* ============ 可展开卡片 ============ */
 .dl-expand-head {
   display: flex;
   align-items: center;
@@ -838,7 +818,6 @@ button {
   white-space: nowrap;
 }
 
-/* ============ 页脚 & 回到顶部 ============ */
 .footer {
   position: relative;
   padding: 36px 24px 40px;
@@ -904,7 +883,6 @@ button {
 .to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .to-top:active { -webkit-transform: scale(.94); transform: scale(.94); }
 
-/* ============ 滚动显现 ============ */
 [data-reveal] {
   opacity: 0;
   -webkit-transform: translateY(64px) scale(.97);
@@ -927,7 +905,6 @@ button {
 
 [data-reveal].no-transition { transition: none !important; }
 
-/* ============ 响应式 ============ */
 @media (max-width: 720px) {
   .mobile-menu-btn { display: flex; }
 
@@ -1011,19 +988,15 @@ button {
   }
 }
 
-/* ============ Apple 专属补丁 ============ */
-
-/* 1. 关闭卡片类元素长按弹出系统菜单 */
 .card, .post, .project, .dl-card, .dl-btn, .social-link, .icon-btn,
 .nav-brand, .nav-links a, .tag, .to-top, .dl-expand-head, .dl-chevron,
 .dl-version-row {
   -webkit-touch-callout: none;
 }
 
-/* 2. 刘海屏安全区（iOS 11+；Safari 10 不认识 env() 会忽略整条声明，无副作用） */
 .navbar {
-  padding-top: constant(safe-area-inset-top);  /* iOS 11.0–11.2 */
-  padding-top: env(safe-area-inset-top);       /* iOS 11.2+ */
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
   height: calc(64px + env(safe-area-inset-top));
 }
 
@@ -1051,10 +1024,8 @@ button {
   }
 }
 
-/* 3. 关闭原生平滑滚动（Safari 15.4 才支持；用 JS 接管更稳） */
 html { scroll-behavior: auto; }
 
-/* 4. 移动端菜单展开时避开安全区 */
 @media (max-width: 720px) {
   .nav-links {
     padding-left:  calc(16px + env(safe-area-inset-left));
@@ -1068,7 +1039,6 @@ html { scroll-behavior: auto; }
 
 <h1 class="sr-only">在线 — MeowRc Blog</h1>
 
-<!-- 导航栏 -->
 <nav class="navbar" id="navbar" aria-label="主导航">
   <div class="navbar-inner">
     <a href="../index-apple.html" class="nav-brand"><em>MeowRc</em> Blog</a>
@@ -1100,7 +1070,6 @@ html { scroll-behavior: auto; }
   </div>
 </nav>
 
-<!-- 页头 -->
 <header class="page-hero">
   <div class="page-hero-inner">
     <div class="page-eyebrow">
@@ -1114,7 +1083,6 @@ html { scroll-behavior: auto; }
   </div>
 </header>
 
-<!-- 主体 -->
 <main class="main">
 
   <section class="section" id="download" aria-labelledby="download-title">
@@ -1131,7 +1099,6 @@ html { scroll-behavior: auto; }
 
     <div class="downloads">
 
-      <!-- 卡巴斯基小助手 -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1172,7 +1139,6 @@ html { scroll-behavior: auto; }
         </div>
       </article>
 
-      <!-- Redmi Note 8 Pro 内核（可展开多版本） -->
       <article class="dl-card dl-card--expand" id="kernelCard" data-reveal>
         <button class="dl-expand-head" type="button"
                 aria-expanded="false" aria-controls="kernelVersions"
@@ -1244,7 +1210,6 @@ html { scroll-behavior: auto; }
         </div>
       </article>
 
-      <!-- 第三方 ROM（可展开多版本） -->
       <article class="dl-card dl-card--expand" id="romCard" data-reveal>
         <button class="dl-expand-head" type="button"
                 aria-expanded="false" aria-controls="romVersions"
@@ -1306,7 +1271,6 @@ html { scroll-behavior: auto; }
         </div>
       </article>
 
-      <!-- NCM 转 MP3 -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1362,7 +1326,6 @@ html { scroll-behavior: auto; }
         </div>
       </article>
 
-      <!-- OpenSteamTool -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1405,7 +1368,6 @@ html { scroll-behavior: auto; }
         </div>
       </article>
 
-      <!-- ManifestHub -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1462,7 +1424,6 @@ html { scroll-behavior: auto; }
         </div>
       </article>
 
-      <!-- clash-verge-rev -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1549,7 +1510,6 @@ html { scroll-behavior: auto; }
             window.webkitRequestAnimationFrame ||
             function (fn) { return setTimeout(fn, 16); };
 
-  /* ---------- 主题读写（Safari 10 dataset 兼容） ---------- */
   function setThemeAttr(val) {
     try {
       document.documentElement.dataset.theme = val;
@@ -1565,12 +1525,13 @@ html { scroll-behavior: auto; }
     return el.getAttribute('data-theme');
   }
 
-  /* ---------- 主题切换 ---------- */
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
       var next = getThemeAttr() === 'dark' ? 'light' : 'dark';
       setThemeAttr(next);
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = next === 'dark' ? '#14121a' : '#fdfbfc';
       try {
         localStorage.setItem('theme', next);
         localStorage.setItem('themeAt', String(Date.now()));
@@ -1578,7 +1539,6 @@ html { scroll-behavior: auto; }
     });
   }
 
-  /* ---------- 可展开卡片 ---------- */
   function initExpandCards() {
     $$('.dl-card--expand').forEach(function (card) {
       var head = card.querySelector('.dl-expand-head');
@@ -1596,7 +1556,6 @@ html { scroll-behavior: auto; }
     });
   }
 
-  /* ---------- 滚动显现 ---------- */
   function initReveal() {
     var els = $$('[data-reveal]');
     if (!els.length) return;
@@ -1663,7 +1622,6 @@ html { scroll-behavior: auto; }
     check();
   }
 
-  /* ---------- 平滑滚动 ---------- */
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -1687,7 +1645,6 @@ html { scroll-behavior: auto; }
     raf(step);
   }
 
-  /* ---------- 滚动 UI ---------- */
   function initScrollUI() {
     var navbar = $('#navbar');
     var toTop = $('#toTop');
@@ -1718,7 +1675,6 @@ html { scroll-behavior: auto; }
     }
   }
 
-  /* ---------- 移动端菜单 ---------- */
   function initMobileMenu() {
     var btn = $('#mobileMenuBtn');
     var list = $('#navLinks');
@@ -1756,7 +1712,6 @@ html { scroll-behavior: auto; }
     });
   }
 
-  /* ---------- 启动 ---------- */
   try {
     initExpandCards();
     initReveal();
