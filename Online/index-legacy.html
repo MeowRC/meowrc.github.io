@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 
 <script>
-/* 三向分流：Safari 家族 → Apple 版；现代 → 现代版；否则 → 本版 */
 (function () {
   function isSafariFamily() {
     var ua = navigator.userAgent;
@@ -44,7 +43,6 @@
 <title>在线 · MeowRc Blog</title>
 
 <script>
-/* 主题跟随系统时间 */
 (function () {
   var OVERRIDE_TTL = 6 * 60 * 60 * 1000;
 
@@ -99,14 +97,6 @@
     }
   }, 60000);
 })();
-
-/* 兜底：5 秒后强制显示内容 */
-setTimeout(function () {
-  var els = document.querySelectorAll('[data-reveal]');
-  for (var i = 0; i < els.length; i++) {
-    els[i].classList.add('is-in');
-  }
-}, 5000);
 </script>
 
 <style>
@@ -192,7 +182,6 @@ button {
   border: 0;
 }
 
-/* ============ 导航栏 ============ */
 .navbar {
   position: fixed;
   top: 0;
@@ -314,7 +303,6 @@ button {
 
 .mobile-menu-btn { display: none; }
 
-/* ============ 页头 ============ */
 .page-hero {
   position: relative;
   padding: 136px 24px 40px;
@@ -414,7 +402,6 @@ button {
   max-width: 52ch;
 }
 
-/* ============ 主体 ============ */
 .main {
   max-width: var(--maxw);
   margin: 0 auto;
@@ -479,7 +466,6 @@ button {
   color: var(--text-2);
 }
 
-/* ============ 下载卡片 ============ */
 .downloads {
   display: flex;
   flex-wrap: wrap;
@@ -616,7 +602,6 @@ button {
   margin-top: 2px;
 }
 
-/* ============ 下载按钮 ============ */
 .dl-btn {
   flex: none;
   display: inline-flex;
@@ -669,7 +654,6 @@ button {
   margin-right: 5px;
 }
 
-/* ============ 描述、标签信息 ============ */
 .dl-desc {
   margin-top: 14px;
   font-size: .9rem;
@@ -708,7 +692,6 @@ button {
   stroke-linejoin: round;
 }
 
-/* 多链接按钮组 */
 .dl-links {
   display: flex;
   flex-wrap: wrap;
@@ -724,7 +707,6 @@ button {
   font-size: .8rem;
 }
 
-/* ============ 可展开卡片 ============ */
 .dl-expand-head {
   display: flex;
   align-items: center;
@@ -825,7 +807,6 @@ button {
   white-space: nowrap;
 }
 
-/* ============ 页脚 & 回到顶部 ============ */
 .footer {
   position: relative;
   padding: 36px 24px 40px;
@@ -891,7 +872,6 @@ button {
 .to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .to-top:active { -webkit-transform: scale(.94); transform: scale(.94); }
 
-/* ============ 滚动显现 ============ */
 [data-reveal] {
   opacity: 0;
   -webkit-transform: translateY(64px) scale(.97);
@@ -914,7 +894,6 @@ button {
 
 [data-reveal].no-transition { transition: none !important; }
 
-/* ============ 响应式 ============ */
 @media (max-width: 720px) {
   .mobile-menu-btn { display: flex; }
 
@@ -1004,7 +983,6 @@ button {
 
 <h1 class="sr-only">在线 — MeowRc Blog</h1>
 
-<!-- 导航栏 -->
 <nav class="navbar" id="navbar" aria-label="主导航">
   <div class="navbar-inner">
     <a href="../index-legacy.html" class="nav-brand"><em>MeowRc</em> Blog</a>
@@ -1036,7 +1014,6 @@ button {
   </div>
 </nav>
 
-<!-- 页头 -->
 <header class="page-hero">
   <div class="page-hero-inner">
     <div class="page-eyebrow">
@@ -1050,7 +1027,6 @@ button {
   </div>
 </header>
 
-<!-- 主体 -->
 <main class="main">
 
   <section class="section" id="download" aria-labelledby="download-title">
@@ -1067,7 +1043,6 @@ button {
 
     <div class="downloads">
 
-      <!-- 卡巴斯基小助手 -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1108,7 +1083,6 @@ button {
         </div>
       </article>
 
-      <!-- Redmi Note 8 Pro 内核（可展开多版本） -->
       <article class="dl-card dl-card--expand" id="kernelCard" data-reveal>
         <button class="dl-expand-head" type="button"
                 aria-expanded="false" aria-controls="kernelVersions"
@@ -1180,7 +1154,6 @@ button {
         </div>
       </article>
 
-      <!-- 第三方 ROM（可展开多版本） -->
       <article class="dl-card dl-card--expand" id="romCard" data-reveal>
         <button class="dl-expand-head" type="button"
                 aria-expanded="false" aria-controls="romVersions"
@@ -1242,7 +1215,6 @@ button {
         </div>
       </article>
 
-      <!-- NCM 转 MP3 -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1298,7 +1270,6 @@ button {
         </div>
       </article>
 
-      <!-- OpenSteamTool -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1341,7 +1312,6 @@ button {
         </div>
       </article>
 
-      <!-- ManifestHub -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1398,7 +1368,6 @@ button {
         </div>
       </article>
 
-      <!-- clash-verge-rev -->
       <article class="dl-card" data-reveal>
         <div class="dl-head">
           <div class="dl-title-wrap">
@@ -1485,7 +1454,6 @@ button {
             window.webkitRequestAnimationFrame ||
             function (fn) { return setTimeout(fn, 16); };
 
-  /* ---------- 主题切换 ---------- */
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
@@ -1504,7 +1472,6 @@ button {
     });
   }
 
-  /* ---------- 可展开卡片 ---------- */
   function initExpandCards() {
     $$('.dl-card--expand').forEach(function (card) {
       var head = card.querySelector('.dl-expand-head');
@@ -1522,7 +1489,6 @@ button {
     });
   }
 
-  /* ---------- 滚动显现（降级 IntersectionObserver） ---------- */
   function initReveal() {
     var els = $$('[data-reveal]');
     if (!els.length) return;
@@ -1589,7 +1555,6 @@ button {
     check();
   }
 
-  /* ---------- 平滑滚动 ---------- */
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -1613,7 +1578,6 @@ button {
     raf(step);
   }
 
-  /* ---------- 滚动 UI ---------- */
   function initScrollUI() {
     var navbar = $('#navbar');
     var toTop = $('#toTop');
@@ -1644,7 +1608,6 @@ button {
     }
   }
 
-  /* ---------- 移动端菜单 ---------- */
   function initMobileMenu() {
     var btn = $('#mobileMenuBtn');
     var list = $('#navLinks');
@@ -1682,7 +1645,6 @@ button {
     });
   }
 
-  /* ---------- 启动 ---------- */
   try {
     initExpandCards();
     initReveal();
