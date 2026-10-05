@@ -59,6 +59,27 @@
   }
 
   /* ---------------------------------------------------------------- 入场 */
+  /* 入场闸门：加载页退场后才统一放行，避免内容在遮罩下白白播完 */
+  var gateOpen = false;
+  var pending = [];
+
+  function revealEl(t) {
+    t.classList.add('fx-in');
+    if (t.hasAttribute('data-reveal')) {
+      setTimeout(function () { t.classList.add('fx-done'); }, 1400);
+    }
+    /* 卡片子元素的分层动画播完后卸载，交还给页面自身的 hover 规则。
+       无条件添加：无加载页时入场可能早于 data-fx 注入，不能靠属性判断。 */
+    setTimeout(function () { t.classList.add('fx-settled'); }, 1700);
+  }
+
+  function openGate() {
+    if (gateOpen) { return; }
+    gateOpen = true;
+    for (var i = 0; i < pending.length; i++) { revealEl(pending[i]); }
+    pending.length = 0;
+  }
+
   function initReveal() {
     var els = $$('[data-reveal]');
     var heads = $$('.section-head');
@@ -76,6 +97,7 @@
     });
 
     if (reduced || !('IntersectionObserver' in window)) {
+      openGate();
       els.forEach(function (el) { el.classList.add('fx-in', 'fx-done'); });
       heads.forEach(function (h) { h.classList.add('fx-in'); });
       return;
@@ -85,16 +107,25 @@
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) { return; }
         var t = entry.target;
-        t.classList.add('fx-in');
-        if (t.hasAttribute('data-reveal')) {
-          setTimeout(function () { t.classList.add('fx-done'); }, 1400);
-        }
         io.unobserve(t);
+        if (!gateOpen) { pending.push(t); return; }
+        revealEl(t);
       });
     }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
 
     els.forEach(function (el) { io.observe(el); });
     heads.forEach(function (h) { io.observe(h); });
+  }
+
+  /* ------------------------------------------------------ 卡片入场光扫元素 */
+  function initSweep() {
+    if (reduced) { return; }
+    $$('.card, .dl-card').forEach(function (h) {
+      h.setAttribute('data-fx', '');
+      var sweep = make('span', 'fx-sweep');
+      sweep.setAttribute('aria-hidden', 'true');
+      h.appendChild(sweep);
+    });
   }
 
   /* ------------------------------------------------- 卡片光斑 + 3D 倾斜 */
@@ -128,17 +159,24 @@
         var ry = (px - 0.5) * 6;
         h.style.transform =
           'perspective(950px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) ' +
-          'translate3d(0,' + lift + 'px,0) scale(1.012)';
+          'translate3d(0,' + lift + 'px,0) scale(var(--fx-scale, 1.012))';
+      }
+      function press(on) {
+        h.style.setProperty('--fx-scale', on ? '.985' : '1.012');
       }
       function leave() {
         rect = null;
         h.classList.remove('fx-tilting');
         h.style.transform = '';
+        h.style.removeProperty('--fx-scale');
       }
 
       h.addEventListener('mouseenter', enter);
       h.addEventListener('mousemove', move);
       h.addEventListener('mouseleave', leave);
+      h.addEventListener('pointerdown', function () { press(true); });
+      h.addEventListener('pointerup', function () { press(false); });
+      h.addEventListener('pointercancel', function () { press(false); });
     });
   }
 
@@ -222,8 +260,9 @@
 
     function loop() {
       var dx = tx - cx, dy = ty - cy;
-      cx += dx * .18;
-      cy += dy * .18;
+      /* 跟随系数越小越绵软，.13 比常见的 .2 更顺滑且不显迟钝 */
+      cx += dx * .13;
+      cy += dy * .13;
       ring.style.transform = 'translate3d(' + (cx - 17).toFixed(1) + 'px,' + (cy - 17).toFixed(1) + 'px,0)';
       if (Math.abs(dx) > .3 || Math.abs(dy) > .3) {
         raf = raf_(loop);
@@ -270,30 +309,42 @@
     var heroEl = doc.querySelector('.hero') || doc.querySelector('.page-hero');
     var particles = doc.querySelector('.hero-particles');
     var ticking = false;
+    var targetY = 0;
+    var curY = -1;
+    var lerpRaf = 0;
+
+    function paint(y) {
+      if (reduced || !heroEl || !heroInner) { return; }
+      var hh = heroEl.offsetHeight || 1;
+      if (y > hh + 160) { return; }
+      heroInner.style.transform = 'translate3d(0,' + (y * .2).toFixed(2) + 'px,0)';
+      heroInner.style.opacity = String(clamp(1 - (y / hh) * .8, 0, 1));
+      if (particles) {
+        particles.style.transform = 'translate3d(0,' + (y * .34).toFixed(2) + 'px,0)';
+      }
+    }
+
+    /* 视差对滚动位置做插值跟随，消除逐帧抖动，观感更顺滑 */
+    function lerpLoop() {
+      curY += (targetY - curY) * .16;
+      if (Math.abs(targetY - curY) < .35) { curY = targetY; }
+      paint(curY);
+      lerpRaf = (curY === targetY) ? 0 : raf_(lerpLoop);
+    }
 
     function apply() {
       ticking = false;
       var y = window.pageYOffset || doc.documentElement.scrollTop || 0;
 
-      /* 进度条 */
+      /* 进度条即时跟随，不做插值 */
       var h = doc.documentElement.scrollHeight - window.innerHeight;
       var p = h > 0 ? clamp(y / h, 0, 1) : 0;
       if (bar) { bar.style.transform = 'scaleX(' + p.toFixed(4) + ')'; }
 
       if (reduced) { return; }
-
-      /* Hero 视差 */
-      if (heroEl && heroInner) {
-        var hh = heroEl.offsetHeight || 1;
-        if (y < hh + 120) {
-          var k = y / hh;
-          heroInner.style.transform = 'translate3d(0,' + (y * .22).toFixed(1) + 'px,0)';
-          heroInner.style.opacity = String(clamp(1 - k * .85, 0, 1));
-          if (particles) {
-            particles.style.transform = 'translate3d(0,' + (y * .38).toFixed(1) + 'px,0)';
-          }
-        }
-      }
+      targetY = y;
+      if (curY < 0) { curY = y; paint(y); return; }   /* 首帧直接落位 */
+      if (!lerpRaf) { lerpRaf = raf_(lerpLoop); }
     }
 
     window.addEventListener('scroll', function () {
@@ -397,12 +448,78 @@
     wrap.appendChild(frag);
   }
 
+  /* -------------------------------------------------------------- 加载页编排 */
+  function initLoader() {
+    var loader = doc.getElementById('loader');
+    if (!loader || reduced) { openGate(); return; }
+
+    var logo = loader.querySelector('.loader-logo');
+    if (logo) { logo.classList.add('fx-logo'); }
+
+    var halo = make('div', 'fx-load-halo');
+    var ring = make('div', 'fx-load-ring');
+    halo.setAttribute('aria-hidden', 'true');
+    ring.setAttribute('aria-hidden', 'true');
+    loader.insertBefore(halo, loader.firstChild);
+    loader.insertBefore(ring, loader.firstChild);
+
+    var dots = make('div', 'fx-load-dots');
+    dots.setAttribute('aria-hidden', 'true');
+    dots.appendChild(make('i'));
+    dots.appendChild(make('i'));
+    dots.appendChild(make('i'));
+    loader.appendChild(dots);
+
+    /* 各变体退场标记不同：index 用 is-out，apple / legacy 用 slide-out */
+    var OUT = ['is-out', 'slide-out'];
+    var done = false;
+
+    function isOut() {
+      for (var i = 0; i < OUT.length; i++) {
+        if (loader.classList.contains(OUT[i])) { return true; }
+      }
+      return false;
+    }
+
+    function startExit() {
+      if (done) { return; }
+      done = true;
+      if (poll) { clearInterval(poll); }
+      if (mo) { mo.disconnect(); }
+      /* 低端设备跳过光圈收缩（全屏 blur 开销大），直接沿用页面自带的淡出 */
+      if (lowEnd) { openGate(); return; }
+      loader.classList.add('fx-out');
+      setTimeout(openGate, 320);              /* 光圈收缩露出页面后再放行内容 */
+    }
+
+    /* MutationObserver 即时捕获，退场动画才有完整的 1.12s 可跑 */
+    var mo = null;
+    if ('MutationObserver' in window) {
+      mo = new MutationObserver(function () {
+        if (!loader.isConnected) { startExit(); return; }
+        if (isOut()) { startExit(); }
+      });
+      mo.observe(loader, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    var ticks = 0;
+    var poll = setInterval(function () {
+      ticks++;
+      if (!loader.isConnected) { startExit(); openGate(); return; }
+      if (isOut()) { startExit(); return; }
+      if (ticks > 300) { clearInterval(poll); openGate(); }   /* 兜底，约 18s */
+    }, 60);
+  }
+
   /* ------------------------------------------------------------------ 启动 */
   function boot() {
     buildDecor();
     var bar = buildProgress();
-    initReveal();
+    initLoader();
+    /* 先给卡片挂上 data-fx，再开启入场观察，保证子层动画与落定逻辑生效 */
+    initSweep();
     initTilt();
+    initReveal();
     initMagnet();
     initRipple();
     initCursor();
@@ -416,6 +533,8 @@
     boot();
   } catch (err) {
     /* 增强层出错时，确保内容可见，不影响原页面 */
+    openGate();
     $$('[data-reveal]').forEach(function (el) { el.classList.add('fx-in', 'fx-done'); });
+    $$('.section-head').forEach(function (h) { h.classList.add('fx-in'); });
   }
 })();

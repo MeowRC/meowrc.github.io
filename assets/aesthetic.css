@@ -10,12 +10,17 @@
   --fx-ease: cubic-bezier(.22, 1, .36, 1);
   --fx-ease-soft: cubic-bezier(.4, 0, .2, 1);
   --fx-spring: cubic-bezier(.34, 1.46, .64, 1);
+  /* 丝滑曲线：起步柔和、收尾极缓，位移类动画统一用它，观感更圆润 */
+  --fx-silk: cubic-bezier(.32, .72, 0, 1);
+  /* 呼吸曲线：正弦式进出，用于循环类动画，避免端点处的生硬折返 */
+  --fx-breath: cubic-bezier(.45, 0, .55, 1);
 
   /* 增强层专用色（各主题下单独覆盖） */
   --fx-wash: rgba(245, 160, 184, .16);
   --fx-wash-2: rgba(214, 188, 255, .26);
   --fx-glow: rgba(245, 160, 184, .34);
   --fx-halo: rgba(245, 160, 184, .5);
+  --fx-sweep-color: rgba(245, 160, 184, .30);
 }
 
 [data-theme="dark"] {
@@ -23,6 +28,7 @@
   --fx-wash-2: rgba(150, 120, 220, .16);
   --fx-glow: rgba(245, 160, 184, .20);
   --fx-halo: rgba(245, 160, 184, .32);
+  --fx-sweep-color: rgba(255, 255, 255, .16);
 }
 
 /* ==========================================================================
@@ -158,25 +164,27 @@
    ========================================================================== */
 [data-reveal] {
   transition:
-    opacity .95s var(--fx-ease) var(--fx-d, 0ms),
-    transform 1.05s var(--fx-ease) var(--fx-d, 0ms),
-    filter .95s var(--fx-ease) var(--fx-d, 0ms);
+    opacity 1s var(--fx-silk) var(--fx-d, 0ms),
+    transform .95s var(--fx-silk) var(--fx-d, 0ms),
+    filter .9s var(--fx-silk) var(--fx-d, 0ms);
 }
 
-.fx-on [data-reveal] {
+/* 隐藏态只作用于「尚未入场」的元素，入场后彻底交还给页面自身的 hover 样式 */
+.fx-on [data-reveal]:not(.is-in):not(.fx-in) {
   opacity: 0;
-  transform: translate3d(0, 38px, 0) scale(.985);
+  transform: perspective(1100px) rotateX(5deg) translate3d(0, 30px, 0) scale(.99);
+  transform-origin: 50% 100%;
 }
-.fx-on [data-reveal].from-above {
-  transform: translate3d(0, -38px, 0) scale(.985);
+.fx-on [data-reveal].from-above:not(.is-in):not(.fx-in) {
+  transform: perspective(1100px) rotateX(-5deg) translate3d(0, -30px, 0) scale(.99);
+  transform-origin: 50% 0;
 }
 @supports (filter: blur(2px)) {
-  .fx-on [data-reveal] { filter: blur(10px); }
+  .fx-on [data-reveal]:not(.is-in):not(.fx-in) { filter: blur(7px); }
 }
 .fx-on [data-reveal].is-in,
 .fx-on [data-reveal].fx-in {
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
   filter: blur(0px);
 }
 /* 动画结束后卸掉 filter，避免长期占用合成层 */
@@ -210,7 +218,7 @@
   transition: transform .55s var(--fx-ease), box-shadow .35s ease, border-color .35s ease;
 }
 [data-fx-tilt].fx-tilting {
-  transition: transform .14s linear, box-shadow .35s ease, border-color .35s ease;
+  transition: transform .2s cubic-bezier(.25, .8, .35, 1), box-shadow .35s ease, border-color .35s ease;
 }
 /* 下载卡片用 top 做悬浮位移，需保留其过渡 */
 .dl-card[data-fx-tilt] {
@@ -218,7 +226,7 @@
               box-shadow .35s ease, border-color .35s ease;
 }
 .dl-card[data-fx-tilt].fx-tilting {
-  transition: transform .14s linear, top .25s var(--fx-ease-soft),
+  transition: transform .2s cubic-bezier(.25, .8, .35, 1), top .25s var(--fx-ease-soft),
               box-shadow .35s ease, border-color .35s ease;
 }
 
@@ -230,7 +238,7 @@
   transition: transform .42s var(--fx-ease), box-shadow .3s ease,
               background-color .3s, color .3s, border-color .3s;
 }
-[data-fx-magnet].fx-magneting { transition: transform .12s linear, box-shadow .3s ease; }
+[data-fx-magnet].fx-magneting { transition: transform .2s cubic-bezier(.25, .8, .35, 1), box-shadow .3s ease; }
 
 .fx-sheen { position: relative; overflow: hidden; }
 .fx-sheen::after {
@@ -356,7 +364,199 @@
 [data-fx]:hover .icon-badge { box-shadow: 0 8px 24px var(--fx-halo); }
 
 /* ==========================================================================
-   10. 降级：移动端、低端设备、减少动效
+   10. 卡片：流光描边 / 入场光扫 / 内容分层错峰
+   ========================================================================== */
+
+/* 流光描边：双层背景（padding-box 纯色 + border-box 流光渐变），
+   仅在 border 区域露出，兼容性优于 mask 方案 */
+/* 悬停时缩短过渡时长，避免入场时长（.7s）拖慢交互手感 */
+.fx-on [data-fx]:not(.fx-tilting):hover { transition-duration: .38s; }
+.fx-on [data-fx]:hover {
+  /* border-width 保持不变以免内容抖动，厚度感由外圈光晕补足 */
+  border-color: transparent;
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-glow);
+  background-image:
+    linear-gradient(var(--surface), var(--surface)),
+    linear-gradient(115deg,
+      transparent 22%,
+      var(--accent) 36%,
+      var(--accent-strong) 50%,
+      var(--accent) 64%,
+      transparent 78%);
+  background-clip: padding-box, border-box;
+  background-size: auto, 300% 300%;
+  animation: fxBorderFlow 3.2s linear infinite;
+}
+@keyframes fxBorderFlow {
+  from { background-position: 0 0, 0% 50%; }
+  to   { background-position: 0 0, 100% 50%; }
+}
+
+/* 入场光扫：卡片进入视口时一道斜光掠过 */
+.fx-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+}
+.fx-sweep::before {
+  content: '';
+  position: absolute;
+  top: -25%; bottom: -25%; left: 0;
+  width: 42%;
+  /* 浅色主题下卡片是白底，用淡粉光泽而非白色，否则完全不可见 */
+  background: linear-gradient(100deg, transparent, var(--fx-sweep-color), transparent);
+  transform: skewX(-14deg) translateX(-180%);
+}
+.fx-on [data-fx].fx-in .fx-sweep { animation: fxSweepOnce 1.25s var(--fx-ease) .18s both; }
+@keyframes fxSweepOnce {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.fx-on [data-fx].fx-in .fx-sweep::before { animation: fxSweepMove 1.25s var(--fx-ease) .18s both; }
+@keyframes fxSweepMove {
+  from { transform: skewX(-14deg) translateX(-180%); }
+  to   { transform: skewX(-14deg) translateX(320%); }
+}
+
+/* 卡片内容分层错峰：图标 / 标题 / 描述 / 标签依次浮现。
+   刻意使用 animation 而非 transition —— 不会覆盖子元素自带的 hover 过渡；
+   落定后由 JS 添加 .fx-settled 移除动画，把 transform 交还给页面自身规则。 */
+.fx-on [data-fx].fx-in > *:not(.fx-spot):not(.fx-sweep):not(.fx-ripple):not(.dl-versions) {
+  animation: fxChildIn .9s var(--fx-silk) both;
+}
+.fx-on [data-fx].fx-in > *:nth-child(1) { animation-delay: .08s; }
+.fx-on [data-fx].fx-in > *:nth-child(2) { animation-delay: .16s; }
+.fx-on [data-fx].fx-in > *:nth-child(3) { animation-delay: .24s; }
+.fx-on [data-fx].fx-in > *:nth-child(4) { animation-delay: .32s; }
+.fx-on [data-fx].fx-in > *:nth-child(5) { animation-delay: .40s; }
+.fx-on [data-fx].fx-in > *:nth-child(6) { animation-delay: .48s; }
+
+/* 图标徽章用弹性曲线弹入 */
+.fx-on [data-fx].fx-in > .icon-badge {
+  animation-name: fxBadgeIn;
+  animation-timing-function: var(--fx-spring);
+}
+
+@keyframes fxChildIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(.985); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fxBadgeIn {
+  from { opacity: 0; transform: translate3d(0, 10px, 0) scale(.68) rotate(-14deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 落定：彻底移除动画，恢复子元素原有的 hover 行为 */
+.fx-on [data-fx].fx-settled > * { animation: none; }
+
+/* 按下时的轻微回弹（JS 通过 --fx-scale 驱动内联 transform；此处为无 JS 倾斜时的兜底） */
+[data-fx-tilt] { transform: translate3d(0, 0, 0) scale(var(--fx-scale, 1)); }
+
+/* ==========================================================================
+   11. 加载页：逐帧氛围 + 光圈收缩退场
+   ========================================================================== */
+#loader { isolation: isolate; }
+
+.fx-load-halo {
+  position: absolute;
+  left: 50%; top: 46%;
+  width: 340px; height: 340px;
+  margin: -170px 0 0 -170px;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, var(--fx-glow) 0%, transparent 68%);
+  filter: blur(26px);
+  animation: fxLoadHalo 4.8s var(--fx-breath) infinite;
+}
+@keyframes fxLoadHalo {
+  0%, 100% { transform: scale(.84); opacity: .45; }
+  50%      { transform: scale(1.14); opacity: .95; }
+}
+
+.fx-load-ring {
+  position: absolute;
+  left: 50%; top: 46%;
+  width: 420px; height: 420px;
+  margin: -210px 0 0 -210px;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: .34;
+  background: conic-gradient(from 0deg,
+    transparent 58%, var(--accent) 74%, var(--accent-strong) 88%, transparent 100%);
+  -webkit-mask: radial-gradient(circle, transparent 78.4%, #000 78.6%, #000 79.6%, transparent 79.8%);
+          mask: radial-gradient(circle, transparent 78.4%, #000 78.6%, #000 79.6%, transparent 79.8%);
+  animation: fxSpin 9s linear infinite;
+}
+
+.loader-logo.fx-logo {
+  animation:
+    fxLogoIn 1.6s var(--fx-silk) both,
+    fxLogoFloat 5s var(--fx-breath) 1.6s infinite;
+}
+@keyframes fxLogoIn {
+  0%   { opacity: 0; transform: translateY(24px) scale(.94); filter: blur(14px); }
+  60%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes fxLogoFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-6px) scale(1.012); }
+}
+
+/* 进度条已移除，改用三点呼吸指示：无直线推进，观感更柔和 */
+.fx-load-dots {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 26px;
+}
+.fx-load-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  opacity: .28;
+  animation: fxDotPulse 1.7s var(--fx-breath) infinite;
+}
+.fx-load-dots i:nth-child(2) { animation-delay: .19s; }
+.fx-load-dots i:nth-child(3) { animation-delay: .38s; }
+@keyframes fxDotPulse {
+  0%, 100% { transform: scale(.72); opacity: .26; }
+  42%      { transform: scale(1.18); opacity: 1; }
+}
+
+/* 退场：内容先收拢，再以光圈收缩揭示页面 */
+#loader.fx-out {
+  animation: fxLoaderOut 1.12s var(--fx-silk) forwards !important;
+}
+@keyframes fxLoaderOut {
+  0%   { opacity: 1; transform: none;        clip-path: circle(140% at 50% 46%); filter: blur(0); }
+  34%  { opacity: 1; transform: scale(1.022); clip-path: circle(140% at 50% 46%); filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.07);  clip-path: circle(0% at 50% 46%);   filter: blur(5px); }
+}
+#loader.fx-out .loader-logo { animation: fxLogoOut .68s var(--fx-silk) forwards; }
+@keyframes fxLogoOut {
+  to { transform: translateY(-14px) scale(.92); opacity: 0; filter: blur(5px); }
+}
+#loader.fx-out .fx-load-dots,
+#loader.fx-out .fx-load-ring { animation: fxFadeQuick .46s var(--fx-silk) forwards; }
+@keyframes fxFadeQuick { to { opacity: 0; transform: scale(.94); } }
+#loader.fx-out .fx-load-halo { animation: fxFadeQuick .8s var(--fx-ease) forwards; }
+
+@media (max-width: 720px) {
+  .fx-load-ring { width: 300px; height: 300px; margin: -150px 0 0 -150px; }
+  .fx-load-halo { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
+}
+
+/* ==========================================================================
+   12. 降级：移动端、低端设备、减少动效
    ========================================================================== */
 @media (max-width: 720px) {
   .fx-grain { display: none; }
@@ -365,13 +565,23 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fx-aurora, .fx-grain, .fx-cursor, .fx-cursor-dot, .fx-flash { display: none !important; }
+  .fx-aurora, .fx-grain, .fx-cursor, .fx-cursor-dot, .fx-flash,
+  .fx-load-halo, .fx-load-ring, .fx-load-dots { display: none !important; }
+  #loader.fx-out,
+  #loader.fx-out .loader-logo,
+  #loader.fx-out .fx-load-dots { animation: none !important; }
   .fx-on [data-reveal],
   .fx-on [data-reveal].from-above {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
   }
+  .fx-on [data-fx] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
   [data-fx-tilt], [data-fx-magnet] { transform: none !important; }
+  .fx-sweep { display: none !important; }
   .to-top::after { display: none; }
 }
