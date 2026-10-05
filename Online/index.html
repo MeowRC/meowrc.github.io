@@ -992,6 +992,39 @@ button {
   .song-size { display: none; }
   .song-list { max-height: 320px; }
 }
+
+/* ===== 内核文件清单 ===== */
+/* 文件较多时整卡独占一行；展开高度需覆盖全部条目（默认 600px 会截断） */
+.dl-card--wide { flex: 0 0 100%; max-width: 100%; margin: 0; grid-column: 1 / -1; }
+.dl-card--wide.expanded .dl-versions { max-height: 1800px; }
+.dl-group + .dl-group { margin-top: 14px; }
+.dl-group-name {
+  display: flex;
+  align-items: center;
+  margin-bottom: 7px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+.dl-group-name::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.dl-file-size {
+  flex: none;
+  font-size: .74rem;
+  color: var(--text-2);
+}
+@media (max-width: 640px) {
+  .dl-file-size { display: none; }
+}
 </style>
 <link rel="stylesheet" href="../assets/aesthetic.css">
 </head>
@@ -1168,6 +1201,87 @@ button {
             </a>
           </div>
 
+        </div>
+      </article>
+
+      <article class="dl-card dl-card--expand dl-card--wide" id="shenCard" data-reveal>
+        <button class="dl-expand-head" type="button"
+                aria-expanded="false" aria-controls="shenVersions"
+                id="shenToggle">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2l9 5-9 5-9-5 9-5z"/>
+                <path d="M3 12l9 5 9-5"/>
+                <path d="M3 17l9 5 9-5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">ShenEternal 内核</div>
+              <div class="dl-version">21 个文件可选</div>
+            </div>
+          </div>
+          <span class="dl-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </span>
+        </button>
+
+        <p class="dl-desc">ShenEternal 系列内核，GKI 分支覆盖 Android 12 / 13 / 14（5.10 / 5.15 / 6.1），另有 OKI 分支。每个版本提供 gz、lz4 与标准三种 AnyKernel3 刷机包。点击展开查看全部文件。</p>
+
+        <div class="dl-links">
+          <a class="dl-btn" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-Fhje3" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            打开网盘下载
+          </a>
+        </div>
+
+        <div class="dl-versions" id="shenVersions" role="region" aria-label="ShenEternal 内核文件列表">
+          <div class="dl-group">
+            <div class="dl-group-name">GKI · 5.10.209</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.209-ShenEternal-AnyKernel3-gz.zip">android12-5.10.209-ShenEternal-AnyKernel3-gz.zip</span><span class="dl-file-size">18.4 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.209-ShenEternal-AnyKernel3-lz4.zip">android12-5.10.209-ShenEternal-AnyKernel3-lz4.zip</span><span class="dl-file-size">18.6 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.209-ShenEternal-AnyKernel3.zip">android12-5.10.209-ShenEternal-AnyKernel3.zip</span><span class="dl-file-size">18.5 MB</span></div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-group-name">GKI · 5.10.209 · swappiness350</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.209-ShenEternal-swappiness350-AnyKernel3-gz.zip">android12-5.10.209-ShenEternal-swappiness350-AnyKernel3-gz.zip</span><span class="dl-file-size">18.4 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.209-ShenEternal-swappiness350-AnyKernel3-lz4.zip">android12-5.10.209-ShenEternal-swappiness350-AnyKernel3-lz4.zip</span><span class="dl-file-size">18.6 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.209-ShenEternal-swappiness350-AnyKernel3.zip">android12-5.10.209-ShenEternal-swappiness350-AnyKernel3.zip</span><span class="dl-file-size">18.5 MB</span></div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-group-name">GKI · 5.10.218（最新）</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10-ShenEternity-AnyKernel3-gz.zip">android12-5.10-ShenEternity-AnyKernel3-gz.zip</span><span class="dl-file-size">18.4 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10-ShenEternity-AnyKernel3-lz4.zip">android12-5.10-ShenEternity-AnyKernel3-lz4.zip</span><span class="dl-file-size">18.6 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10-ShenEternity-AnyKernel3.zip">android12-5.10-ShenEternity-AnyKernel3.zip</span><span class="dl-file-size">18.5 MB</span></div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-group-name">GKI · 5.10.226</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.226-ShenEternal-AnyKernel3-gz.zip">android12-5.10.226-ShenEternal-AnyKernel3-gz.zip</span><span class="dl-file-size">18.4 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.226-ShenEternal-AnyKernel3-lz4.zip">android12-5.10.226-ShenEternal-AnyKernel3-lz4.zip</span><span class="dl-file-size">18.6 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android12-5.10.226-ShenEternal-AnyKernel3.zip">android12-5.10.226-ShenEternal-AnyKernel3.zip</span><span class="dl-file-size">18.5 MB</span></div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-group-name">GKI · 5.15.167</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android13-5.15.167-ShenEternal-AnyKernel3-gz.zip">android13-5.15.167-ShenEternal-AnyKernel3-gz.zip</span><span class="dl-file-size">21.0 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android13-5.15.167-ShenEternal-AnyKernel3-lz4.zip">android13-5.15.167-ShenEternal-AnyKernel3-lz4.zip</span><span class="dl-file-size">21.4 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android13-5.15.167-ShenEternal-AnyKernel3.zip">android13-5.15.167-ShenEternal-AnyKernel3.zip</span><span class="dl-file-size">21.1 MB</span></div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-group-name">GKI · 6.1</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android14-6.1-ShenEternal-AnyKernel3-gz.zip">android14-6.1-ShenEternal-AnyKernel3-gz.zip</span><span class="dl-file-size">16.6 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android14-6.1-ShenEternal-AnyKernel3-lz4.zip">android14-6.1-ShenEternal-AnyKernel3-lz4.zip</span><span class="dl-file-size">16.8 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="android14-6.1-ShenEternal-AnyKernel3.zip">android14-6.1-ShenEternal-AnyKernel3.zip</span><span class="dl-file-size">16.6 MB</span></div>
+          </div>
+          <div class="dl-group">
+            <div class="dl-group-name">OKI</div>
+            <div class="dl-version-row"><span class="dl-version-name" title="OKI-Android12-5.10.226-ShenEternity-AnyKernel3-gz.zip">OKI-Android12-5.10.226-ShenEternity-AnyKernel3-gz.zip</span><span class="dl-file-size">18.4 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="OKI-Android12-5.10.226-ShenEternity-AnyKernel3-lz4.zip">OKI-Android12-5.10.226-ShenEternity-AnyKernel3-lz4.zip</span><span class="dl-file-size">18.6 MB</span></div>
+            <div class="dl-version-row"><span class="dl-version-name" title="OKI-Android12-5.10.226-ShenEternity-AnyKernel3.zip">OKI-Android12-5.10.226-ShenEternity-AnyKernel3.zip</span><span class="dl-file-size">18.5 MB</span></div>
+          </div>
         </div>
       </article>
 
