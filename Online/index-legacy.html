@@ -988,17 +988,22 @@ button {
 .music-wrap { margin-top: 2px; }
 /* 曲目较多，整卡独占一行，列表内部滚动 */
 .dl-card--music { flex: 0 0 100%; max-width: 100%; margin: 0; }
-.song-list {
+.song-list,
+.file-list {
   margin: 16px 0 0;
   padding: 2px 8px 2px 0;
+  list-style: none;
   max-height: 380px;
   overflow-y: auto;
   border-top: 1px solid var(--border);
   -webkit-overflow-scrolling: touch;
 }
-.song-list::-webkit-scrollbar { width: 6px; }
-.song-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-.song-row {
+.song-list::-webkit-scrollbar,
+.file-list::-webkit-scrollbar { width: 6px; }
+.song-list::-webkit-scrollbar-thumb,
+.file-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.song-row,
+.file-row {
   display: flex;
   align-items: baseline;
   padding: 8px 8px;
@@ -1007,7 +1012,8 @@ button {
   font-size: .86rem;
   transition: background-color .22s ease, color .22s ease;
 }
-.song-row:hover { background: var(--accent-soft); }
+.song-row:hover,
+.file-row:hover { background: var(--accent-soft); }
 .song-no {
   flex: none;
   width: 34px;
@@ -1016,7 +1022,8 @@ button {
   color: var(--text-2);
   opacity: .65;
 }
-.song-name {
+.song-name,
+.file-name {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -1035,7 +1042,8 @@ button {
   background: var(--accent-soft);
   border: 1px solid var(--border);
 }
-.song-size {
+.song-size,
+.file-size {
   flex: none;
   margin-left: 10px;
   min-width: 62px;
@@ -1044,8 +1052,8 @@ button {
   color: var(--text-2);
 }
 @media (max-width: 640px) {
-  .song-size { display: none; }
-  .song-list { max-height: 320px; }
+  .song-size, .file-size { display: none; }
+  .song-list, .file-list { max-height: 300px; }
 }
 
 /* ===== 内核文件清单 ===== */
@@ -1080,6 +1088,33 @@ button {
 @media (max-width: 640px) {
   .dl-file-size { display: none; }
 }
+
+/* ===== 刷机资源文件清单 ===== */
+.file-group-name {
+  margin: 13px 0 3px;
+  padding: 0 8px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--accent-strong);
+  opacity: .9;
+}
+.file-group-name:first-child { margin-top: 0; }
+.dl-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+}
+.dl-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 12px -4px -4px;
+}
+.dl-tags > * { margin: 4px; }
 </style>
 <link rel="stylesheet" href="../assets/aesthetic.css">
 </head>
@@ -1612,6 +1647,893 @@ button {
     </div>
   </section>
 
+
+  <section class="section" id="flash" aria-labelledby="flash-title">
+    <header class="section-head" data-reveal>
+      <span class="section-label">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="2" width="14" height="20" rx="2"/>
+          <path d="M12 18h.01"/>
+          <path d="M9 7l3-3 3 3M12 4v8"/>
+        </svg>
+        刷机
+      </span>
+      <h2 class="section-title" id="flash-title">Redmi Note 8 Pro 刷机资源</h2>
+      <p class="section-desc">492 个文件 · 约 456.40 GB，含第三方 ROM、内核、TWRP 与相机等分类。</p>
+    </header>
+
+    <div class="downloads">
+
+      <article class="dl-card dl-card--wide" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/><path d="M9 7l3-3 3 3M12 4v8"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dl-name">红米Note8Pro 刷机资源合集</div>
+              <div class="dl-version">492 个文件 · 8 个分类</div>
+            </div>
+          </div>
+          <a class="dl-btn" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-0fnt3" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+            </svg>
+            下载
+          </a>
+        </div>
+        <p class="dl-desc">红米 Note 8 Pro（Begonia）刷机资源合集：第三方 ROM、各类内核、TWRP / PBRP / OrangeFox 等 Recovery、谷歌相机与系统扩容包。右侧分类卡片内可滚动查看每个文件。</p>
+        <div class="dl-info">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 8l-9 12-9-12 9-4z"/><path d="M3 8h18M12 4v16"/>
+            </svg>
+            456.40 GB
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 22h8M12 18v4"/>
+            </svg>
+            123 云盘
+          </span>
+        </div>
+        <div class="dl-tags" aria-label="分类统计">
+            <span class="dl-tag">部分刷机教程 · 5</span>
+            <span class="dl-tag">第三方ROM · 220</span>
+            <span class="dl-tag">谷歌相机 · 16</span>
+            <span class="dl-tag">内核 · 209</span>
+            <span class="dl-tag">修复新机器前置 · 2</span>
+            <span class="dl-tag">MiuiCamera增强版 · 2</span>
+            <span class="dl-tag">system一键扩容包（TWRP刷入） · 6</span>
+            <span class="dl-tag">TWRP · 32</span>
+        </div>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">部分刷机教程</div>
+              <div class="dl-version">5 个文件 · 0.00 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="部分刷机教程 文件列表">
+          <li class="file-group-name">根目录</li>
+            <li class="file-row"><span class="file-name" title="12.5格式化失败解决方法.txt">12.5格式化失败解决方法.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="强解后开机报错解决办法.txt">强解后开机报错解决办法.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="刷机前备份好IEMI，以免sp救砖丢失.txt">刷机前备份好IEMI，以免sp救砖丢失.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="刷入基于12.5底层的类原生教程.txt">刷入基于12.5底层的类原生教程.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="刷入基于12底层的类原生教程.txt">刷入基于12底层的类原生教程.txt</span><span class="file-size">0.0 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">第三方ROM</div>
+              <div class="dl-version">220 个文件 · 450.59 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="第三方ROM 文件列表">
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / 防止主题恢复默认模块</li>
+            <li class="file-row"><span class="file-name" title="防止MIUI主题恢复默认(1).zip">防止MIUI主题恢复默认(1).zip</span><span class="file-size">0.1 MB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / MIUI APP补全</li>
+            <li class="file-row"><span class="file-name" title="MIUI APP补全.zip">MIUI APP补全.zip</span><span class="file-size">686.3 MB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.0</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.4.12-20220412_63261178f9_WuXinROM-3.0_V11.0.zip">BEGONIA_22.4.12-20220412_63261178f9_WuXinROM-3.0_V11.0.zip</span><span class="file-size">2.41 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.1.1</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.5.8-20220508_9e56b94208_WuXinROM-3.1.1_V11.zip">BEGONIA_22.5.8-20220508_9e56b94208_WuXinROM-3.1.1_V11.zip</span><span class="file-size">2.45 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.1</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.4.16-20220416_925005932a_WuXinROM-3.1_V11.0.zip">BEGONIA_22.4.16-20220416_925005932a_WuXinROM-3.1_V11.0.zip</span><span class="file-size">2.45 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.2.1</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.5.17-20220517_a8fa693c89_WuXinROM-3.2.1_V11.zip">BEGONIA_22.5.17-20220517_a8fa693c89_WuXinROM-3.2.1_V11.zip</span><span class="file-size">2.31 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.2.2</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.5.18-20220518_e46b4390ff_WuXinROM-3.2.2_V11(1).zip">BEGONIA_22.5.18-20220518_e46b4390ff_WuXinROM-3.2.2_V11(1).zip</span><span class="file-size">2.31 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.2.3</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.5.22-20220522_cbea3aa067_WuXinROM-3.2.3_V11.zip">BEGONIA_22.5.22-20220522_cbea3aa067_WuXinROM-3.2.3_V11.zip</span><span class="file-size">2.30 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.2</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.5.15-20220515_d2fba72959_WuXinROM-3.2_V11.zip">BEGONIA_22.5.15-20220515_d2fba72959_WuXinROM-3.2_V11.zip</span><span class="file-size">2.32 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.3.1</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.6.1-20220601_d1bd0e3c04_WuXinROM-3.3.1_V11.zip">BEGONIA_22.6.1-20220601_d1bd0e3c04_WuXinROM-3.3.1_V11.zip</span><span class="file-size">2.36 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.3</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.5.28-20220528_2b78786464_WuXinROM-3.3_V11.zip">BEGONIA_22.5.28-20220528_2b78786464_WuXinROM-3.3_V11.zip</span><span class="file-size">2.37 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.4</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.6.5-20220605_71fffbe21b_WuXinROM-3.4_V11.zip">BEGONIA_22.6.5-20220605_71fffbe21b_WuXinROM-3.4_V11.zip</span><span class="file-size">2.37 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.5</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.6.14-20220614_166a479a1e_WuXinROM-3.5_V11.zip">BEGONIA_22.6.14-20220614_166a479a1e_WuXinROM-3.5_V11.zip</span><span class="file-size">2.41 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.6</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.6.19-20220619_b6f34f6f87_WuXinROM-3.6_V11.zip">BEGONIA_22.6.19-20220619_b6f34f6f87_WuXinROM-3.6_V11.zip</span><span class="file-size">2.51 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.7</li>
+            <li class="file-row"><span class="file-name" title="BEGONIA_22.7.1-20220701_b804db39a5_WuXinROM-3.7_V11.zip">BEGONIA_22.7.1-20220701_b804db39a5_WuXinROM-3.7_V11.zip</span><span class="file-size">2.40 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.8</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.7.13-20220713_f45889f848_V3.8_11.0.zip">begonia_22.7.13-20220713_f45889f848_V3.8_11.0.zip</span><span class="file-size">2.51 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.9.1</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.7.30.dev-20220730_0bbdd02dfe_V3.9.1_11.0.zip">begonia_22.7.30.dev-20220730_0bbdd02dfe_V3.9.1_11.0.zip</span><span class="file-size">2.56 GB</span></li>
+            <li class="file-row"><span class="file-name" title="images_begonia_22.7.30.dev-20220730_WUXINROM_V3.9.1_11.0.7z">images_begonia_22.7.30.dev-20220730_WUXINROM_V3.9.1_11.0.7z</span><span class="file-size">2.33 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v3.x / ROM包 / 3.9</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.7.27-20220727_36a11411b2_V3.9_11.0.zip">begonia_22.7.27-20220727_36a11411b2_V3.9_11.0.zip</span><span class="file-size">2.51 GB</span></li>
+            <li class="file-row"><span class="file-name" title="images_begonia_22.7.27-20220727_WUXINROM_V3.9_11.0.7z">images_begonia_22.7.27-20220727_WUXINROM_V3.9_11.0.7z</span><span class="file-size">2.19 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.0</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.9.1.dev-20220901_ff266f8835_V4_11.0.zip">begonia_22.9.1.dev-20220901_ff266f8835_V4_11.0.zip</span><span class="file-size">2.62 GB</span></li>
+            <li class="file-row"><span class="file-name" title="images_begonia_22.9.1.dev-20220901_WUXINROM_V4_11.0.7z">images_begonia_22.9.1.dev-20220901_WUXINROM_V4_11.0.7z</span><span class="file-size">2.29 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.1</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.9.9.dev-20220909_259343a373_V4.1_11.0.zip">begonia_22.9.9.dev-20220909_259343a373_V4.1_11.0.zip</span><span class="file-size">2.63 GB</span></li>
+            <li class="file-row"><span class="file-name" title="images_begonia_22.9.9.dev-20220909_WUXINROM_V4.1_11.0.7z">images_begonia_22.9.9.dev-20220909_WUXINROM_V4.1_11.0.7z</span><span class="file-size">2.29 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.2.1</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.9.30.dev-20220930_f20ff35a2c_V4.2.1_11.0.zip">begonia_22.9.30.dev-20220930_f20ff35a2c_V4.2.1_11.0.zip</span><span class="file-size">2.63 GB</span></li>
+            <li class="file-row"><span class="file-name" title="images_begonia_22.9.30.dev-20220930_WUXINROM_V4.2.1_11.0.7z">images_begonia_22.9.30.dev-20220930_WUXINROM_V4.2.1_11.0.7z</span><span class="file-size">2.29 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.2</li>
+            <li class="file-row"><span class="file-name" title="begonia_22.9.17.dev-20220917_947a16f713_V4.2_11.0.zip">begonia_22.9.17.dev-20220917_947a16f713_V4.2_11.0.zip</span><span class="file-size">2.63 GB</span></li>
+            <li class="file-row"><span class="file-name" title="images_begonia_22.9.17.dev-20220917_WUXINROM_V4.2_11.0.7z">images_begonia_22.9.17.dev-20220917_WUXINROM_V4.2_11.0.7z</span><span class="file-size">2.29 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.3</li>
+            <li class="file-row"><span class="file-name" title="[卡线一体]begonia_22.10.23.dev-20221023_2f576216f1_WUXINROM_V4.3_11.0(1).zip">[卡线一体]begonia_22.10.23.dev-20221023_2f576216f1_WUXINROM_V4.3_11.0(1).zip</span><span class="file-size">2.83 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.4</li>
+            <li class="file-row"><span class="file-name" title="[卡线一体]begonia_22.11.20.dev-20221120_a0ce4b9d1c_WUXINROM_V4.4_11.0.zip">[卡线一体]begonia_22.11.20.dev-20221120_a0ce4b9d1c_WUXINROM_V4.4_11.0.zip</span><span class="file-size">2.86 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.5</li>
+            <li class="file-row"><span class="file-name" title="[卡线一体]begonia_23.1.2.dev-20230102_c90086b22d_WUXINROM_V4.5_11.0.zip">[卡线一体]begonia_23.1.2.dev-20230102_c90086b22d_WUXINROM_V4.5_11.0.zip</span><span class="file-size">2.91 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.6.5</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_23.4.30.dev-20230430_ae8bf31ce8_WUXINROM_V4.6.5_11.0.zip">FORF_begonia_23.4.30.dev-20230430_ae8bf31ce8_WUXINROM_V4.6.5_11.0.zip</span><span class="file-size">2.91 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.6</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_23.3.5.dev-20230305_75413d5f29_WUXINROM_V4.6_11.0.zip">FORF_begonia_23.3.5.dev-20230305_75413d5f29_WUXINROM_V4.6_11.0.zip</span><span class="file-size">2.87 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.7.1</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_23.5.30.DEV-20230530_48b7664103_WUXINROM_V4.7.1_11.0.zip">FORF_begonia_23.5.30.DEV-20230530_48b7664103_WUXINROM_V4.7.1_11.0.zip</span><span class="file-size">2.90 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.7</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_23.5.20.DEV-20230520_8c21ad6a31_WUXINROM_V4.7_11.0.zip">FORF_begonia_23.5.20.DEV-20230520_8c21ad6a31_WUXINROM_V4.7_11.0.zip</span><span class="file-size">2.90 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v4.x / ROM包 / 4.8</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_23.6.22.DEV-20230622_ba949cbf19_WUXINROM_V4.8_11.0.zip">FORF_begonia_23.6.22.DEV-20230622_ba949cbf19_WUXINROM_V4.8_11.0.zip</span><span class="file-size">2.90 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v5.x / ROM / 5.0.1</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_V14.0.23.8.6.DEV-20230806_c059f6221d_WUXINROM_V5.0.1_11.0.zip">FORF_begonia_V14.0.23.8.6.DEV-20230806_c059f6221d_WUXINROM_V5.0.1_11.0.zip</span><span class="file-size">2.91 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v5.x / ROM / 5.0.7</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_V14.0.23.8.17.DEV-20230817_b7a58de809_WUXINROM_V5.0.7_11.0.zip">FORF_begonia_V14.0.23.8.17.DEV-20230817_b7a58de809_WUXINROM_V5.0.7_11.0.zip</span><span class="file-size">2.98 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v5.x / ROM / 5.0</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_V14.0.23.8.3.DEV-20230803_9b411872cd_WUXINROM_V5_11.0.zip">FORF_begonia_V14.0.23.8.3.DEV-20230803_9b411872cd_WUXINROM_V5_11.0.zip</span><span class="file-size">2.94 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v5.x / ROM / 5.1</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_V14.0.23.8.25.DEV-20230825_0fa372b1eb_WUXINROM_V5.1_11.0.zip">FORF_begonia_V14.0.23.8.25.DEV-20230825_0fa372b1eb_WUXINROM_V5.1_11.0.zip</span><span class="file-size">2.99 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v5.x / ROM / 5.2</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_V14.0.23.10.17.DEV-20231017_dd25b06435_WUXINROM_V5.2_V11.zip">FORF_begonia_V14.0.23.10.17.DEV-20231017_dd25b06435_WUXINROM_V5.2_V11.zip</span><span class="file-size">2.98 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.11.24v5.x / ROM / 5.3-EOL</li>
+            <li class="file-row"><span class="file-name" title="FORF_begonia_V14.0.23.11.18.DEV-20231118_1de874aeef_WUXINROM_V5.3-EOL_V11.zip">FORF_begonia_V14.0.23.11.18.DEV-20231118_1de874aeef_WUXINROM_V5.3-EOL_V11.zip</span><span class="file-size">2.96 GB</span></li>
+          <li class="file-group-name">无心官改 / 21.6.30v2.2 / 内置应用恢复补丁</li>
+            <li class="file-row"><span class="file-name" title="投屏相关.zip">投屏相关.zip</span><span class="file-size">11.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="小米互传.zip">小米互传.zip</span><span class="file-size">5.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="小米钱包.zip">小米钱包.zip</span><span class="file-size">19.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="小米应用商店.zip">小米应用商店.zip</span><span class="file-size">9.6 MB</span></li>
+          <li class="file-group-name">无心官改 / 21.6.30v2.2 / 主题防止覆盖模块</li>
+            <li class="file-row"><span class="file-name" title="防止MIUI主题恢复默认(1).zip">防止MIUI主题恢复默认(1).zip</span><span class="file-size">0.1 MB</span></li>
+          <li class="file-group-name">无心官改 / 21.6.30v2.2 / ROM包</li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro_21.6.30_WuXinROM2.2_11.zip">RedmiNote8Pro_21.6.30_WuXinROM2.2_11.zip</span><span class="file-size">2.10 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用）</li>
+            <li class="file-row"><span class="file-name" title="[Magisk]Flyme10应用补全-必刷-20230402.zip">[Magisk]Flyme10应用补全-必刷-20230402.zip</span><span class="file-size">775.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Flyme10-Demo-begonia-20230402_1e2f631cc2_13.0.zip">Flyme10-Demo-begonia-20230402_1e2f631cc2_13.0.zip</span><span class="file-size">2.12 GB</span></li>
+            <li class="file-row"><span class="file-name" title="Flyme10-Demo2-begonia-20230410_aa89337387_13.0.zip">Flyme10-Demo2-begonia-20230410_aa89337387_13.0.zip</span><span class="file-size">2.11 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.11.19</li>
+            <li class="file-row"><span class="file-name" title="Flyme10.3.0.0A-begonia-20231119_b4ef768f8d_13.0-9.zip">Flyme10.3.0.0A-begonia-20231119_b4ef768f8d_13.0-9.zip</span><span class="file-size">3.78 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.11.5</li>
+            <li class="file-row"><span class="file-name" title="Flyme10.2.0.0.A-begonia-20231105_ff6f99a4b1_13.0-8.zip">Flyme10.2.0.0.A-begonia-20231105_ff6f99a4b1_13.0-8.zip</span><span class="file-size">3.47 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.6.17</li>
+            <li class="file-row"><span class="file-name" title="[Magisk]Flyme10应用补全-必刷-20230617.zip">[Magisk]Flyme10应用补全-必刷-20230617.zip</span><span class="file-size">1.09 GB</span></li>
+            <li class="file-row"><span class="file-name" title="双击唤醒.zip">双击唤醒.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Flyme 10.23.6.12.daily-begonia-20230617_d0108f84fe_13.0.zip">Flyme 10.23.6.12.daily-begonia-20230617_d0108f84fe_13.0.zip</span><span class="file-size">2.19 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.6.17 / 截图</li>
+            <li class="file-row"><span class="file-name" title="S30617-16560342_com.meizu.flyme.launcher.png">S30617-16560342_com.meizu.flyme.launcher.png</span><span class="file-size">1.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="S30617-16561089_com.android.settings.png">S30617-16561089_com.android.settings.png</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="S30617-16561391_com.android.settings.png">S30617-16561391_com.android.settings.png</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="S30617-16565154_com.meizu.flyme.launcher.png">S30617-16565154_com.meizu.flyme.launcher.png</span><span class="file-size">1.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="S30617-16572151_com.android.systemui.png">S30617-16572151_com.android.systemui.png</span><span class="file-size">2.2 MB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.8.12</li>
+            <li class="file-row"><span class="file-name" title="双击唤醒.zip">双击唤醒.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Flyme10.2.0.0.A-begonia-20230812_07308b8fbe_13.0-6.zip">Flyme10.2.0.0.A-begonia-20230812_07308b8fbe_13.0-6.zip</span><span class="file-size">3.36 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.8.13</li>
+            <li class="file-row"><span class="file-name" title="双击唤醒.zip">双击唤醒.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Flyme10.2.0.0.A-begonia-20230813_a5f44eeaf3_13.0-6.zip">Flyme10.2.0.0.A-begonia-20230813_a5f44eeaf3_13.0-6.zip</span><span class="file-size">3.35 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.8.17</li>
+            <li class="file-row"><span class="file-name" title="Flyme10.2.0.0.A-begonia-20230817_dfefa3b4da_13.0-7.zip">Flyme10.2.0.0.A-begonia-20230817_dfefa3b4da_13.0-7.zip</span><span class="file-size">3.40 GB</span></li>
+          <li class="file-group-name">Flyme10（勉强日用） / 2023.8.5</li>
+            <li class="file-row"><span class="file-name" title="双击唤醒.zip">双击唤醒.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Flyme10.0.0A-begonia-20230805_1f62242d64_13.0.zip">Flyme10.0.0A-begonia-20230805_1f62242d64_13.0.zip</span><span class="file-size">3.31 GB</span></li>
+          <li class="file-group-name">Flyme8 by 憨憨wwy</li>
+            <li class="file-row"><span class="file-name" title="'注意事项.txt">'注意事项.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="'bv.zip">'bv.zip</span><span class="file-size">11.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="'Flyme8（恢复包）.zip">'Flyme8（恢复包）.zip</span><span class="file-size">1.93 GB</span></li>
+            <li class="file-row"><span class="file-name" title="Permissiver_v5（刷完包就刷这个）.zip">Permissiver_v5（刷完包就刷这个）.zip</span><span class="file-size">1.2 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓11〈Release〉</li>
+            <li class="file-row"><span class="file-name" title="begonia_HyperOS_V1.0.9.0.RGGCNXM_6132526ce3_11.0.zip">begonia_HyperOS_V1.0.9.0.RGGCNXM_6132526ce3_11.0.zip</span><span class="file-size">3.61 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓11〈Release〉 / R2</li>
+            <li class="file-row"><span class="file-name" title="begonia_HyperOS_V1.0.9.0.RGGCNXM_6a1e3fa63e_11.0-R2.zip">begonia_HyperOS_V1.0.9.0.RGGCNXM_6a1e3fa63e_11.0-R2.zip</span><span class="file-size">3.60 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓11〈Release〉 / R3</li>
+            <li class="file-row"><span class="file-name" title="begonia_HyperOS_V1.0.9.0.RGGCNXM_28355c2a27_11.0-R3.zip">begonia_HyperOS_V1.0.9.0.RGGCNXM_28355c2a27_11.0-R3.zip</span><span class="file-size">3.60 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓11〈Release〉 / R4</li>
+            <li class="file-row"><span class="file-name" title="begonia_HyperOS_V1.0.11.0.RGGCNXM_b8f8383795_11.0-R4.zip">begonia_HyperOS_V1.0.11.0.RGGCNXM_b8f8383795_11.0-R4.zip</span><span class="file-size">3.98 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓11〈Release〉 / R5</li>
+            <li class="file-row"><span class="file-name" title="begonia_OS1.0.12.0.RGGCNXM_8e52e99467_11.0-R5.zip">begonia_OS1.0.12.0.RGGCNXM_8e52e99467_11.0-R5.zip</span><span class="file-size">3.86 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓11〈Release〉 / R6</li>
+            <li class="file-row"><span class="file-name" title="begonia_OS1.0.13.0.RGGCNXM_891067548a_11.0-R6.zip">begonia_OS1.0.13.0.RGGCNXM_891067548a_11.0-R6.zip</span><span class="file-size">3.79 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓13（Beta） / 2024.5.11</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.6.0.TGGCNXM_b6da9101bc_13.0.zip">miui_BEGONIA_OS1.0.6.0.TGGCNXM_b6da9101bc_13.0.zip</span><span class="file-size">3.51 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓13（Beta） / 改善澎湃OS流畅度（内核）</li>
+            <li class="file-row"><span class="file-name" title="NoVA-Begonia-4.14.327-KSU.zip">NoVA-Begonia-4.14.327-KSU.zip</span><span class="file-size">16.1 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓13（Beta） / 截图</li>
+            <li class="file-row"><span class="file-name" title="Image_1697721532920.jpg">Image_1697721532920.jpg</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721534862.jpg">Image_1697721534862.jpg</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721536774.jpg">Image_1697721536774.jpg</span><span class="file-size">0.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721538999.jpg">Image_1697721538999.jpg</span><span class="file-size">0.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721540805.jpg">Image_1697721540805.jpg</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721543186.jpg">Image_1697721543186.jpg</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721545704.jpg">Image_1697721545704.jpg</span><span class="file-size">0.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721547984.jpg">Image_1697721547984.jpg</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721549907.jpg">Image_1697721549907.jpg</span><span class="file-size">0.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Image_1697721554131.jpg">Image_1697721554131.jpg</span><span class="file-size">0.1 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓13（Beta）</li>
+            <li class="file-row"><span class="file-name" title="HyperOS_23.9.18_begonia-20231020_7838a55124_V13.0_Beta.zip">HyperOS_23.9.18_begonia-20231020_7838a55124_V13.0_Beta.zip</span><span class="file-size">3.00 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.12.2（R8） / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS-Android14_R8.zip">Begoniain_Firmware_Patch_For_HyperOS-Android14_R8.zip</span><span class="file-size">350.1 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.12.2（R8）</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS1.0.22.0.UGGCNXM-user-14.0-R8-c2c5dbd079.zip">begonia-ota_full-OS1.0.22.0.UGGCNXM-user-14.0-R8-c2c5dbd079.zip</span><span class="file-size">5.38 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.12.22（R9） / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS-Android14_R9.zip">Begoniain_Firmware_Patch_For_HyperOS-Android14_R9.zip</span><span class="file-size">353.3 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.12.22（R9）</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS1.0.23.0.UGGCNXM-user-14.0-R9-b86d787dcc.zip">begonia-ota_full-OS1.0.23.0.UGGCNXM-user-14.0-R9-b86d787dcc.zip</span><span class="file-size">5.32 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.2.19</li>
+            <li class="file-row"><span class="file-name" title="hyperOS_fw_20240219.zip">hyperOS_fw_20240219.zip</span><span class="file-size">273.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.8.0.UGGCNXM_29899e7c4a_14.0-Beta.zip">miui_BEGONIA_OS1.0.8.0.UGGCNXM_29899e7c4a_14.0-Beta.zip</span><span class="file-size">3.99 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.5.20（rc1）</li>
+            <li class="file-row"><span class="file-name" title="fw_begonia_miui_BEGONIA_V12.5.6.0.RGGCNXM_ef89538caa_11.0.zip">fw_begonia_miui_BEGONIA_V12.5.6.0.RGGCNXM_ef89538caa_11.0.zip</span><span class="file-size">48.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.13.0.UGGCNXM_259956fba2_14.0-rc1.zip">miui_BEGONIA_OS1.0.13.0.UGGCNXM_259956fba2_14.0-rc1.zip</span><span class="file-size">4.52 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.6.7（rc2）</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.13.0.UGGCNXM_a25b1bc2bc_14.0-rc2.zip">miui_BEGONIA_OS1.0.13.0.UGGCNXM_a25b1bc2bc_14.0-rc2.zip</span><span class="file-size">4.61 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.7.1（R1）</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.15.0.UGGCNXM_156774bb0d_14.0-R1.zip">miui_BEGONIA_OS1.0.15.0.UGGCNXM_156774bb0d_14.0-R1.zip</span><span class="file-size">4.62 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.7.13（R4）</li>
+            <li class="file-row"><span class="file-name" title="Magisk v27.apk">Magisk v27.apk</span><span class="file-size">12.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.15.0.UGGCNXM_bf410a22cf_14.0-R4fix.zip">miui_BEGONIA_OS1.0.15.0.UGGCNXM_bf410a22cf_14.0-R4fix.zip</span><span class="file-size">4.64 GB</span></li>
+            <li class="file-row"><span class="file-name" title="OpenSELinux.zip">OpenSELinux.zip</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.7.2（R2）</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.15.0.UGGCNXM_36f260de27_14.0-R2.zip">miui_BEGONIA_OS1.0.15.0.UGGCNXM_36f260de27_14.0-R2.zip</span><span class="file-size">4.62 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.15.0.UGGCNXM_b2846715e3_14.0-R2-Fix.zip">miui_BEGONIA_OS1.0.15.0.UGGCNXM_b2846715e3_14.0-R2-Fix.zip</span><span class="file-size">4.62 GB</span></li>
+            <li class="file-row"><span class="file-name" title="OpenSELinux.zip">OpenSELinux.zip</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.7.5（R3）</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.15.0.UGGCNXM_9f955288dd_14.0-R3.zip">miui_BEGONIA_OS1.0.15.0.UGGCNXM_9f955288dd_14.0-R3.zip</span><span class="file-size">4.62 GB</span></li>
+            <li class="file-row"><span class="file-name" title="OpenSELinux.zip">OpenSELinux.zip</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.8.17（R6） / 印度专属固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS-Android14_3.zip">Begoniain_Firmware_Patch_For_HyperOS-Android14_3.zip</span><span class="file-size">370.8 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.8.17（R6）</li>
+            <li class="file-row"><span class="file-name" title="Magisk v27.apk">Magisk v27.apk</span><span class="file-size">12.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.17.0.UGGCNXM_cbde98a43b_14.0-R6.zip">miui_BEGONIA_OS1.0.17.0.UGGCNXM_cbde98a43b_14.0-R6.zip</span><span class="file-size">5.59 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.8.3（R5）</li>
+            <li class="file-row"><span class="file-name" title="Magisk v27.apk">Magisk v27.apk</span><span class="file-size">12.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.17.0.UGGCNXM_5b98264fcd_14.0-R5.zip">miui_BEGONIA_OS1.0.17.0.UGGCNXM_5b98264fcd_14.0-R5.zip</span><span class="file-size">4.71 GB</span></li>
+            <li class="file-row"><span class="file-name" title="OpenSELinux.zip">OpenSELinux.zip</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.9.28（R7） / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS-Android14_R7.zip">Begoniain_Firmware_Patch_For_HyperOS-Android14_R7.zip</span><span class="file-size">349.3 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0 / 2024.9.28（R7）</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS1.0.19.0.UGGCNXM-user-14.0-R7-547b9ec2be.zip">begonia-ota_full-OS1.0.19.0.UGGCNXM-user-14.0-R7-547b9ec2be.zip</span><span class="file-size">5.02 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 1.0</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_OS1.0.5.0.UGGCNXM_1d649bc4d7_14.0-DEV.zip">miui_BEGONIA_OS1.0.5.0.UGGCNXM_1d649bc4d7_14.0-DEV.zip</span><span class="file-size">3.95 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.2.8 / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS2-Android14_R1.zip">Begoniain_Firmware_Patch_For_HyperOS2-Android14_R1.zip</span><span class="file-size">353.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.2.8</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.3.0.UGGCNXM-user-14.0-R1-35309145ba.zip">begonia-ota_full-OS2.0.3.0.UGGCNXM-user-14.0-R1-35309145ba.zip</span><span class="file-size">4.86 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.3.24 / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS2-Android14_R2.zip">Begoniain_Firmware_Patch_For_HyperOS2-Android14_R2.zip</span><span class="file-size">352.1 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.3.24</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.102.0.UGGCNXM-user-14.0-R2-55a7010e48.zip">begonia-ota_full-OS2.0.102.0.UGGCNXM-user-14.0-R2-55a7010e48.zip</span><span class="file-size">4.87 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.4.2 / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS2-Android14_R3.zip">Begoniain_Firmware_Patch_For_HyperOS2-Android14_R3.zip</span><span class="file-size">352.3 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.4.2</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.103.0.UGGCNXM-user-14.0-R3-d07c95000c.zip">begonia-ota_full-OS2.0.103.0.UGGCNXM-user-14.0-R3-d07c95000c.zip</span><span class="file-size">4.86 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.5.29 / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS2-Android14_R4.zip">Begoniain_Firmware_Patch_For_HyperOS2-Android14_R4.zip</span><span class="file-size">352.2 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.5.29</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.105.0.UGGCNXM-user-14.0-R4-30b5d75825.zip">begonia-ota_full-OS2.0.105.0.UGGCNXM-user-14.0-R4-30b5d75825.zip</span><span class="file-size">4.88 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2025.7.10</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.107.0.UGGCNXM-user-14.0-R5-6ba4bbe8a6.zip">begonia-ota_full-OS2.0.107.0.UGGCNXM-user-14.0-R5-6ba4bbe8a6.zip</span><span class="file-size">4.94 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2026.1.13</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.127.0.UGGCNXM-user-14.0-R7-8c31236cdf.zip">begonia-ota_full-OS2.0.127.0.UGGCNXM-user-14.0-R7-8c31236cdf.zip</span><span class="file-size">4.02 GB</span></li>
+            <li class="file-row"><span class="file-name" title="TWRP-3.7.1_12-Unified Ver By wuxinG90-20251213-begonia.img">TWRP-3.7.1_12-Unified Ver By wuxinG90-20251213-begonia.img</span><span class="file-size">64.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2026.1.13 / Del-Apps</li>
+            <li class="file-row"><span class="file-name" title="data-app.zip">data-app.zip</span><span class="file-size">1019.5 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0 / 2026.1.13 / India</li>
+            <li class="file-row"><span class="file-name" title="begoniain-ota_full-OS2.0.127.0.UGGCNXM-user-14.0-R7-4e832c6cf5.zip">begoniain-ota_full-OS2.0.127.0.UGGCNXM-user-14.0-R7-4e832c6cf5.zip</span><span class="file-size">4.01 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓14（Release） / 2.0</li>
+            <li class="file-row"><span class="file-name" title="KernelSU_Next_v1.0.5_12430-release.apk">KernelSU_Next_v1.0.5_12430-release.apk</span><span class="file-size">7.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="ksu_module_susfs_1.5.2+R16.zip">ksu_module_susfs_1.5.2+R16.zip</span><span class="file-size">1.0 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓15（Beta） / 2024.11.23 / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS2-Android15_Beta.zip">Begoniain_Firmware_Patch_For_HyperOS2-Android15_Beta.zip</span><span class="file-size">399.8 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓15（Beta） / 2024.11.23</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.0.11.VGGCNXM-user-15.0-Beta-d595c6aaf7.zip">begonia-ota_full-OS2.0.0.11.VGGCNXM-user-15.0-Beta-d595c6aaf7.zip</span><span class="file-size">4.89 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓15（Beta） / 2024.11.24</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.0.11.VGGCNXM-user-15.0-Beta-f82cec5db2.zip">begonia-ota_full-OS2.0.0.11.VGGCNXM-user-15.0-Beta-f82cec5db2.zip</span><span class="file-size">4.89 GB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓15（Beta） / 2024.12.31 / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_HyperOS2-Android15_Beta2.zip">Begoniain_Firmware_Patch_For_HyperOS2-Android15_Beta2.zip</span><span class="file-size">433.7 MB</span></li>
+          <li class="file-group-name">HyperOS（小米澎湃OS） / 安卓15（Beta） / 2024.12.31</li>
+            <li class="file-row"><span class="file-name" title="begonia-ota_full-OS2.0.101.0.VGGCNXM-user-15.0-Beta2-bf8990abdd.zip">begonia-ota_full-OS2.0.101.0.VGGCNXM-user-15.0-Beta2-bf8990abdd.zip</span><span class="file-size">5.06 GB</span></li>
+          <li class="file-group-name">Linux系列系统</li>
+            <li class="file-row"><span class="file-name" title="保姆级教程.txt">保姆级教程.txt</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">Linux系列系统 / 所需要的固件</li>
+            <li class="file-row"><span class="file-name" title="boot.img">boot.img</span><span class="file-size">28.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="dtbo.img">dtbo.img</span><span class="file-size">32.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="fw_full_begonia_12.0.8.0.zip">fw_full_begonia_12.0.8.0.zip</span><span class="file-size">1.09 GB</span></li>
+          <li class="file-group-name">Linux系列系统 / Droidian（Debian）</li>
+            <li class="file-row"><span class="file-name" title="droidian_OFFICIAL_phosh_phone_xiaomi_begonia_api29_arm64_26_20230621.zip">droidian_OFFICIAL_phosh_phone_xiaomi_begonia_api29_arm64_26_20230621.zip</span><span class="file-size">1.73 GB</span></li>
+            <li class="file-row"><span class="file-name" title="droidian_UNOFFICIAL_xiaomi_begonia_rootfs_api29_arm64_26_20230621.zip">droidian_UNOFFICIAL_xiaomi_begonia_rootfs_api29_arm64_26_20230621.zip</span><span class="file-size">1.18 GB</span></li>
+          <li class="file-group-name">Linux系列系统 / Ubuntu Touch</li>
+            <li class="file-row"><span class="file-name" title="ubuntu-touch-begonia.zip">ubuntu-touch-begonia.zip</span><span class="file-size">910.8 MB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release）</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_171185b637_11.0-R2.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_171185b637_11.0-R2.zip</span><span class="file-size">2.16 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_7e8ac1c32a_11.0-R4.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_7e8ac1c32a_11.0-R4.zip</span><span class="file-size">2.47 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_b6f55ef5c7_11.0.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_b6f55ef5c7_11.0.zip</span><span class="file-size">2.25 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_c7ca725fcb_11.0-R3.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_c7ca725fcb_11.0-R3.zip</span><span class="file-size">2.18 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R10</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.9.0.RGGCNXM_265b92edba_11.0-R10_NON-ROOT.zip">miui_BEGONIA_V14.0.9.0.RGGCNXM_265b92edba_11.0-R10_NON-ROOT.zip</span><span class="file-size">2.69 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.9.0.RGGCNXM_8afc2c416f_11.0-R10_KSU-ROOT.zip">miui_BEGONIA_V14.0.9.0.RGGCNXM_8afc2c416f_11.0-R10_KSU-ROOT.zip</span><span class="file-size">2.69 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R11</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.10.0.RGGCNXM_ab41fdeeb4_11.0-R11.zip">miui_BEGONIA_V14.0.10.0.RGGCNXM_ab41fdeeb4_11.0-R11.zip</span><span class="file-size">2.75 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R5</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_467b7bc2f9_11.0-R5_NON-ROOT.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_467b7bc2f9_11.0-R5_NON-ROOT.zip</span><span class="file-size">2.47 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_ebd04d66f6_11.0-R5_ROOT.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_ebd04d66f6_11.0-R5_ROOT.zip</span><span class="file-size">2.48 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R6</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_162c3d7a42_11.0-R6_NON-ROOT.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_162c3d7a42_11.0-R6_NON-ROOT.zip</span><span class="file-size">2.47 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.3.0.RGGCNXM_f41defe5d0_11.0-R6_KSU-ROOT.zip">miui_BEGONIA_V14.0.3.0.RGGCNXM_f41defe5d0_11.0-R6_KSU-ROOT.zip</span><span class="file-size">2.47 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R7</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.5.0.RGGCNXM_26f6a620c5_11.0-R7-1_NON-ROOT.zip">miui_BEGONIA_V14.0.5.0.RGGCNXM_26f6a620c5_11.0-R7-1_NON-ROOT.zip</span><span class="file-size">2.46 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.5.0.RGGCNXM_7e6b236445_11.0-R7-1_KSU-ROOT.zip">miui_BEGONIA_V14.0.5.0.RGGCNXM_7e6b236445_11.0-R7-1_KSU-ROOT.zip</span><span class="file-size">2.47 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R8</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.6.0.RGGCNXM_0ad59f438e_11.0-R8_NON-ROOT.zip">miui_BEGONIA_V14.0.6.0.RGGCNXM_0ad59f438e_11.0-R8_NON-ROOT.zip</span><span class="file-size">2.45 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.6.0.RGGCNXM_6111b99f9c_11.0-R8_KSU-ROOT.zip">miui_BEGONIA_V14.0.6.0.RGGCNXM_6111b99f9c_11.0-R8_KSU-ROOT.zip</span><span class="file-size">2.45 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓11（Release） / R9</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.6.0.RGGCNXM_5e77a3d0d5_11.0-R9_NON-ROOT.zip">miui_BEGONIA_V14.0.6.0.RGGCNXM_5e77a3d0d5_11.0-R9_NON-ROOT.zip</span><span class="file-size">2.55 GB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.6.0.RGGCNXM_e2ccf00751_11.0-R9_KSU-ROOT.zip">miui_BEGONIA_V14.0.6.0.RGGCNXM_e2ccf00751_11.0-R9_KSU-ROOT.zip</span><span class="file-size">2.55 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓13（Beta） / Beta2</li>
+            <li class="file-row"><span class="file-name" title="刷入教程.txt">刷入教程.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.23.1.26.DEV.TGGCNXM_01cf5ef225_13.0-beta2.zip">miui_BEGONIA_V14.0.23.1.26.DEV.TGGCNXM_01cf5ef225_13.0-beta2.zip</span><span class="file-size">3.95 GB</span></li>
+            <li class="file-row"><span class="file-name" title="MIUI14_A13_Begonia_Patch_Fw.zip">MIUI14_A13_Begonia_Patch_Fw.zip</span><span class="file-size">143.8 MB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓13（Beta） / Beta3</li>
+            <li class="file-row"><span class="file-name" title="fw_miui_BEGONIA_V14.0.23.7.3.DEV_TGGCNXM_ab3bcbe785_13.0.zip">fw_miui_BEGONIA_V14.0.23.7.3.DEV_TGGCNXM_ab3bcbe785_13.0.zip</span><span class="file-size">602.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.23.7.3.DEV_TGGCNXM_aff7f57f72_13.0-Beta3-1.zip">miui_BEGONIA_V14.0.23.7.3.DEV_TGGCNXM_aff7f57f72_13.0-Beta3-1.zip</span><span class="file-size">3.80 GB</span></li>
+          <li class="file-group-name">MIUI14 / 安卓13（Beta）</li>
+            <li class="file-row"><span class="file-name" title="miui_BEGONIA_V14.0.22.12.5.DEV.TGGCNXM_5071ab9dc4_13.0-BETA.zip">miui_BEGONIA_V14.0.22.12.5.DEV.TGGCNXM_5071ab9dc4_13.0-BETA.zip</span><span class="file-size">3.95 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.1.12</li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220112_77220d207d_BY 无心BOYS-BETA.zip">Origin Ocean-begonia-20220112_77220d207d_BY 无心BOYS-BETA.zip</span><span class="file-size">2.29 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.1.14</li>
+            <li class="file-row"><span class="file-name" title="'Origin Ocean-begonia-20220114_f8280023e7_BY 无心BOYS-BETA2.zip">'Origin Ocean-begonia-20220114_f8280023e7_BY 无心BOYS-BETA2.zip</span><span class="file-size">2.83 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.1.25 / BETA3.1</li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220125_41fac57e9e_BY 无心BOYS-BETA3.1.zip">Origin Ocean-begonia-20220125_41fac57e9e_BY 无心BOYS-BETA3.1.zip</span><span class="file-size">2.77 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.1.25 / BETA3</li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220125_3f44d48178_BY 无心BOYS-BETA3.zip">Origin Ocean-begonia-20220125_3f44d48178_BY 无心BOYS-BETA3.zip</span><span class="file-size">2.75 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.1.26</li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220126_2f2d05067c_BY 无心BOYS-BETA3.2.zip">Origin Ocean-begonia-20220126_2f2d05067c_BY 无心BOYS-BETA3.2.zip</span><span class="file-size">2.77 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.1.28</li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220128_2511d68b9a_BY 无心BOYS-BETA3.3.zip">Origin Ocean-begonia-20220128_2511d68b9a_BY 无心BOYS-BETA3.3.zip</span><span class="file-size">2.75 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.4.4</li>
+            <li class="file-row"><span class="file-name" title="修复ocean乱叫.zip">修复ocean乱叫.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220404_de36fb1794_BY 憨憨初音酱-Stable1.0.zip">Origin Ocean-begonia-20220404_de36fb1794_BY 憨憨初音酱-Stable1.0.zip</span><span class="file-size">2.74 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.8.27</li>
+            <li class="file-row"><span class="file-name" title="[Magisk]OriginOcean应用补全-必刷-20220827.zip">[Magisk]OriginOcean应用补全-必刷-20220827.zip</span><span class="file-size">1.57 GB</span></li>
+            <li class="file-row"><span class="file-name" title="米窗（开机自启闪烁版）.zip">米窗（开机自启闪烁版）.zip</span><span class="file-size">1.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="修复主题加载. 开机后使用MT管理器root执行.sh">修复主题加载. 开机后使用MT管理器root执行.sh</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220827_f7534b433a_BY 憨憨初音酱-Stable1.5.zip">Origin Ocean-begonia-20220827_f7534b433a_BY 憨憨初音酱-Stable1.5.zip</span><span class="file-size">2.23 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2022.9.30</li>
+            <li class="file-row"><span class="file-name" title="[Magisk]OriginOcean应用补全-必刷-20220930.zip">[Magisk]OriginOcean应用补全-必刷-20220930.zip</span><span class="file-size">1.66 GB</span></li>
+            <li class="file-row"><span class="file-name" title="米窗（开机自启闪烁版）.zip">米窗（开机自启闪烁版）.zip</span><span class="file-size">1.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="修复主题加载. 开机后使用MT管理器root执行.sh">修复主题加载. 开机后使用MT管理器root执行.sh</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Origin Ocean-begonia-20220930_4440cbd59d_BY 憨憨初音酱-Stable2.0.zip">Origin Ocean-begonia-20220930_4440cbd59d_BY 憨憨初音酱-Stable2.0.zip</span><span class="file-size">2.33 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2023.12.11</li>
+            <li class="file-row"><span class="file-name" title="fw_OriginOcean-begonia_7ab317ad73_20231211.zip">fw_OriginOcean-begonia_7ab317ad73_20231211.zip</span><span class="file-size">615.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20231211_bdcfd1feb1_BY 无心-V3.3-full.zip">OriginOcean-begonia-20231211_bdcfd1feb1_BY 无心-V3.3-full.zip</span><span class="file-size">3.86 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2023.2.11 / 免扩容版本</li>
+            <li class="file-row"><span class="file-name" title="[Magisk]OriginOcean应用补全-必刷-20230211.zip">[Magisk]OriginOcean应用补全-必刷-20230211.zip</span><span class="file-size">1.87 GB</span></li>
+            <li class="file-row"><span class="file-name" title="更新及说明.txt">更新及说明.txt</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20230211_e84511b7b1_BY 憨憨初音酱-Stable3.0.zip">OriginOcean-begonia-20230211_e84511b7b1_BY 憨憨初音酱-Stable3.0.zip</span><span class="file-size">2.21 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2023.2.11 / 完整扩容版本</li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20230211_c0965b91ab_BY 憨憨初音酱-Stable3.0-完整版.zip">OriginOcean-begonia-20230211_c0965b91ab_BY 憨憨初音酱-Stable3.0-完整版.zip</span><span class="file-size">3.97 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2023.6.10</li>
+            <li class="file-row"><span class="file-name" title="双击唤醒.zip">双击唤醒.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="修复相机TWRP刷入.zip">修复相机TWRP刷入.zip</span><span class="file-size">70.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="fw_OriginOcean-begonia_c727066665_20230610.zip">fw_OriginOcean-begonia_c727066665_20230610.zip</span><span class="file-size">410.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20230610_1b81c99176_BY无心-V3.1-full.zip">OriginOcean-begonia-20230610_1b81c99176_BY无心-V3.1-full.zip</span><span class="file-size">3.94 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2023.7.10</li>
+            <li class="file-row"><span class="file-name" title="双击唤醒.zip">双击唤醒.zip</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="小米相机修复TWRP刷入.zip">小米相机修复TWRP刷入.zip</span><span class="file-size">160.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="fw_OriginOcean-begonia_7cd866d342_20230710.zip">fw_OriginOcean-begonia_7cd866d342_20230710.zip</span><span class="file-size">410.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20230710_18ed952d9e_BY 无心-V3.2-full(1).zip">OriginOcean-begonia-20230710_18ed952d9e_BY 无心-V3.2-full(1).zip</span><span class="file-size">3.98 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2024.3.9</li>
+            <li class="file-row"><span class="file-name" title="fw_OriginOcean-begonia_89e5c2c2dd_20240309.zip">fw_OriginOcean-begonia_89e5c2c2dd_20240309.zip</span><span class="file-size">624.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20240309_bcc55b2b5d_BY 无心-V3.4-full.zip">OriginOcean-begonia-20240309_bcc55b2b5d_BY 无心-V3.4-full.zip</span><span class="file-size">3.86 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOceam（安卓11） / 2024.6.23</li>
+            <li class="file-row"><span class="file-name" title="OriginOcean-begonia-20240623_160e2b9ccc_BY 无心-V3.5-full.zip.zip">OriginOcean-begonia-20240623_160e2b9ccc_BY 无心-V3.5-full.zip.zip</span><span class="file-size">5.05 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS3.0（安卓13）</li>
+            <li class="file-row"><span class="file-name" title="OriginOS3_begonia_Patch_Fw(2).zip">OriginOS3_begonia_Patch_Fw(2).zip</span><span class="file-size">465.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="originOS3.0_begonia-20230113_e005d9fd9a_13.0-Beta.zip">originOS3.0_begonia-20230113_e005d9fd9a_13.0-Beta.zip</span><span class="file-size">3.96 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS3.1（安卓13） / 2024.1.24</li>
+            <li class="file-row"><span class="file-name" title="fw_OriginOS3.1-begonia_ab37faaac4_20240124.zip">fw_OriginOS3.1-begonia_ab37faaac4_20240124.zip</span><span class="file-size">618.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOS3.1-begonia-20240124_c64e733864_13.0-Beta3.zip">OriginOS3.1-begonia-20240124_c64e733864_13.0-Beta3.zip</span><span class="file-size">3.97 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS3.1（安卓13）</li>
+            <li class="file-row"><span class="file-name" title="更多设置（需要Root）.apk">更多设置（需要Root）.apk</span><span class="file-size">7.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="fw_OriginOS3.1-begonia_585a3029a9_20231002.zip">fw_OriginOS3.1-begonia_585a3029a9_20231002.zip</span><span class="file-size">621.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOS3.1-begonia-20231002_6eee448d65_13.0-Beta2.zip">OriginOS3.1-begonia-20231002_6eee448d65_13.0-Beta2.zip</span><span class="file-size">3.99 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS4.0（安卓14） / 2024.3.28</li>
+            <li class="file-row"><span class="file-name" title="更多设置（需要Root）.apk">更多设置（需要Root）.apk</span><span class="file-size">7.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OriginOS4.0-begonia-20240328_4fbefb6bcc_14.0-beta-1.zip">OriginOS4.0-begonia-20240328_4fbefb6bcc_14.0-beta-1.zip</span><span class="file-size">4.98 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS4.0（安卓14） / 2024.4.4</li>
+            <li class="file-row"><span class="file-name" title="OriginOS4.0-begonia-20240404_6c076398f7_14.0-beta2.zip">OriginOS4.0-begonia-20240404_6c076398f7_14.0-beta2.zip</span><span class="file-size">5.35 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS4.0（安卓14） / 2024.5.28（rc1）</li>
+            <li class="file-row"><span class="file-name" title="OriginOS4.0-rc1_begonia_29cd209360_14.0.zip">OriginOS4.0-rc1_begonia_29cd209360_14.0.zip</span><span class="file-size">5.21 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS4.0（安卓14） / 2024.6.1（rc2）</li>
+            <li class="file-row"><span class="file-name" title="OriginOS4.0-rc2_begonia_20240601_467ecf24df_14.0.zip">OriginOS4.0-rc2_begonia_20240601_467ecf24df_14.0.zip</span><span class="file-size">5.21 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS4.0（安卓14） / 2024.7.8（R1）</li>
+            <li class="file-row"><span class="file-name" title="OriginOS4.0-R1_begonia_20240708_09ca8c08a9_14.0.zip">OriginOS4.0-R1_begonia_20240708_09ca8c08a9_14.0.zip</span><span class="file-size">5.15 GB</span></li>
+          <li class="file-group-name">OriginOS / OriginOS4.0（安卓14） / 2024.8.8（R2）</li>
+            <li class="file-row"><span class="file-name" title="OriginOS4.0-R2_begonia_20240808_e7715dca0a_14.0.zip">OriginOS4.0-R2_begonia_20240808_e7715dca0a_14.0.zip</span><span class="file-size">5.08 GB</span></li>
+          <li class="file-group-name">ROGUI（华硕） / 2025.3.10（R1） / 印度固件</li>
+            <li class="file-row"><span class="file-name" title="Begoniain_Firmware_Patch_For_ROGUI-Android14_R1.zip">Begoniain_Firmware_Patch_For_ROGUI-Android14_R1.zip</span><span class="file-size">354.8 MB</span></li>
+          <li class="file-group-name">ROGUI（华硕） / 2025.3.10（R1）</li>
+            <li class="file-row"><span class="file-name" title="ROGUI14_begonia_20250310_5cfec54795_14.0-R1.zip">ROGUI14_begonia_20250310_5cfec54795_14.0-R1.zip</span><span class="file-size">3.83 GB</span></li>
+          <li class="file-group-name">ROGUI（华硕）</li>
+            <li class="file-row"><span class="file-name" title="更多设置（需要Root）.apk">更多设置（需要Root）.apk</span><span class="file-size">7.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="KernelSU_Next_v1.0.4_12335-release.apk">KernelSU_Next_v1.0.4_12335-release.apk</span><span class="file-size">7.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="ksu_module_susfs_1.5.2+.zip">ksu_module_susfs_1.5.2+.zip</span><span class="file-size">1.2 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">谷歌相机</div>
+              <div class="dl-version">16 个文件 · 1.25 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="谷歌相机 文件列表">
+          <li class="file-group-name">根目录</li>
+            <li class="file-row"><span class="file-name" title="8.1.011_Aspen_rr2.09_lib_mwp_hdrv4_NR62W17T17_f(4).apk">8.1.011_Aspen_rr2.09_lib_mwp_hdrv4_NR62W17T17_f(4).apk</span><span class="file-size">124.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="AGCV9_8.4.300.414775575.18.apk">AGCV9_8.4.300.414775575.18.apk</span><span class="file-size">144.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="GCam_7.3.018_RN8P_Wyroczen_v2.apk">GCam_7.3.018_RN8P_Wyroczen_v2.apk</span><span class="file-size">77.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="GCam_7.3.018_RN8P_Wyroczen.apk">GCam_7.3.018_RN8P_Wyroczen.apk</span><span class="file-size">77.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="GCam_RN8P_Wyroczen_7.3.020_1.1.apk">GCam_RN8P_Wyroczen_7.3.020_1.1.apk</span><span class="file-size">77.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="GCam_RN8P_Wyroczen_7.3.020_2.0.apk">GCam_RN8P_Wyroczen_7.3.020_2.0.apk</span><span class="file-size">77.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="GCam_RN8P_Wyroczen_7.3.020_Reborn_1.991O.apk">GCam_RN8P_Wyroczen_7.3.020_Reborn_1.991O.apk</span><span class="file-size">79.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="MGC_3.2.045_TlnNeun_V1.0_Wyroczen_Remosaic-1625915994695.apk">MGC_3.2.045_TlnNeun_V1.0_Wyroczen_Remosaic-1625915994695.apk</span><span class="file-size">26.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="MGC_6.1_RN8P_Edition_4.6_STABLE.apk">MGC_6.1_RN8P_Edition_4.6_STABLE.apk</span><span class="file-size">110.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="MGC_6.1_RN8P_Edition_4.75.apk">MGC_6.1_RN8P_Edition_4.75.apk</span><span class="file-size">110.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="MGC_6.1_RN8P_Edition_4.8.apk">MGC_6.1_RN8P_Edition_4.8.apk</span><span class="file-size">110.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="trCameraV5_RN8P_Wyroczen.apk">trCameraV5_RN8P_Wyroczen.apk</span><span class="file-size">139.2 MB</span></li>
+          <li class="file-group-name">取景框缓存模块</li>
+            <li class="file-row"><span class="file-name" title="BufferFix4_RN8P_Wyroczen.zip">BufferFix4_RN8P_Wyroczen.zip</span><span class="file-size">0.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BufferFix4_RN8P_WyroczenTWRP.zip">BufferFix4_RN8P_WyroczenTWRP.zip</span><span class="file-size">0.7 MB</span></li>
+          <li class="file-group-name">LMC8.x / LMC8.4</li>
+            <li class="file-row"><span class="file-name" title="LMC8.4_Lite.apk">LMC8.4_Lite.apk</span><span class="file-size">127.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="LMC8.4_R8_MK_PRO_V7.4.2.xml">LMC8.4_R8_MK_PRO_V7.4.2.xml</span><span class="file-size">0.1 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">内核</div>
+              <div class="dl-version">209 个文件 · 2.93 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="内核 文件列表">
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用）</li>
+            <li class="file-row"><span class="file-name" title="[1019][Proton][Q-OSS]-4.14.251-____perfz.zip">[1019][Proton][Q-OSS]-4.14.251-____perfz.zip</span><span class="file-size">13.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[DragonTC][Q-OSS][4.14.252]-BukanMaen-10211305.zip">[DragonTC][Q-OSS][4.14.252]-BukanMaen-10211305.zip</span><span class="file-size">11.6 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / 独角兽内核</li>
+            <li class="file-row"><span class="file-name" title="UnicornHorn-R9_begonia_110621.zip">UnicornHorn-R9_begonia_110621.zip</span><span class="file-size">13.7 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / 咆哮内核</li>
+            <li class="file-row"><span class="file-name" title="Rave-Begonia-v1.8.zip">Rave-Begonia-v1.8.zip</span><span class="file-size">11.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Rave-Begonia-v1.9.zip">Rave-Begonia-v1.9.zip</span><span class="file-size">11.4 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / 修复MIUI12使用内核绿屏</li>
+            <li class="file-row"><span class="file-name" title="miui12-kernel-fix-non-cfw-V2.zip">miui12-kernel-fix-non-cfw-V2.zip</span><span class="file-size">1.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="miui12-kernel-fix-non-cfw.zip">miui12-kernel-fix-non-cfw.zip</span><span class="file-size">0.9 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / AkameKemel</li>
+            <li class="file-row"><span class="file-name" title="AkameKernel-begonia-2.zip">AkameKernel-begonia-2.zip</span><span class="file-size">19.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / GK（GengKapak）</li>
+            <li class="file-row"><span class="file-name" title="DTC_4.14.246_GK_nTu21_09091626.zip">DTC_4.14.246_GK_nTu21_09091626.zip</span><span class="file-size">12.9 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / MegaByte Kernel</li>
+            <li class="file-row"><span class="file-name" title="[DragonTC][Q-OSS]-4.14.255-MegaByte-11251338.zip">[DragonTC][Q-OSS]-4.14.255-MegaByte-11251338.zip</span><span class="file-size">12.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GCC][Q-OSS]-4.14.255-MegaByte-11251352.zip">[GCC][Q-OSS]-4.14.255-MegaByte-11251352.zip</span><span class="file-size">13.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GengKapak][Q-OSS]-4.14.255-MegaByte-11251332.zip">[GengKapak][Q-OSS]-4.14.255-MegaByte-11251332.zip</span><span class="file-size">13.4 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / nTu21 / 4.14.252</li>
+            <li class="file-row"><span class="file-name" title="[Begonia][DragonTC][Q-OSS]_4.14.252-nTu21.Tech-10301917.zip">[Begonia][DragonTC][Q-OSS]_4.14.252-nTu21.Tech-10301917.zip</span><span class="file-size">13.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][DragonTC][Q-OSS]-4.14.252-nTu21.Tech-10240820.zip">[Begonia][DragonTC][Q-OSS]-4.14.252-nTu21.Tech-10240820.zip</span><span class="file-size">13.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][GCC][Q-OSS]_4.14.252-nTu21.Tech-10301911.zip">[Begonia][GCC][Q-OSS]_4.14.252-nTu21.Tech-10301911.zip</span><span class="file-size">13.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][GCC][Q-OSS]-4.14.252-nTu21.Tech-10240752.zip">[Begonia][GCC][Q-OSS]-4.14.252-nTu21.Tech-10240752.zip</span><span class="file-size">13.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][Proton][Q-OSS]_4.14.252-nTu21.Tech-10301858.zip">[Begonia][Proton][Q-OSS]_4.14.252-nTu21.Tech-10301858.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][Proton][Q-OSS]-4.14.252-nTu21.Tech-10240815.zip">[Begonia][Proton][Q-OSS]-4.14.252-nTu21.Tech-10240815.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Begonia_DTC_Q-OSS_4.14.252-nTu21.Tech-10240100.zip">Begonia_DTC_Q-OSS_4.14.252-nTu21.Tech-10240100.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Begonia_GCC_Q-OSS_4.14.252-nTu21.Tech-10240054.zip">Begonia_GCC_Q-OSS_4.14.252-nTu21.Tech-10240054.zip</span><span class="file-size">13.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Begonia_Proton_Q-OSS_4.14.252-nTu21.Tech-10240051.zip">Begonia_Proton_Q-OSS_4.14.252-nTu21.Tech-10240051.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RN8Pro_Q-OSS_DragonTC_4.14.252-nTu21-10230945.zip">RN8Pro_Q-OSS_DragonTC_4.14.252-nTu21-10230945.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RN8Pro_Q-OSS_GCC_4.14.252-nTu21-10231235.zip">RN8Pro_Q-OSS_GCC_4.14.252-nTu21-10231235.zip</span><span class="file-size">13.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RN8Pro_Q-OSS_Proton_4.14.252-nTu21-10231223.zip">RN8Pro_Q-OSS_Proton_4.14.252-nTu21-10231223.zip</span><span class="file-size">13.1 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / nTu21 / 4.14.253</li>
+            <li class="file-row"><span class="file-name" title="[Begonia][DragonTC][Q-OSS]_4.14.253-nTu21.Tech-10311348.zip">[Begonia][DragonTC][Q-OSS]_4.14.253-nTu21.Tech-10311348.zip</span><span class="file-size">11.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][GCC][Q-OSS]_4.14.253-nTu21.Tech-10311205.zip">[Begonia][GCC][Q-OSS]_4.14.253-nTu21.Tech-10311205.zip</span><span class="file-size">12.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][GengKapak][Q-OSS]_4.14.253-nTu21.Tech-10311318.zip">[Begonia][GengKapak][Q-OSS]_4.14.253-nTu21.Tech-10311318.zip</span><span class="file-size">12.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Begonia][Proton][Q-OSS]_4.14.253-nTu21.Tech-10311345.zip">[Begonia][Proton][Q-OSS]_4.14.253-nTu21.Tech-10311345.zip</span><span class="file-size">11.9 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核</li>
+            <li class="file-row"><span class="file-name" title="新内核信息与更改频率方法.txt">新内核信息与更改频率方法.txt</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.07.02 / LX</li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][DTC-OLD][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][DTC-OLD][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][DTC-OLD][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][ALMK][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][GCC][NON-CFW][ALMK][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][SLMK][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][GCC][NON-CFW][SLMK][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][Stock-LMK][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip">[0702][GCC][NON-CFW][Stock-LMK][Begonia]4.14.238-Neutrino-LX-89605ae5567e.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.07.02 / LY</li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][DTC-OLD][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][DTC-OLD][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][DTC-OLD][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][ALMK][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][GCC][NON-CFW][ALMK][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][SLMK][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][GCC][NON-CFW][SLMK][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][Stock-LMK][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip">[0702][GCC][NON-CFW][Stock-LMK][Begonia]4.14.238-Neutrino-LY-cabda3e4fd45.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.07.02 / LZ</li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][DTC-OLD][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][DTC-OLD][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][DTC-OLD][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][DTC-OLD][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][ALMK][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][GCC][NON-CFW][ALMK][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][SLMK][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][GCC][NON-CFW][SLMK][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0702][GCC][NON-CFW][Stock-LMK][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip">[0702][GCC][NON-CFW][Stock-LMK][Begonia]4.14.238-Neutrino-LZ-6c48456d67d7.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.08.08 / LX</li>
+            <li class="file-row"><span class="file-name" title="[0808][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.243-Neutrino-LX-499f32a375a9.zip">[0808][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.243-Neutrino-LX-499f32a375a9.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0808][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.243-Neutrino-LX-499f32a375a9.zip">[0808][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.243-Neutrino-LX-499f32a375a9.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0808][GCC][NON-CFW][Stock-LMK][Begonia]4.14.243-Neutrino-LX-499f32a375a9.zip">[0808][GCC][NON-CFW][Stock-LMK][Begonia]4.14.243-Neutrino-LX-499f32a375a9.zip</span><span class="file-size">13.6 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.08.08 / LY</li>
+            <li class="file-row"><span class="file-name" title="[0808][GCC][NON-CFW][Stock-LMK][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip">[0808][GCC][NON-CFW][Stock-LMK][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip</span><span class="file-size">13.6 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.08.08 / LZ</li>
+            <li class="file-row"><span class="file-name" title="[0808][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.243-Neutrino-LZ-2fb899ff65d5.zip">[0808][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.243-Neutrino-LZ-2fb899ff65d5.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0808][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.243-Neutrino-LZ-2fb899ff65d5.zip">[0808][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.243-Neutrino-LZ-2fb899ff65d5.zip</span><span class="file-size">14.1 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.08.09 / LY</li>
+            <li class="file-row"><span class="file-name" title="[0809][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip">[0809][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip</span><span class="file-size">14.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0809][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip">[0809][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0809][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip">[0809][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.243-Neutrino-LY-f38f0e1b581a.zip</span><span class="file-size">14.1 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.09.01 / LX</li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][DTC][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][DTC][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][DTC][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][ALMK][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][GCC][NON-CFW][ALMK][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][SLMK][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][GCC][NON-CFW][SLMK][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][Stock-LMK][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip">[0901][GCC][NON-CFW][Stock-LMK][Begonia]4.14.245-Neutrino-LX-c16333ae6507.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.09.01 / LY</li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][DTC][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][DTC][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][DTC][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][ALMK][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][GCC][NON-CFW][ALMK][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][SLMK][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][GCC][NON-CFW][SLMK][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][Stock-LMK][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip">[0901][GCC][NON-CFW][Stock-LMK][Begonia]4.14.245-Neutrino-LY-8c811eca597e.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.09.01 / LZ</li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][CLANG][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][CLANG][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][CLANG][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">14.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][DTC][NON-CFW][ALMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][DTC][NON-CFW][SLMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][DTC][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][DTC][NON-CFW][Stock-LMK][Thin-LTO][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][ALMK][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][GCC][NON-CFW][ALMK][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][SLMK][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][GCC][NON-CFW][SLMK][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">13.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0901][GCC][NON-CFW][Stock-LMK][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip">[0901][GCC][NON-CFW][Stock-LMK][Begonia]4.14.245-Neutrino-LZ-a47c7317b4f0.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.09.23</li>
+            <li class="file-row"><span class="file-name" title="[0923][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-Q-78a641a32c63.zip">[0923][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-Q-78a641a32c63.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0923][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-QueenFlex-3cc5ea879536.zip">[0923][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-QueenFlex-3cc5ea879536.zip</span><span class="file-size">13.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0923][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-Stock-441dc7edba0d.zip">[0923][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-Stock-441dc7edba0d.zip</span><span class="file-size">13.1 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU） / 2021.11.19</li>
+            <li class="file-row"><span class="file-name" title="[1119][DTC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-Q-9f2b35c27.zip">[1119][DTC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-Q-9f2b35c27.zip</span><span class="file-size">12.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][DTC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-Q-5e682e84b.zip">[1119][DTC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-Q-5e682e84b.zip</span><span class="file-size">12.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][DTC][Q-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-694f8f26b.zip">[1119][DTC][Q-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-694f8f26b.zip</span><span class="file-size">12.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][GCC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-Q-9f2b35c27.zip">[1119][GCC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-Q-9f2b35c27.zip</span><span class="file-size">12.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][GCC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-Q-5e682e84b.zip">[1119][GCC][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-Q-5e682e84b.zip</span><span class="file-size">12.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][GCC][Q-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-694f8f26b.zip">[1119][GCC][Q-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-694f8f26b.zip</span><span class="file-size">12.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-Q-9f2b35c27.zip">[1119][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-Q-9f2b35c27.zip</span><span class="file-size">13.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-Q-5e682e84b.zip">[1119][Proton][Q-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-Q-5e682e84b.zip</span><span class="file-size">13.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][Proton][Q-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-694f8f26b.zip">[1119][Proton][Q-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-694f8f26b.zip</span><span class="file-size">13.2 MB</span></li>
+          <li class="file-group-name">安卓10（MIUI安卓10-类原生A10-11可用） / ZYC超频内核 / Neutrino（超频GPU）</li>
+            <li class="file-row"><span class="file-name" title="各字母的意思.txt">各字母的意思.txt</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用）</li>
+            <li class="file-row"><span class="file-name" title="[1019][Proton][R-OSS]-4.14.251-____perf.zip">[1019][Proton][R-OSS]-4.14.251-____perf.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1019][Proton][R-OSS]-4.14.251-ぎ九十ちperf.zip">[1019][Proton][R-OSS]-4.14.251-ぎ九十ちperf.zip</span><span class="file-size">14.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GCC][R-OSS][SLMK]-4.14.250-MegaByte-10101934.zip">[GCC][R-OSS][SLMK]-4.14.250-MegaByte-10101934.zip</span><span class="file-size">13.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="DragonTC_R-OSS_4.14.252-BukanMaen-10211947.zip">DragonTC_R-OSS_4.14.252-BukanMaen-10211947.zip</span><span class="file-size">14.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Stock.R-OSS.4.14.246-GCC.12.EVA-RN8Pro.zip">Stock.R-OSS.4.14.246-GCC.12.EVA-RN8Pro.zip</span><span class="file-size">13.2 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / BlazeKernel</li>
+            <li class="file-row"><span class="file-name" title="[DragonTC][R-OSS]-4.14.257-Blaze-12091327.zip">[DragonTC][R-OSS]-4.14.257-Blaze-12091327.zip</span><span class="file-size">12.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GCC][R-OSS]-4.14.257-Blaze-12091232.zip">[GCC][R-OSS]-4.14.257-Blaze-12091232.zip</span><span class="file-size">12.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Proton][R-OSS]-4.14.257-Blaze-12091256.zip">[Proton][R-OSS]-4.14.257-Blaze-12091256.zip</span><span class="file-size">12.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[TRB CLANG][R-OSS]-4.14.257-Blaze-12111404.zip">[TRB CLANG][R-OSS]-4.14.257-Blaze-12111404.zip</span><span class="file-size">12.7 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / GPU超频内核（900MHz）</li>
+            <li class="file-row"><span class="file-name" title="DragonTC_R-OSS_4.14.247-MegaByte-09231331.zip">DragonTC_R-OSS_4.14.247-MegaByte-09231331.zip</span><span class="file-size">12.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="GCC_R-OSS_4.14.247-MegaByte-09231343.zip">GCC_R-OSS_4.14.247-MegaByte-09231343.zip</span><span class="file-size">13.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Proton_R-OSS_4.14.247-MegaByte-09231338.zip">Proton_R-OSS_4.14.247-MegaByte-09231338.zip</span><span class="file-size">13.3 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / MegaByte Kernel / 4.14.255</li>
+            <li class="file-row"><span class="file-name" title="[DragonTC][R-OSS]-4.14.255-MegaByte-11251209.zip">[DragonTC][R-OSS]-4.14.255-MegaByte-11251209.zip</span><span class="file-size">12.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GCC][R-OSS]-4.14.255-MegaByte-11251241.zip">[GCC][R-OSS]-4.14.255-MegaByte-11251241.zip</span><span class="file-size">12.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GengKapak][R-OSS]-4.14.255-MegaByte-11251149.zip">[GengKapak][R-OSS]-4.14.255-MegaByte-11251149.zip</span><span class="file-size">12.7 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / MegaByte Kernel / 4.14.257</li>
+            <li class="file-row"><span class="file-name" title="[DragonTC][R-OSS]-4.14.257-MegaByte-12090138.zip">[DragonTC][R-OSS]-4.14.257-MegaByte-12090138.zip</span><span class="file-size">12.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[GCC][R-OSS]-4.14.257-MegaByte-12090120.zip">[GCC][R-OSS]-4.14.257-MegaByte-12090120.zip</span><span class="file-size">12.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[Proton][R-OSS]-4.14.257-MegaByte-12090131.zip">[Proton][R-OSS]-4.14.257-MegaByte-12090131.zip</span><span class="file-size">12.7 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / nTu21 / 4.14.256</li>
+            <li class="file-row"><span class="file-name" title="[Begonia][G.K]-4.14.256-nTu21.Tech-R.zip">[Begonia][G.K]-4.14.256-nTu21.Tech-R.zip</span><span class="file-size">12.7 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / nTu21 / 4.14.257</li>
+            <li class="file-row"><span class="file-name" title="(Begonia)(DragonTC)-4.14.257-nTu21.Tech-R.zip">(Begonia)(DragonTC)-4.14.257-nTu21.Tech-R.zip</span><span class="file-size">11.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="(Begonia)(G.K)-4.14.257-nTu21.Tech-R.zip">(Begonia)(G.K)-4.14.257-nTu21.Tech-R.zip</span><span class="file-size">12.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="(Begonia)(Proton)-4.14.257-nTu21.Tech-R.zip">(Begonia)(Proton)-4.14.257-nTu21.Tech-R.zip</span><span class="file-size">12.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="(Begonia)(ZyC)-4.14.257-nTu21.Tech-R.zip">(Begonia)(ZyC)-4.14.257-nTu21.Tech-R.zip</span><span class="file-size">12.2 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / zyc内核</li>
+            <li class="file-row"><span class="file-name" title="新内核信息与更改频率方法.txt">新内核信息与更改频率方法.txt</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / zyc内核 / Neutrino / 2021.09.23</li>
+            <li class="file-row"><span class="file-name" title="[0923][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-R-913400357f68.zip">[0923][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-R-913400357f68.zip</span><span class="file-size">13.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0923][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-ReFlex-0cdd16b924b3.zip">[0923][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-ReFlex-0cdd16b924b3.zip</span><span class="file-size">13.9 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[0923][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-Stock-2a02d61de7d5.zip">[0923][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.247-Neutrino-Stock-2a02d61de7d5.zip</span><span class="file-size">13.9 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / zyc内核 / Neutrino / 2021.10.26</li>
+            <li class="file-row"><span class="file-name" title="[1026][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Flamescion-R-2af5942f6.zip">[1026][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Flamescion-R-2af5942f6.zip</span><span class="file-size">16.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Phantasm-R-7b850fcee.zip">[1026][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Phantasm-R-7b850fcee.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][DTC][R-OSS][Stable][Begonia]4.14.252-Neutrino-Stock-2247923a6.zip">[1026][DTC][R-OSS][Stable][Begonia]4.14.252-Neutrino-Stock-2247923a6.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Flamescion-R-2af5942f6.zip">[1026][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Flamescion-R-2af5942f6.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Phantasm-R-7b850fcee.zip">[1026][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Phantasm-R-7b850fcee.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][GCC][R-OSS][Stable][Begonia]4.14.252-Neutrino-Stock-2247923a6.zip">[1026][GCC][R-OSS][Stable][Begonia]4.14.252-Neutrino-Stock-2247923a6.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Flamescion-R-2af5942f6.zip">[1026][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Flamescion-R-2af5942f6.zip</span><span class="file-size">17.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Phantasm-R-7b850fcee.zip">[1026][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.252-Neutrino-Phantasm-R-7b850fcee.zip</span><span class="file-size">17.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1026][Proton][R-OSS][Stable][Begonia]4.14.252-Neutrino-Stock-2247923a6.zip">[1026][Proton][R-OSS][Stable][Begonia]4.14.252-Neutrino-Stock-2247923a6.zip</span><span class="file-size">17.2 MB</span></li>
+          <li class="file-group-name">安卓11（MIUI12.5-类原生安卓11可用） / zyc内核 / Neutrino / 2021.11.19</li>
+            <li class="file-row"><span class="file-name" title="[1119][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-R-04ac8e35d.zip">[1119][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-R-04ac8e35d.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-R-644e806f3.zip">[1119][DTC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-R-644e806f3.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][DTC][R-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-795a78e38.zip">[1119][DTC][R-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-795a78e38.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-R-04ac8e35d.zip">[1119][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-R-04ac8e35d.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-R-644e806f3.zip">[1119][GCC][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-R-644e806f3.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][GCC][R-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-795a78e38.zip">[1119][GCC][R-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-795a78e38.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-R-04ac8e35d.zip">[1119][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Flamescion-R-04ac8e35d.zip</span><span class="file-size">17.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-R-644e806f3.zip">[1119][Proton][R-OSS][806Mhz][Stable][Begonia]4.14.255-Neutrino-Phantasm-R-644e806f3.zip</span><span class="file-size">17.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[1119][Proton][R-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-795a78e38.zip">[1119][Proton][R-OSS][Stable][Begonia]4.14.255-Neutrino-Stock-795a78e38.zip</span><span class="file-size">17.2 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / CoconutKernel</li>
+            <li class="file-row"><span class="file-name" title="coconutKernel-[R-OSS]-[RELEASE-1]-[01.12.21].zip">coconutKernel-[R-OSS]-[RELEASE-1]-[01.12.21].zip</span><span class="file-size">16.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="coconutKernel-[R-OSS]-[RELEASE-2]-[02.02.2022].zip">coconutKernel-[R-OSS]-[RELEASE-2]-[02.02.2022].zip</span><span class="file-size">16.4 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / KangMonkeyKernel</li>
+            <li class="file-row"><span class="file-name" title="1129R_OSSDTCTestBegonia4_14_255_KangMonkey_v12_aafcba885.zip">1129R_OSSDTCTestBegonia4_14_255_KangMonkey_v12_aafcba885.zip</span><span class="file-size">12.7 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.03.12</li>
+            <li class="file-row"><span class="file-name" title="QuantumKernel-[DragonTC]-[R-OSS]-[Begonia]-4.14.266.zip">QuantumKernel-[DragonTC]-[R-OSS]-[Begonia]-4.14.266.zip</span><span class="file-size">11.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="QuantumKernel-[GCC][R-OSS]-[Begonia]-4.14.266.zip">QuantumKernel-[GCC][R-OSS]-[Begonia]-4.14.266.zip</span><span class="file-size">12.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="QuantumKernel-[Proton][R-OSS]-[Begonia]-4.14.266.zip">QuantumKernel-[Proton][R-OSS]-[Begonia]-4.14.266.zip</span><span class="file-size">11.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="QuantumKernel-[TRB][R-OSS]-[Begonia]-4.14.266.zip">QuantumKernel-[TRB][R-OSS]-[Begonia]-4.14.266.zip</span><span class="file-size">11.9 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.06.05 / Azure（均衡）</li>
+            <li class="file-row"><span class="file-name" title="[Azure][R-OSS]-4.14.281-QuantumKernel.zip">[Azure][R-OSS]-4.14.281-QuantumKernel.zip</span><span class="file-size">13.7 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.06.05 / DTC（性能）</li>
+            <li class="file-row"><span class="file-name" title="[DragonTC]-4.14.281-QuantumKernel.zip">[DragonTC]-4.14.281-QuantumKernel.zip</span><span class="file-size">12.1 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.06.05 / GCC（省电）</li>
+            <li class="file-row"><span class="file-name" title="[GCC][R-OSS]-4.14.281-QuantumKernel.zip">[GCC][R-OSS]-4.14.281-QuantumKernel.zip</span><span class="file-size">15.5 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.8.31 / Balance（均衡）</li>
+            <li class="file-row"><span class="file-name" title="Balance-.Azure.-.R-OSS.-4.14.290-QKR.zip">Balance-.Azure.-.R-OSS.-4.14.290-QKR.zip</span><span class="file-size">13.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Erofs-Balance-Azure-R-OSS-4.14.290-QKR.zip">Erofs-Balance-Azure-R-OSS-4.14.290-QKR.zip</span><span class="file-size">13.6 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.8.31 / BB（省电）</li>
+            <li class="file-row"><span class="file-name" title="BB-.Azure.-.R-OSS.-4.14.290-QKR.zip">BB-.Azure.-.R-OSS.-4.14.290-QKR.zip</span><span class="file-size">13.5 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / QuantumKernel（量子内核） / 2022.8.31 / DTC（性能）</li>
+            <li class="file-row"><span class="file-name" title="Erofs-Perf-DragonTC-R-OSS-4.14.290-QKR.zip">Erofs-Perf-DragonTC-R-OSS-4.14.290-QKR.zip</span><span class="file-size">12.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="Perf-.DragonTC.-.R-OSS.-4.14.290-QKR.zip">Perf-.DragonTC.-.R-OSS.-4.14.290-QKR.zip</span><span class="file-size">12.5 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / TriadeKernel</li>
+            <li class="file-row"><span class="file-name" title="[GCC][R-OSS]-4.14.272-Triade-balance-03250744.zip">[GCC][R-OSS]-4.14.272-Triade-balance-03250744.zip</span><span class="file-size">12.9 MB</span></li>
+          <li class="file-group-name">安卓12（兼容MIUI12.5安卓11） / VoidKernel（虚空内核）</li>
+            <li class="file-row"><span class="file-name" title="VO1D-begonia-v0.01.zip">VO1D-begonia-v0.01.zip</span><span class="file-size">11.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="VO1D-begonia-v0.02.zip">VO1D-begonia-v0.02.zip</span><span class="file-size">11.8 MB</span></li>
+          <li class="file-group-name">群主自编译内核（ROSS）-支持kernelSU</li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.302]KernelSU-begonia-202302141225-ROSS.zip">[WUXIN-4.14.302]KernelSU-begonia-202302141225-ROSS.zip</span><span class="file-size">16.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.305]KernelSU-begonia-202302152350.zip">[WUXIN-4.14.305]KernelSU-begonia-202302152350.zip</span><span class="file-size">16.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.305]KernelSU-begonia-202302171314.zip">[WUXIN-4.14.305]KernelSU-begonia-202302171314.zip</span><span class="file-size">16.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.305]KernelSU-begonia-202302241906.zip">[WUXIN-4.14.305]KernelSU-begonia-202302241906.zip</span><span class="file-size">16.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.307]Docker-KernelSU-begonia-202303151639.zip">[WUXIN-4.14.307]Docker-KernelSU-begonia-202303151639.zip</span><span class="file-size">17.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.307]Docker-KernelSU-begonia-202303241610.zip">[WUXIN-4.14.307]Docker-KernelSU-begonia-202303241610.zip</span><span class="file-size">17.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.307]KernelSU-begonia-202303021657.zip">[WUXIN-4.14.307]KernelSU-begonia-202303021657.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.307]KernelSU-begonia-202303071324.zip">[WUXIN-4.14.307]KernelSU-begonia-202303071324.zip</span><span class="file-size">16.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.309]Docker-KernelSU-begonia-202303261320.zip">[WUXIN-4.14.309]Docker-KernelSU-begonia-202303261320.zip</span><span class="file-size">17.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.311]Docker-KernelSU-begonia-202304041221.zip">[WUXIN-4.14.311]Docker-KernelSU-begonia-202304041221.zip</span><span class="file-size">17.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.311]Docker-KernelSU-begonia-202304051145.zip">[WUXIN-4.14.311]Docker-KernelSU-begonia-202304051145.zip</span><span class="file-size">17.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.311]Docker-KernelSU-begonia-202304141209.zip">[WUXIN-4.14.311]Docker-KernelSU-begonia-202304141209.zip</span><span class="file-size">17.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.311]Docker-KernelSU-begonia-202304221113.zip">[WUXIN-4.14.311]Docker-KernelSU-begonia-202304221113.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.313]Docker-KernelSU-begonia-202304251723-10818.zip">[WUXIN-4.14.313]Docker-KernelSU-begonia-202304251723-10818.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.314]Docker-KernelSU-begonia-202305071416-10847.zip">[WUXIN-4.14.314]Docker-KernelSU-begonia-202305071416-10847.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.315]Docker-KernelSU-begonia-202306051653-10964.zip">[WUXIN-4.14.315]Docker-KernelSU-begonia-202306051653-10964.zip</span><span class="file-size">18.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.316]Docker-KernelSU-begonia-202306071304-10983.zip">[WUXIN-4.14.316]Docker-KernelSU-begonia-202306071304-10983.zip</span><span class="file-size">18.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.318]Docker-KernelSU-begonia-202306182054-11013.zip">[WUXIN-4.14.318]Docker-KernelSU-begonia-202306182054-11013.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.318]Docker-KernelSU-begonia-202306241150-11043.zip">[WUXIN-4.14.318]Docker-KernelSU-begonia-202306241150-11043.zip</span><span class="file-size">18.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.320]Docker-KernelSU-begonia-202306300802-11055.zip">[WUXIN-4.14.320]Docker-KernelSU-begonia-202306300802-11055.zip</span><span class="file-size">18.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.320]Docker-KernelSU-begonia-202307162310-11110.zip">[WUXIN-4.14.320]Docker-KernelSU-begonia-202307162310-11110.zip</span><span class="file-size">18.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.320F]Docker-KernelSU-begonia-202308101336-11191.zip">[WUXIN-4.14.320F]Docker-KernelSU-begonia-202308101336-11191.zip</span><span class="file-size">18.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.320F]Docker-KernelSU-begonia-202308211955-11210.zip">[WUXIN-4.14.320F]Docker-KernelSU-begonia-202308211955-11210.zip</span><span class="file-size">18.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.320F]Docker-KernelSU-begonia-202309172338-11238.zip">[WUXIN-4.14.320F]Docker-KernelSU-begonia-202309172338-11238.zip</span><span class="file-size">18.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.326]Docker-KernelSU-begonia-202310032356-11252.zip">[WUXIN-4.14.326]Docker-KernelSU-begonia-202310032356-11252.zip</span><span class="file-size">18.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.326]Docker-KernelSU-begonia-202310112210-11272.zip">[WUXIN-4.14.326]Docker-KernelSU-begonia-202310112210-11272.zip</span><span class="file-size">18.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.332]Docker-KernelSU-begonia-202312121848-11391.zip">[WUXIN-4.14.332]Docker-KernelSU-begonia-202312121848-11391.zip</span><span class="file-size">18.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.332]Docker-KernelSU-begonia-202401012016-11415.zip">[WUXIN-4.14.332]Docker-KernelSU-begonia-202401012016-11415.zip</span><span class="file-size">18.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.332]Docker-KernelSU-begonia-202401091124-11434-EOL.zip">[WUXIN-4.14.332]Docker-KernelSU-begonia-202401091124-11434-EOL.zip</span><span class="file-size">18.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.336]Docker-KernelSU-begonia-202401221914-11458.zip">[WUXIN-4.14.336]Docker-KernelSU-begonia-202401221914-11458.zip</span><span class="file-size">18.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.336]Docker-KernelSU-begonia-202402270909-11563.zip">[WUXIN-4.14.336]Docker-KernelSU-begonia-202402270909-11563.zip</span><span class="file-size">18.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="[WUXIN-4.14.336F]Docker-KernelSU-begonia-202405051724-11804.zip">[WUXIN-4.14.336F]Docker-KernelSU-begonia-202405051724-11804.zip</span><span class="file-size">18.6 MB</span></li>
+            <li class="file-row"><span class="file-name" title="{WUXIN-4.14.314}Docker-KernelSU-begonia-202305141949-10862.zip">{WUXIN-4.14.314}Docker-KernelSU-begonia-202305141949-10862.zip</span><span class="file-size">18.3 MB</span></li>
+          <li class="file-group-name">群主自编译内核（ROSS）-支持kernelSU / 普通版{没有root}</li>
+            <li class="file-row"><span class="file-name" title="WUXIN-4.14.314-Docker-begonia-202305141902.zip">WUXIN-4.14.314-Docker-begonia-202305141902.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="WUXIN-4.14.315-Docker-begonia-202306051804.zip">WUXIN-4.14.315-Docker-begonia-202306051804.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="WUXIN-4.14.316-Docker-begonia-202306071330.zip">WUXIN-4.14.316-Docker-begonia-202306071330.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="WUXIN-4.14.318-Docker-begonia-202306182133.zip">WUXIN-4.14.318-Docker-begonia-202306182133.zip</span><span class="file-size">18.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="WUXIN-4.14.320-Docker-begonia-202306300846.zip">WUXIN-4.14.320-Docker-begonia-202306300846.zip</span><span class="file-size">18.3 MB</span></li>
+          <li class="file-group-name">群主自编译内核（ROSS）-支持kernelSU / Astera</li>
+            <li class="file-row"><span class="file-name" title="[Astera-4.14.324]Docker-KernelSU-begonia-202309172259-11238.zip">[Astera-4.14.324]Docker-KernelSU-begonia-202309172259-11238.zip</span><span class="file-size">18.4 MB</span></li>
+          <li class="file-group-name">MIUI官方内核</li>
+            <li class="file-row"><span class="file-name" title="[0416][R-OSS][CLANG][Stable][Begonia]4.14.186-MIUI-Stock.zip">[0416][R-OSS][CLANG][Stable][Begonia]4.14.186-MIUI-Stock.zip</span><span class="file-size">20.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="0728-R-OSS-CLANG-Stable-Begonia-4.14.186-MIUI-Stock.zip">0728-R-OSS-CLANG-Stable-Begonia-4.14.186-MIUI-Stock.zip</span><span class="file-size">20.0 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5l3-3-5-5-3 3z"/><path d="M20.7 12.2 12 21l-9-9 3-3 6 6 5.7-5.7z"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">修复新机器前置</div>
+              <div class="dl-version">2 个文件 · 0.00 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="修复新机器前置 文件列表">
+          <li class="file-group-name">根目录</li>
+            <li class="file-row"><span class="file-name" title="-157212800_boot.img.part">-157212800_boot.img.part</span><span class="file-size">0.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="MIUI12-kernelsupport-customrom.zip.part">MIUI12-kernelsupport-customrom.zip.part</span><span class="file-size">0.0 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">MiuiCamera增强版</div>
+              <div class="dl-version">2 个文件 · 0.00 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="MiuiCamera增强版 文件列表">
+          <li class="file-group-name">适用于MIUI12.5</li>
+            <li class="file-row"><span class="file-name" title="Modded-MiuiCamera--Miui12.5-RedmiNote8Pro.zip.part">Modded-MiuiCamera--Miui12.5-RedmiNote8Pro.zip.part</span><span class="file-size">0.0 MB</span></li>
+          <li class="file-group-name">适用于MIUI12</li>
+            <li class="file-row"><span class="file-name" title="Modded-MiuiCamera--Miui12-RedmiNote8Pro.zip.part">Modded-MiuiCamera--Miui12-RedmiNote8Pro.zip.part</span><span class="file-size">0.0 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M21 8l-9 12-9-12 9-4z"/><path d="M3 8h18M12 4v16"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">system一键扩容包（TWRP刷入）</div>
+              <div class="dl-version">6 个文件 · 0.00 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="system一键扩容包（TWRP刷入） 文件列表">
+          <li class="file-group-name">10GB</li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro扩容10GB（128G版本.zip">RedmiNote8Pro扩容10GB（128G版本.zip</span><span class="file-size">0.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro扩容10GB（256G版本.zip">RedmiNote8Pro扩容10GB（256G版本.zip</span><span class="file-size">0.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro扩容10GB（64G版本.zip">RedmiNote8Pro扩容10GB（64G版本.zip</span><span class="file-size">0.5 MB</span></li>
+          <li class="file-group-name">根目录</li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro扩容8GB（128G版本.zip">RedmiNote8Pro扩容8GB（128G版本.zip</span><span class="file-size">0.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro扩容8GB（256G版本.zip">RedmiNote8Pro扩容8GB（256G版本.zip</span><span class="file-size">0.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="RedmiNote8Pro扩容8GB（64G版本.zip">RedmiNote8Pro扩容8GB（64G版本.zip</span><span class="file-size">0.5 MB</span></li>
+        </ol>
+      </article>
+
+      <article class="dl-card" data-reveal>
+        <div class="dl-head">
+          <div class="dl-title-wrap">
+            <div class="dl-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/><path d="M9 7l3-3 3 3M12 4v8"/></svg>
+            </div>
+            <div>
+              <div class="dl-name">TWRP</div>
+              <div class="dl-version">32 个文件 · 1.62 GB</div>
+            </div>
+          </div>
+        </div>
+        <ol class="file-list" aria-label="TWRP 文件列表">
+          <li class="file-group-name">安卓12及更高（类原生安卓12.1及更高版本支持解密） / 支持硬件解密的Rec（软件解密的不要用）</li>
+            <li class="file-row"><span class="file-name" title="PBRP-begonia-4.1-20231221-1423-UNOFFICIAL_Beanpod.zip">PBRP-begonia-4.1-20231221-1423-UNOFFICIAL_Beanpod.zip</span><span class="file-size">62.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-v3.7.0_12-20231220-shhhamik-UNOFFICIAL-begonia.zip">twrp-v3.7.0_12-20231220-shhhamik-UNOFFICIAL-begonia.zip</span><span class="file-size">43.6 MB</span></li>
+          <li class="file-group-name">安卓12及更高（类原生安卓12.1及更高版本支持解密）</li>
+            <li class="file-row"><span class="file-name" title="PBRP-begonia-3.2.0-20221027-1023-UNOFFICIAL.zip">PBRP-begonia-3.2.0-20221027-1023-UNOFFICIAL.zip</span><span class="file-size">63.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="PBRP-begonia-4.0-20230516-2002-UNOFFICIAL.zip">PBRP-begonia-4.0-20230516-2002-UNOFFICIAL.zip</span><span class="file-size">62.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="PBRP-begonia-4.0-20231121-1558-UNOFFICIAL.zip">PBRP-begonia-4.0-20231121-1558-UNOFFICIAL.zip</span><span class="file-size">62.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="SHRP_v3.1_Stable-Unofficial_begonia-18.02.23.zip">SHRP_v3.1_Stable-Unofficial_begonia-18.02.23.zip</span><span class="file-size">61.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="TWRP-3.6.2_12-4-begonia-UNOFFICIAL.img">TWRP-3.6.2_12-4-begonia-UNOFFICIAL.img</span><span class="file-size">64.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-3.7.0_12-20221018-timjosten-UNOFFICIAL-begonia.zip">twrp-3.7.0_12-20221018-timjosten-UNOFFICIAL-begonia.zip</span><span class="file-size">42.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-v3.7.0_12-20231030-shhhamik-UNOFFICIAL-begonia.zip">twrp-v3.7.0_12-20231030-shhhamik-UNOFFICIAL-begonia.zip</span><span class="file-size">43.4 MB</span></li>
+          <li class="file-group-name">MIUI12.5-安卓11（类原生同样可用）</li>
+            <li class="file-row"><span class="file-name" title="BRP3.5.2v3.0-fastboot.zip">BRP3.5.2v3.0-fastboot.zip</span><span class="file-size">58.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRP3.5.2v3.0-twrp.zip">BRP3.5.2v3.0-twrp.zip</span><span class="file-size">48.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRP3.5.2v3.1-fastboot.zip">BRP3.5.2v3.1-fastboot.zip</span><span class="file-size">59.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRP3.5.2v3.1-twrp.zip">BRP3.5.2v3.1-twrp.zip</span><span class="file-size">48.8 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRPv3.6-Dark-twrp.zip">BRPv3.6-Dark-twrp.zip</span><span class="file-size">61.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRPv3.6-fastboot.zip">BRPv3.6-fastboot.zip</span><span class="file-size">72.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OrangeFox-R11.1-Unofficial-begonia.zip">OrangeFox-R11.1-Unofficial-begonia.zip</span><span class="file-size">51.2 MB</span></li>
+            <li class="file-row"><span class="file-name" title="OrangeFox-Unofficial-begonia-R11.1_1.zip">OrangeFox-Unofficial-begonia-R11.1_1.zip</span><span class="file-size">51.3 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp_3.6.0_11-2-20211203-UNOFFICIAL-begonia.img">twrp_3.6.0_11-2-20211203-UNOFFICIAL-begonia.img</span><span class="file-size">64.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp_3.6.1-12_begonia.img">twrp_3.6.1-12_begonia.img</span><span class="file-size">64.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-3.5.2_11-1-UNOFFICIAL-begonia.img">twrp-3.5.2_11-1-UNOFFICIAL-begonia.img</span><span class="file-size">64.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-3.6.0_11-2-20211127-begonia-unofficial(1).img">twrp-3.6.0_11-2-20211127-begonia-unofficial(1).img</span><span class="file-size">64.0 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-3.6.1_12-2-timjosten-UNOFFICIAL-begonia.zip">twrp-3.6.1_12-2-timjosten-UNOFFICIAL-begonia.zip</span><span class="file-size">36.4 MB</span></li>
+            <li class="file-row"><span class="file-name" title="twrp-3.6.1_12-5-timjosten-UNOFFICIAL-begonia.zip">twrp-3.6.1_12-5-timjosten-UNOFFICIAL-begonia.zip</span><span class="file-size">38.6 MB</span></li>
+          <li class="file-group-name">MIUI安卓10(类原生安卓10-11可用)</li>
+            <li class="file-row"><span class="file-name" title="'一键刷入TWRP 3.5.2-10（MIUI A10自动去avb检验）.zip">'一键刷入TWRP 3.5.2-10（MIUI A10自动去avb检验）.zip</span><span class="file-size">31.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="一键刷入橙狐R11.1-MIUI A10自动去avb检验.zip">一键刷入橙狐R11.1-MIUI A10自动去avb检验.zip</span><span class="file-size">34.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="一键刷入TWRP-3.3.2b-0305-begonia-w大修改版-可解密.zip">一键刷入TWRP-3.3.2b-0305-begonia-w大修改版-可解密.zip</span><span class="file-size">34.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRP（TWRP）3.5.2v2.7-fastboot（MIUI A10自动去avb）.zip">BRP（TWRP）3.5.2v2.7-fastboot（MIUI A10自动去avb）.zip</span><span class="file-size">55.5 MB</span></li>
+            <li class="file-row"><span class="file-name" title="BRP（TWRP）3.5.2v2.7-twrp卡刷包.zip">BRP（TWRP）3.5.2v2.7-twrp卡刷包.zip</span><span class="file-size">53.3 MB</span></li>
+          <li class="file-group-name">MIUI安卓9</li>
+            <li class="file-row"><span class="file-name" title="安卓9   一键刷入Rec-TWRP-3.3.1-1104.zip">安卓9   一键刷入Rec-TWRP-3.3.1-1104.zip</span><span class="file-size">34.1 MB</span></li>
+            <li class="file-row"><span class="file-name" title="一键刷入橙狐R11-安卓9-MIUI自动去avb检验.zip">一键刷入橙狐R11-安卓9-MIUI自动去avb检验.zip</span><span class="file-size">35.7 MB</span></li>
+            <li class="file-row"><span class="file-name" title="TWRP-3.3.1-0924安卓9.7z">TWRP-3.3.1-0924安卓9.7z</span><span class="file-size">34.1 MB</span></li>
+          <li class="file-group-name">Pe PPUI（安卓11）专用rec（不在可用）</li>
+            <li class="file-row"><span class="file-name" title="twrp-PE-PPUI-begonia.img">twrp-PE-PPUI-begonia.img</span><span class="file-size">64.0 MB</span></li>
+        </ol>
+      </article>
+
+    </div>
+  </section>
 
   <section class="section" id="music" aria-labelledby="music-title">
     <header class="section-head" data-reveal>
