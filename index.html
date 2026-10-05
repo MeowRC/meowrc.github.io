@@ -9,24 +9,41 @@
 
 <script>
 (function () {
-  var ua = navigator.userAgent;
+  var ua = navigator.userAgent || '';
+  var dm = document.documentMode;
 
-  var safariish =
-    /iPad|iPhone|iPod/.test(ua) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
-    (/Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua));
-
-  var modern = !!(window.CSS && CSS.supports &&
-    CSS.supports('translate', '0 64px') &&
-    CSS.supports('inset', '0'));
-
-  var target = safariish ? 'index-apple.html'
-             : modern    ? 'index.html'
-             :             'index-legacy.html';
-
-  if (!location.pathname.endsWith('/' + target)) {
-    location.replace(target + location.search + location.hash);
+  /* IE8 ~ IE11（含 IE11 兼容视图）走专门的 ie 版本 */
+  function isLegacyIE() {
+    if (dm && dm <= 11) return true;
+    return (/MSIE |Trident\//).test(ua);
   }
+
+  function isSafariFamily() {
+    if ((/iPad|iPhone|iPod/).test(ua)) return true;
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+    if ((/Safari/).test(ua) &&
+        !(/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/).test(ua)) return true;
+    return false;
+  }
+
+  function isModern() {
+    if (!window.CSS || !CSS.supports) return false;
+    try {
+      return !!CSS.supports('translate', '0 64px') && !!CSS.supports('inset', '0');
+    } catch (e) { return false; }
+  }
+
+  var target;
+  if (isLegacyIE())          target = 'index-ie.html';
+  else if (isSafariFamily()) target = 'index-apple.html';
+  else if (isModern())       target = 'index.html';
+  else                       target = 'index-legacy.html';
+
+  var p = location.pathname || '';
+  var suffix = '/' + target;
+  var current = p.length >= suffix.length &&
+                p.substring(p.length - suffix.length) === suffix;
+  if (!current) location.replace(target + location.search + location.hash);
 })();
 
 (function () {
