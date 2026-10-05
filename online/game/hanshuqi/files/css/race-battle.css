@@ -1,0 +1,378 @@
+/* 竞速对战（2-4 人联机竞速）UI 样式 · 深色科技霓虹风 */
+:root {
+    --rb-primary: #22d3ee; --rb-primary2: #0ea5e9; --rb-primary3: #6366f1;
+    --rb-bg: #070d1a; --rb-panel: rgba(15,23,42,.85); --rb-panel2: rgba(30,41,59,.6);
+    --rb-text: #f8fafc; --rb-dim: #94a3b8;
+    --rb-green: #22c55e; --rb-amber: #f59e0b; --rb-red: #ef4444; --rb-blue: #3b82f6;
+    --rb-grad: linear-gradient(90deg, #A0F1D8, #848BCF);
+    --rb-glow: 0 0 12px rgba(34,211,238,.55);
+}
+
+/* ── 房间弹窗 ── */
+#race-battle-modal .modal-content.p2p-room-content {
+    max-height: 92vh;
+    overflow-y: auto !important;
+}
+.race-battle-rank-tag {
+    margin-left:10px; font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px;
+    color:#94a3b8; background:rgba(30,41,59,.6); border:1px solid rgba(148,163,184,.3); white-space:nowrap;
+}
+.race-battle-rank-tag.is-ranked { color:#ffd166; border-color:rgba(255,209,102,.5); background:rgba(255,209,102,.1); }
+@keyframes rb-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* 左侧参数栏：排位行 + 强度预览（stepper 复用全局 .stepper-selector 样式） */
+.race-battle-param-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.race-battle-param-label { font-size:13px; font-weight:600; color:var(--rb-dim); width:44px; flex-shrink:0; }
+
+.race-battle-toggle { position:relative; display:inline-block; width:46px; height:24px; cursor:pointer; }
+.race-battle-toggle input { opacity:0; width:0; height:0; }
+.race-battle-toggle-slider {
+    position:absolute; inset:0; border-radius:999px;
+    background:rgba(148,163,184,.3); transition:.3s;
+}
+.race-battle-toggle-slider::before {
+    content:''; position:absolute; width:18px; height:18px; left:3px; top:3px;
+    border-radius:50%; background:#fff; transition:.3s;
+}
+.race-battle-toggle input:checked + .race-battle-toggle-slider {
+    background:linear-gradient(90deg,var(--rb-primary),var(--rb-primary3)); box-shadow:0 0 10px rgba(34,211,238,.5);
+}
+.race-battle-toggle input:checked + .race-battle-toggle-slider::before { transform:translateX(22px); }
+.race-battle-param-hint { font-size:12px; color:var(--rb-dim); }
+
+.race-battle-join-error { font-size:12px; color:var(--rb-red); min-height:16px; margin-bottom:8px; text-align:center; }
+
+.race-battle-members-pane { padding:14px; border-radius:14px; background:var(--rb-panel2); border:1px solid rgba(34,211,238,.12); }
+.race-battle-members-head {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; font-weight:600; color:var(--rb-dim); margin-bottom:10px;
+}
+.race-battle-members { display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; }
+.race-battle-member {
+    display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
+    background:rgba(7,13,26,.5); border:1px solid rgba(148,163,184,.15);
+    transition:all .25s; animation:rb-member-in .3s ease;
+}
+@keyframes rb-member-in { from{opacity:0; transform:translateX(-10px)} to{opacity:1; transform:none} }
+.race-battle-member.is-leaving { animation:rb-member-out .3s ease forwards; }
+@keyframes rb-member-out { to{opacity:0; transform:translateX(12px)} }
+.race-battle-member.is-me { border-color:rgba(34,211,238,.6); box-shadow:inset 0 0 12px rgba(34,211,238,.08); }
+.race-battle-member-nick { font-size:14px; font-weight:600; color:var(--rb-text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.race-battle-member-badge {
+    font-size:10px; padding:2px 8px; border-radius:999px; flex-shrink:0;
+    color:#a5b4fc; background:rgba(99,102,241,.2); border:1px solid rgba(99,102,241,.4);
+}
+.race-battle-member-role { font-size:10px; color:var(--rb-dim); flex-shrink:0; }
+.race-battle-member-ready {
+    font-size:10px; padding:2px 8px; border-radius:999px; flex-shrink:0;
+    color:var(--rb-amber); background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.4);
+}
+.race-battle-member-ready.is-ready { color:var(--rb-green); background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.5); }
+.race-battle-member-disconnected {
+    font-size:10px; padding:2px 8px; border-radius:999px; flex-shrink:0;
+    color:var(--rb-red); background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.4);
+}
+.race-battle-kick-btn {
+    font-size:11px; padding:2px 8px; border-radius:6px; cursor:pointer; flex-shrink:0;
+    color:var(--rb-red); background:transparent; border:1px solid rgba(239,68,68,.4); transition:all .15s;
+}
+.race-battle-kick-btn:hover { background:rgba(239,68,68,.15); }
+.race-battle-ready-btn {
+    font-size:11px; padding:3px 10px; border-radius:8px; cursor:pointer; flex-shrink:0;
+    color:var(--rb-primary); background:rgba(34,211,238,.12); border:1px solid rgba(34,211,238,.4); transition:all .15s;
+}
+.race-battle-ready-btn:hover { background:rgba(34,211,238,.25); box-shadow:var(--rb-glow); }
+
+.race-battle-start-btn {
+    padding:11px 0; font-size:15px; font-weight:700; cursor:pointer;
+    color:#fff; border:none; border-radius:12px;
+    background:linear-gradient(90deg,var(--rb-primary),var(--rb-primary3));
+    box-shadow:0 0 16px rgba(34,211,238,.4); transition:all .25s;
+}
+.race-battle-start-btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 0 24px rgba(34,211,238,.7); }
+.race-battle-start-btn:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+
+/* 竞速房间内"离开房间/开始竞速"左右等宽 */
+.lobby-actions .p2p-action-btn { width: auto !important; }
+.lobby-actions .p2p-back-btn { margin-top: 0 !important; }
+
+/* ── 对局进度面板 ── */
+.race-battle-panel {
+    position:fixed; top:8px; left:50%; transform:translateX(-50%);
+    width:min(620px, calc(100vw - 16px)); z-index:1200;
+    background:linear-gradient(180deg, rgba(7,13,26,.92), rgba(15,23,42,.85));
+    border:1px solid rgba(34,211,238,.35); border-radius:14px;
+    backdrop-filter:blur(10px); padding:8px 12px;
+    box-shadow:0 4px 30px rgba(0,0,0,.5), 0 0 20px rgba(34,211,238,.12);
+    animation:rb-panel-in .35s ease;
+}
+@keyframes rb-panel-in { from{opacity:0; transform:translateX(-50%) translateY(-14px)} to{opacity:1; transform:translateX(-50%) translateY(0)} }
+.race-battle-panel-head {
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-bottom:6px; margin-bottom:6px;
+    border-bottom:1px solid rgba(148,163,184,.15);
+}
+.race-battle-panel-title { font-size:13px; font-weight:700; color:var(--rb-primary); text-shadow:0 0 8px rgba(34,211,238,.5); }
+.race-battle-panel-collapse {
+    font-size:12px; line-height:1; padding:3px 7px; border-radius:6px; cursor:pointer;
+    color:var(--rb-dim); background:var(--rb-panel2); border:1px solid rgba(148,163,184,.3); transition:all .15s;
+}
+.race-battle-panel-collapse:hover { color:var(--rb-primary); border-color:var(--rb-primary); }
+/* 折叠态：只留标题栏一条，最大限度让出棋盘空间（2026-08-11 新增） */
+.race-battle-panel.is-collapsed { padding:4px 10px; }
+.race-battle-panel.is-collapsed .race-battle-panel-head { padding-bottom:0; margin-bottom:0; border-bottom:none; }
+.race-battle-panel.is-collapsed .race-battle-rows,
+.race-battle-panel.is-collapsed .race-battle-feature-line,
+.race-battle-panel.is-collapsed .race-battle-wait-hint { display:none; }
+/* 折叠态窄进度线：2px 细线贴合标题栏底部，全员各一段并排（本人绿色、他人白色），段内填充 = 各人进度，透明不挡棋盘 */
+.race-battle-progress-thin {
+    display:none;
+    height:2px;
+    margin-top:2px;
+    border-radius:1px;
+    width:100%;
+    overflow:hidden;
+    background:rgba(148,163,184,.12);
+}
+.race-battle-panel.is-collapsed .race-battle-progress-thin { display:flex; gap:4px; }
+.rb-progress-thin-seg { flex:1 1 0; min-width:0; position:relative; height:100%; border-radius:2px; overflow:hidden; }
+.rb-progress-thin-fill { position:absolute; left:0; top:0; bottom:0; border-radius:2px; background:rgba(255,255,255,.55); transition:width .3s ease; }
+.rb-progress-thin-seg.is-me .rb-progress-thin-fill { background:linear-gradient(90deg, var(--rb-primary), var(--rb-blue)); box-shadow:0 0 8px rgba(34,211,238,.5); }
+.rb-progress-thin-seg.is-offline .rb-progress-thin-fill { background:rgba(148,163,184,.35); }
+.race-battle-panel-code { font-family:Consolas,monospace; font-size:12px; color:var(--rb-dim); letter-spacing:2px; }
+.race-battle-panel-timer { font-size:15px; font-weight:700; color:var(--rb-blue); font-family:Consolas,monospace; margin-left:auto; }
+.race-battle-wait-hint {
+    font-size:12px; font-weight:600; color:var(--rb-amber); padding:2px 10px; border-radius:999px;
+    background:rgba(245,158,11,.15); border:1px solid rgba(245,158,11,.4); animation:rb-pulse 1.2s ease-in-out infinite;
+}
+.race-battle-panel-exit {
+    font-size:12px; padding:4px 12px; border-radius:8px; cursor:pointer;
+    color:var(--rb-dim); background:var(--rb-panel2); border:1px solid rgba(148,163,184,.3); transition:all .15s;
+}
+.race-battle-panel-exit:hover { color:var(--rb-red); border-color:var(--rb-red); }
+/* 完成后"退出结算 / 继续观战"按钮（2026-08-11 新增） */
+.rb-finish-exit-btn { color:var(--rb-amber); border-color:rgba(245,158,11,.45); }
+.rb-finish-exit-btn:hover { color:var(--rb-red); border-color:var(--rb-red); }
+.rb-finish-watch-btn { color:var(--rb-blue); border-color:rgba(34,211,238,.45); }
+.rb-finish-watch-btn:hover { color:var(--rb-green); border-color:var(--rb-green); }
+.race-battle-rows { display:flex; flex-direction:column; gap:6px; max-height:42vh; overflow-y:auto; }
+
+.race-battle-row {
+    display:grid; grid-template-columns:22px minmax(48px,1fr) minmax(62px,1.2fr) minmax(78px,1.6fr) 56px;
+    align-items:center; gap:6px; padding:5px 7px; border-radius:10px;
+    background:rgba(7,13,26,.45); border:1px solid transparent;
+    transition:border-color .3s, box-shadow .3s, background .3s;
+}
+.race-battle-row.is-leader {
+    border-color:rgba(34,211,238,.7);
+    background:linear-gradient(90deg, rgba(34,211,238,.12), rgba(99,102,241,.08));
+    box-shadow:0 0 14px rgba(34,211,238,.25);
+}
+.race-battle-row.is-self { border-color:rgba(34,211,238,.4); }
+.race-battle-row.is-waiting { opacity:.75; }
+.race-battle-row.is-done { background:rgba(34,197,94,.06); }
+.race-battle-rank { font-size:13px; font-weight:700; text-align:center; color:var(--rb-dim); font-family:Consolas,monospace; }
+.race-battle-row.is-leader .race-battle-rank { color:var(--rb-amber); text-shadow:0 0 8px rgba(245,158,11,.8); }
+.race-battle-nick { font-size:13px; font-weight:600; color:var(--rb-text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.race-battle-nick .rb-me-tag {
+    font-size:9px; font-weight:700; color:var(--rb-primary);
+    background:rgba(34,211,238,.15); border:1px solid rgba(34,211,238,.4);
+    border-radius:999px; padding:1px 6px; margin-left:4px;
+}
+.race-battle-state { font-size:12px; color:var(--rb-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.race-battle-state.is-green { color:var(--rb-green); }
+.race-battle-state.is-amber { color:var(--rb-amber); }
+.race-battle-state.is-red { color:var(--rb-red); }
+
+.race-battle-times { display:flex; gap:2px; align-items:center; }
+.race-battle-time {
+    flex:1; min-width:14px; font-size:9px; text-align:center; font-family:Consolas,monospace;
+    color:var(--rb-dim); padding:1px 0; border-radius:4px; background:rgba(148,163,184,.08);
+}
+.race-battle-time.is-blue { color:var(--rb-blue); background:rgba(59,130,246,.15); font-weight:700; }
+.race-battle-time.is-red { color:var(--rb-red); background:rgba(239,68,68,.12); }
+.race-battle-time.is-green { color:var(--rb-green); background:rgba(34,197,94,.12); font-weight:700; animation:rb-pulse 1.2s ease-in-out infinite; }
+.race-battle-time.is-gray { color:var(--rb-dim); }
+
+.race-battle-progress-wrap { position:relative; }
+.race-battle-progress-bar { height:8px; border-radius:999px; background:rgba(148,163,184,.18); overflow:hidden; position:relative; }
+.race-battle-progress-fill {
+    height:100%; width:0%; background:var(--rb-grad); border-radius:999px;
+    transition:width .35s ease; box-shadow:0 0 8px rgba(132,139,207,.5);
+}
+.race-battle-row.is-leader .race-battle-progress-fill {
+    background:linear-gradient(90deg,#A0F1D8,#22d3ee,#6366f1); box-shadow:0 0 12px rgba(34,211,238,.8);
+}
+.race-battle-progress-pct {
+    position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    font-size:9px; color:var(--rb-text); font-family:Consolas,monospace; text-shadow:0 1px 2px rgba(0,0,0,.8);
+}
+.race-battle-wait-row {
+    font-size:11px; color:var(--rb-amber); padding:4px 8px; border-radius:8px;
+    background:rgba(245,158,11,.08); border:1px dashed rgba(245,158,11,.35);
+}
+.race-battle-feature-line {
+    margin-top:6px; padding-top:6px; border-top:1px solid rgba(148,163,184,.15);
+    font-size:12px; color:var(--rb-dim); text-align:center; min-height:16px;
+}
+/* 只读态：等待开局/对局中锁定左侧参数 */
+.p2p-selectors-left.is-readonly .stepper-arrow,
+.p2p-selectors-left.is-readonly .race-battle-toggle {
+    opacity:.35; pointer-events:none;
+}
+
+/* ── 全屏倒计时 / 特性卡 overlay ── */
+.race-battle-overlay {
+    position:fixed; inset:0; z-index:6000; /* 高于悬浮键盘(5000)，避免开始倒计时被键盘遮挡 */
+    background:rgba(7,13,26,.72); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+}
+.race-battle-overlay-card {
+    min-width:260px; max-width:82vw; text-align:center;
+    padding:34px 44px; border-radius:20px;
+    background:rgba(15,23,42,.85); border:1px solid rgba(34,211,238,.4);
+    box-shadow:0 0 40px rgba(34,211,238,.25);
+    animation:rb-card-in .3s ease;
+}
+@keyframes rb-card-in { from{opacity:0; transform:scale(.85)} to{opacity:1; transform:scale(1)} }
+.race-battle-overlay-card.is-count {
+    font-size:84px; font-weight:800; color:var(--rb-primary);
+    text-shadow:0 0 30px rgba(34,211,238,.9); font-family:Consolas,monospace;
+    animation:rb-count-pop 1s ease;
+}
+@keyframes rb-count-pop {
+    0%{transform:scale(2.2); opacity:0} 30%{transform:scale(1); opacity:1}
+    80%{transform:scale(1); opacity:1} 100%{transform:scale(.8); opacity:.4}
+}
+.race-battle-overlay-card.is-go { color:var(--rb-green); text-shadow:0 0 30px rgba(34,197,94,.9); }
+.race-battle-overlay-card.is-feature { font-size:16px; color:var(--rb-text); }
+.race-battle-overlay-card.is-feature .rb-feature-title {
+    font-size:26px; font-weight:800; margin-bottom:14px;
+    color:var(--rb-text); letter-spacing:2px;
+}
+.rb-feature-chips { display:flex; flex-direction:column; gap:8px; align-items:center; }
+.rb-feature-chip {
+    font-size:13px; font-weight:600; padding:6px 16px; border-radius:999px; color:var(--rb-text);
+}
+.rb-feature-chip.goal { background:rgba(34,197,94,.15); border:1px solid var(--rb-green); }
+.rb-feature-chip.forbidden { background:rgba(239,68,68,.15); border:1px solid var(--rb-red); }
+.rb-feature-chip.lock { background:rgba(245,158,11,.15); border:1px solid var(--rb-amber); }
+.rb-feature-chip.symbol { background:rgba(99,102,241,.15); border:1px solid #a5b4fc; }
+
+/* ── 房主迁移弹窗（房主退出自动重排新房主并重连同步）── */
+.race-migration-modal {
+    z-index: 11000; /* 高于 showModal 动态层级(10000+栈深)，确保盖过对局面板与确认框 */
+    background: rgba(4, 8, 16, .72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+#race-migration-modal .modal-content.race-migration-content {
+    max-width: 420px; max-height: 90vh; text-align: center;
+    overflow-y: auto !important; /* 规避 shaihai-theme 全局 overflow:hidden */
+    background: linear-gradient(160deg, rgba(15,23,42,.96), rgba(7,13,26,.98));
+    border: 1px solid rgba(245,158,11,.45); border-radius: 18px;
+    box-shadow: 0 0 40px rgba(245,158,11,.22);
+}
+.race-migration-icon {
+    width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #f59e0b;
+    background: rgba(245,158,11,.14); border: 1px solid rgba(245,158,11,.5);
+    animation: rb-migration-glow 1.4s ease-in-out infinite;
+}
+.race-migration-title { font-size: 22px; font-weight: 800; color: var(--rb-text); margin: 0 0 12px; letter-spacing: .5px; }
+.race-migration-status { font-size: 14px; line-height: 1.6; color: var(--rb-dim); min-height: 22px; }
+.race-migration-spinner { display: flex; gap: 8px; justify-content: center; margin: 16px 0 4px; }
+.race-migration-spinner i {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: #f59e0b;
+    animation: rb-migration-bounce 1s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(245,158,11,.7);
+}
+.race-migration-spinner i:nth-child(2) { animation-delay: .18s; }
+.race-migration-spinner i:nth-child(3) { animation-delay: .36s; }
+.race-migration-hint { font-size: 12px; color: rgba(148,163,184,.7); margin: 10px 0 0; }
+/* U7: 迁移弹窗 10s 后出现的「放弃对局」按钮 */
+.race-migration-abort-btn { margin-top: 18px; }
+@keyframes rb-migration-glow {
+    0%, 100% { box-shadow: 0 0 16px rgba(245,158,11,.25); }
+    50% { box-shadow: 0 0 30px rgba(245,158,11,.55); }
+}
+@keyframes rb-migration-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: .5; }
+    30% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ── 结算弹窗 ── */
+#race-battle-result-modal .modal-content.race-battle-result-content {
+    max-width:520px; max-height:90vh;
+    overflow-y:auto !important;
+    background:linear-gradient(160deg, rgba(15,23,42,.96), rgba(7,13,26,.98));
+    border:1px solid rgba(34,211,238,.3); border-radius:18px;
+    box-shadow:0 0 40px rgba(34,211,238,.18);
+}
+.race-battle-result-title { text-align:center; font-size:24px; font-weight:800; color:var(--rb-text); margin:0 0 16px; }
+.race-battle-result-ranklist { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+.rb-result-item {
+    display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px;
+    background:rgba(7,13,26,.5); border:1px solid rgba(148,163,184,.15);
+    animation:rb-member-in .35s ease;
+}
+.rb-result-item.is-self { border-color:rgba(34,211,238,.6); box-shadow:inset 0 0 12px rgba(34,211,238,.08); }
+.rb-result-medal { font-size:22px; width:34px; text-align:center; flex-shrink:0; }
+.rb-result-name { font-size:14px; font-weight:700; color:var(--rb-text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rb-result-time { font-size:12px; color:var(--rb-dim); font-family:Consolas,monospace; }
+.rb-result-delta { font-size:13px; font-weight:700; color:var(--rb-green); font-family:Consolas,monospace; }
+.rb-result-delta.neg { color:var(--rb-red); }
+.rb-result-casual { font-size:11px; color:var(--rb-dim); }
+.race-battle-result-self {
+    margin:14px 0; padding:12px 14px; border-radius:12px; text-align:center;
+    background:rgba(34,211,238,.07); border:1px solid rgba(34,211,238,.35);
+}
+.rb-result-rankline { font-size:15px; font-weight:700; color:var(--rb-text); margin-bottom:6px; }
+.rb-result-eloline { font-size:13px; color:var(--rb-text); }
+.rb-result-elo {
+    display:inline-block; font-size:16px; font-weight:800; color:var(--rb-green);
+    font-family:Consolas,monospace; transition:all .5s; margin:0 4px;
+}
+.rb-result-elo.neg { color:var(--rb-red); }
+.rb-result-rankbar-wrap { height:8px; border-radius:999px; background:rgba(148,163,184,.2); overflow:hidden; margin-top:8px; }
+.rb-result-rankbar {
+    height:100%; width:0%; background:var(--rb-grad); border-radius:999px;
+    box-shadow:0 0 8px rgba(132,139,207,.6);
+    animation:rb-rankbar-grow 1s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes rb-rankbar-grow { to{width:var(--rb-bar-w, 100%)} }
+.race-battle-result-buttons { display:flex; gap:10px; justify-content:center; }
+.race-battle-rematch-btn {
+    padding:11px 28px; font-size:15px; font-weight:700; cursor:pointer; color:#fff;
+    border:none; border-radius:12px;
+    background:linear-gradient(90deg,var(--rb-primary),var(--rb-primary3));
+    box-shadow:0 0 16px rgba(34,211,238,.4); transition:all .25s;
+}
+.race-battle-rematch-btn:hover { transform:translateY(-1px); box-shadow:0 0 24px rgba(34,211,238,.7); }
+
+/* ── toast ── */
+.race-battle-toast {
+    position:fixed; top:88px; left:50%; transform:translateX(-50%);
+    z-index:1400; padding:9px 18px; border-radius:999px;
+    font-size:13px; font-weight:600; color:var(--rb-text);
+    background:rgba(15,23,42,.92); border:1px solid rgba(34,211,238,.5);
+    box-shadow:0 0 18px rgba(34,211,238,.25);
+    animation:rb-toast-in .3s ease;
+    pointer-events:none;
+}
+@keyframes rb-toast-in { from{opacity:0; transform:translateX(-50%) translateY(-8px)} to{opacity:1; transform:translateX(-50%) translateY(0)} }
+.race-battle-toast.is-hiding { opacity:0; transition:opacity .3s; }
+
+/* ── 竞速对局背景：已按用户要求移除全屏光带+速度线特效（2026-08-11，避免遮挡棋盘）── */
+
+/* 复制房间码成功反馈（对齐 P2P 按钮风格） */
+.p2p-copy-btn.copied { color:#22c55e !important; border-color:#22c55e !important; }
+
+/* ── 响应式 ── */
+@media (max-width: 640px) {
+    .race-battle-row { grid-template-columns:22px minmax(52px,1fr) minmax(90px,1.2fr) minmax(120px,1.8fr) 70px; gap:5px; }
+    .race-battle-time { font-size:9px; }
+    .race-battle-overlay-card { padding:24px 28px; }
+    .race-battle-overlay-card.is-count { font-size:64px; }
+}
