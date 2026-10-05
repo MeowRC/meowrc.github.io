@@ -55,37 +55,38 @@
   width: 46vmax; height: 46vmax;
   left: -8vmax; top: -12vmax;
   background: radial-gradient(circle at 40% 40%, var(--fx-glow), transparent 66%);
-  animation: fxDrift1 28s var(--fx-ease-soft) infinite alternate;
+  /* 对称的呼吸曲线：alternate 折返点速度连续，不会突然一顿 */
+  animation: fxDrift1 30s var(--fx-breath) infinite alternate;
 }
 
 .fx-aurora i:nth-child(2) {
   width: 38vmax; height: 38vmax;
   right: -6vmax; top: 8vmax;
   background: radial-gradient(circle at 55% 45%, var(--fx-wash-2), transparent 68%);
-  animation: fxDrift2 34s var(--fx-ease-soft) infinite alternate;
+  animation: fxDrift2 36s var(--fx-breath) infinite alternate;
 }
 
 .fx-aurora i:nth-child(3) {
   width: 42vmax; height: 42vmax;
   left: 22vmax; bottom: -18vmax;
   background: radial-gradient(circle at 50% 50%, var(--fx-glow), transparent 70%);
-  animation: fxDrift3 40s var(--fx-ease-soft) infinite alternate;
+  animation: fxDrift3 42s var(--fx-breath) infinite alternate;
 }
 
 @keyframes fxDrift1 {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(7vw, 5vh, 0) scale(1.16); }
-  100% { transform: translate3d(-4vw, -4vh, 0) scale(.94); }
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: .5; }
+  50%  { transform: translate3d(7vw, 5vh, 0) scale(1.16); opacity: .62; }
+  100% { transform: translate3d(-4vw, -4vh, 0) scale(.94); opacity: .5; }
 }
 @keyframes fxDrift2 {
-  0%   { transform: translate3d(0, 0, 0) scale(1.05); }
-  50%  { transform: translate3d(-8vw, 8vh, 0) scale(.92); }
-  100% { transform: translate3d(5vw, -6vh, 0) scale(1.18); }
+  0%   { transform: translate3d(0, 0, 0) scale(1.05); opacity: .46; }
+  50%  { transform: translate3d(-8vw, 8vh, 0) scale(.92); opacity: .6; }
+  100% { transform: translate3d(5vw, -6vh, 0) scale(1.18); opacity: .46; }
 }
 @keyframes fxDrift3 {
-  0%   { transform: translate3d(0, 0, 0) scale(.95); }
-  50%  { transform: translate3d(-6vw, -7vh, 0) scale(1.14); }
-  100% { transform: translate3d(6vw, 3vh, 0) scale(1); }
+  0%   { transform: translate3d(0, 0, 0) scale(.95); opacity: .42; }
+  50%  { transform: translate3d(-6vw, -7vh, 0) scale(1.14); opacity: .58; }
+  100% { transform: translate3d(6vw, 3vh, 0) scale(1); opacity: .42; }
 }
 
 /* ==========================================================================
@@ -164,23 +165,23 @@
    ========================================================================== */
 [data-reveal] {
   transition:
-    opacity 1s var(--fx-silk) var(--fx-d, 0ms),
-    transform .95s var(--fx-silk) var(--fx-d, 0ms),
-    filter .9s var(--fx-silk) var(--fx-d, 0ms);
+    opacity 1.05s var(--fx-silk) var(--fx-d, 0ms),
+    transform 1.1s var(--fx-silk) var(--fx-d, 0ms),
+    filter .85s var(--fx-silk) var(--fx-d, 0ms);
 }
 
 /* 隐藏态只作用于「尚未入场」的元素，入场后彻底交还给页面自身的 hover 样式 */
 .fx-on [data-reveal]:not(.is-in):not(.fx-in) {
   opacity: 0;
-  transform: perspective(1100px) rotateX(5deg) translate3d(0, 30px, 0) scale(.99);
+  transform: perspective(1200px) rotateX(4deg) translate3d(0, 34px, 0) scale(.985);
   transform-origin: 50% 100%;
 }
 .fx-on [data-reveal].from-above:not(.is-in):not(.fx-in) {
-  transform: perspective(1100px) rotateX(-5deg) translate3d(0, -30px, 0) scale(.99);
+  transform: perspective(1200px) rotateX(-4deg) translate3d(0, -34px, 0) scale(.985);
   transform-origin: 50% 0;
 }
 @supports (filter: blur(2px)) {
-  .fx-on [data-reveal]:not(.is-in):not(.fx-in) { filter: blur(7px); }
+  .fx-on [data-reveal]:not(.is-in):not(.fx-in) { filter: blur(6px); }
 }
 .fx-on [data-reveal].is-in,
 .fx-on [data-reveal].fx-in {
@@ -191,10 +192,24 @@
 .fx-on [data-reveal].fx-done { filter: none; }
 
 /* 章节标题左侧竖条：随入场生长 */
-.section-head.fx-in::before { animation: fxBarGrow .95s var(--fx-ease) both; }
+.section-head.fx-in::before { animation: fxBarGrow 1s var(--fx-ease) both; }
 @keyframes fxBarGrow {
   from { transform: scaleY(0); transform-origin: 50% 0; }
   to   { transform: scaleY(1); transform-origin: 50% 0; }
+}
+
+/* 章节小标题：字距由散到聚 + 轻微上浮，排版更有呼吸感 */
+.section-head.fx-in .section-label { animation: fxLabelIn 1s var(--fx-silk) .06s both; }
+@keyframes fxLabelIn {
+  from { opacity: 0; letter-spacing: .42em; transform: translate3d(0, 7px, 0); }
+  to   { opacity: 1; letter-spacing: .16em; transform: none; }
+}
+
+/* 页脚分隔线：随页脚入场向两侧展开 */
+.fx-on .footer.fx-in::before { animation: fxLineOpen 1.15s var(--fx-silk) .1s both; }
+@keyframes fxLineOpen {
+  from { transform: translateX(-50%) scaleX(.18); opacity: 0; }
+  to   { transform: translateX(-50%) scaleX(1); opacity: .75; }
 }
 
 /* ==========================================================================
@@ -207,38 +222,39 @@
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(340px circle at var(--fx-mx, 50%) var(--fx-my, 50%), var(--fx-wash), transparent 62%);
-  transition: opacity .5s var(--fx-ease-soft);
+  /* 双层光斑：近处亮核 + 远处柔晕，边缘过渡更细腻 */
+  background:
+    radial-gradient(320px circle at var(--fx-mx, 50%) var(--fx-my, 50%), var(--fx-wash), transparent 62%),
+    radial-gradient(680px circle at var(--fx-mx, 50%) var(--fx-my, 50%), var(--fx-wash-2), transparent 72%);
+  transition: opacity .45s var(--fx-ease-soft);
 }
 [data-fx]:hover > .fx-spot { opacity: 1; }
 
+/* 倾斜由 JS 的临界阻尼弹簧逐帧驱动，这里不要再挂 transform 过渡，
+   否则每帧都会打断并重启过渡，产生明显的顿挫感 */
 [data-fx-tilt] {
   transform-style: preserve-3d;
-  will-change: transform;
-  transition: transform .55s var(--fx-ease), box-shadow .35s ease, border-color .35s ease;
+  transition: box-shadow .45s var(--fx-ease-soft), border-color .45s var(--fx-ease-soft);
 }
 [data-fx-tilt].fx-tilting {
-  transition: transform .2s cubic-bezier(.25, .8, .35, 1), box-shadow .35s ease, border-color .35s ease;
+  /* 只在交互期间提升为合成层，避免常驻大量 will-change */
+  will-change: transform;
 }
 /* 下载卡片用 top 做悬浮位移，需保留其过渡 */
 .dl-card[data-fx-tilt] {
-  transition: transform .55s var(--fx-ease), top .25s var(--fx-ease-soft),
-              box-shadow .35s ease, border-color .35s ease;
-}
-.dl-card[data-fx-tilt].fx-tilting {
-  transition: transform .2s cubic-bezier(.25, .8, .35, 1), top .25s var(--fx-ease-soft),
-              box-shadow .35s ease, border-color .35s ease;
+  transition: top .35s var(--fx-ease-soft),
+              box-shadow .45s var(--fx-ease-soft), border-color .45s var(--fx-ease-soft);
 }
 
 /* ==========================================================================
    7. 按钮：磁吸 + 高光扫过 + 涟漪
    ========================================================================== */
+/* 磁吸同样交给弹簧引擎，过渡里只留颜色类属性 */
 [data-fx-magnet] {
-  will-change: transform;
-  transition: transform .42s var(--fx-ease), box-shadow .3s ease,
-              background-color .3s, color .3s, border-color .3s;
+  transition: box-shadow .35s var(--fx-ease-soft),
+              background-color .35s, color .35s, border-color .35s;
 }
-[data-fx-magnet].fx-magneting { transition: transform .2s cubic-bezier(.25, .8, .35, 1), box-shadow .3s ease; }
+[data-fx-magnet].fx-magneting { will-change: transform; }
 
 .fx-sheen { position: relative; overflow: hidden; }
 .fx-sheen::after {
@@ -251,7 +267,7 @@
   background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .65), transparent);
   transform: translateX(-170%) skewX(-16deg);
 }
-.fx-sheen:hover::after { animation: fxSheen 1s var(--fx-ease-soft); }
+.fx-sheen:hover::after { animation: fxSheen 1.15s var(--fx-ease-soft); }
 @keyframes fxSheen {
   0%   { transform: translateX(-170%) skewX(-16deg); opacity: 0; }
   18%  { opacity: .95; }
@@ -266,7 +282,7 @@
   opacity: .85;
   background: radial-gradient(circle, var(--fx-halo), transparent 68%);
   transform: translate(-50%, -50%) scale(0);
-  animation: fxRipple .7s var(--fx-ease) forwards;
+  animation: fxRipple .85s var(--fx-silk) forwards;
 }
 @keyframes fxRipple {
   to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
@@ -282,22 +298,23 @@
   z-index: 10000;
   border-radius: 50%;
   pointer-events: none;
+  /* 负 margin 居中：缩放一律走 transform，圆环放大时才不会偏移出光标中心 */
   will-change: transform;
 }
 .fx-cursor {
   width: 34px; height: 34px;
+  margin: -17px 0 0 -17px;
   border: 1px solid var(--accent);
   opacity: .5;
-  transition: width .3s var(--fx-ease), height .3s var(--fx-ease),
-              opacity .3s var(--fx-ease), background-color .3s var(--fx-ease);
+  transition: opacity .35s var(--fx-ease-soft), background-color .35s var(--fx-ease-soft);
 }
 .fx-cursor.is-active {
-  width: 54px; height: 54px;
   background: var(--fx-wash);
-  opacity: .85;
+  opacity: .8;
 }
 .fx-cursor-dot {
   width: 5px; height: 5px;
+  margin: -2.5px 0 0 -2.5px;
   background: var(--accent-strong);
   opacity: .9;
 }
@@ -347,7 +364,7 @@
   border: 1px solid var(--accent);
   opacity: 0;
   pointer-events: none;
-  animation: fxRing 2.8s var(--fx-ease-soft) infinite;
+  animation: fxRing 3.4s var(--fx-breath) infinite;
 }
 .to-top.show::after { animation-delay: 1s; }
 @keyframes fxRing {
@@ -385,7 +402,7 @@
       transparent 78%);
   background-clip: padding-box, border-box;
   background-size: auto, 300% 300%;
-  animation: fxBorderFlow 3.2s linear infinite;
+  animation: fxBorderFlow 4.4s linear infinite;
 }
 @keyframes fxBorderFlow {
   from { background-position: 0 0, 0% 50%; }
@@ -411,13 +428,13 @@
   background: linear-gradient(100deg, transparent, var(--fx-sweep-color), transparent);
   transform: skewX(-14deg) translateX(-180%);
 }
-.fx-on [data-fx].fx-in .fx-sweep { animation: fxSweepOnce 1.25s var(--fx-ease) .18s both; }
+.fx-on [data-fx].fx-in .fx-sweep { animation: fxSweepOnce 1.4s var(--fx-ease) .22s both; }
 @keyframes fxSweepOnce {
   0%   { opacity: 0; }
   12%  { opacity: 1; }
   100% { opacity: 0; }
 }
-.fx-on [data-fx].fx-in .fx-sweep::before { animation: fxSweepMove 1.25s var(--fx-ease) .18s both; }
+.fx-on [data-fx].fx-in .fx-sweep::before { animation: fxSweepMove 1.4s var(--fx-ease) .22s both; }
 @keyframes fxSweepMove {
   from { transform: skewX(-14deg) translateX(-180%); }
   to   { transform: skewX(-14deg) translateX(320%); }
@@ -427,14 +444,14 @@
    刻意使用 animation 而非 transition —— 不会覆盖子元素自带的 hover 过渡；
    落定后由 JS 添加 .fx-settled 移除动画，把 transform 交还给页面自身规则。 */
 .fx-on [data-fx].fx-in > *:not(.fx-spot):not(.fx-sweep):not(.fx-ripple):not(.dl-versions) {
-  animation: fxChildIn .9s var(--fx-silk) both;
+  animation: fxChildIn 1s var(--fx-silk) both;
 }
-.fx-on [data-fx].fx-in > *:nth-child(1) { animation-delay: .08s; }
-.fx-on [data-fx].fx-in > *:nth-child(2) { animation-delay: .16s; }
-.fx-on [data-fx].fx-in > *:nth-child(3) { animation-delay: .24s; }
-.fx-on [data-fx].fx-in > *:nth-child(4) { animation-delay: .32s; }
-.fx-on [data-fx].fx-in > *:nth-child(5) { animation-delay: .40s; }
-.fx-on [data-fx].fx-in > *:nth-child(6) { animation-delay: .48s; }
+.fx-on [data-fx].fx-in > *:nth-child(1) { animation-delay: .09s; }
+.fx-on [data-fx].fx-in > *:nth-child(2) { animation-delay: .18s; }
+.fx-on [data-fx].fx-in > *:nth-child(3) { animation-delay: .27s; }
+.fx-on [data-fx].fx-in > *:nth-child(4) { animation-delay: .36s; }
+.fx-on [data-fx].fx-in > *:nth-child(5) { animation-delay: .45s; }
+.fx-on [data-fx].fx-in > *:nth-child(6) { animation-delay: .54s; }
 
 /* 图标徽章用弹性曲线弹入 */
 .fx-on [data-fx].fx-in > .icon-badge {
@@ -532,21 +549,23 @@
   42%      { transform: scale(1.18); opacity: 1; }
 }
 
-/* 退场：内容先收拢，再以光圈收缩揭示页面 */
+/* 退场：内容先收拢，再以光圈收缩揭示页面。
+   中间多插一帧，让光圈收缩是「渐快」而非匀速，收尾更自然 */
 #loader.fx-out {
-  animation: fxLoaderOut 1.12s var(--fx-silk) forwards !important;
+  animation: fxLoaderOut 1.24s var(--fx-silk) forwards !important;
 }
 @keyframes fxLoaderOut {
-  0%   { opacity: 1; transform: none;        clip-path: circle(140% at 50% 46%); filter: blur(0); }
-  34%  { opacity: 1; transform: scale(1.022); clip-path: circle(140% at 50% 46%); filter: blur(0); }
-  100% { opacity: 0; transform: scale(1.07);  clip-path: circle(0% at 50% 46%);   filter: blur(5px); }
+  0%   { opacity: 1; transform: scale(1);     clip-path: circle(140% at 50% 46%); filter: blur(0); }
+  26%  { opacity: 1; transform: scale(1.014); clip-path: circle(140% at 50% 46%); filter: blur(0); }
+  62%  { opacity: 1; transform: scale(1.036); clip-path: circle(76% at 50% 46%);  filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.07);  clip-path: circle(0% at 50% 46%);   filter: blur(6px); }
 }
-#loader.fx-out .loader-logo { animation: fxLogoOut .68s var(--fx-silk) forwards; }
+#loader.fx-out .loader-logo { animation: fxLogoOut .8s var(--fx-silk) forwards; }
 @keyframes fxLogoOut {
-  to { transform: translateY(-14px) scale(.92); opacity: 0; filter: blur(5px); }
+  to { transform: translateY(-16px) scale(.9); opacity: 0; filter: blur(6px); }
 }
 #loader.fx-out .fx-load-dots,
-#loader.fx-out .fx-load-ring { animation: fxFadeQuick .46s var(--fx-silk) forwards; }
+#loader.fx-out .fx-load-ring { animation: fxFadeQuick .52s var(--fx-silk) forwards; }
 @keyframes fxFadeQuick { to { opacity: 0; transform: scale(.94); } }
 #loader.fx-out .fx-load-halo { animation: fxFadeQuick .8s var(--fx-ease) forwards; }
 
@@ -581,6 +600,8 @@
     transform: none !important;
     animation: none !important;
   }
+  .section-head.fx-in .section-label,
+  .footer.fx-in::before { animation: none !important; letter-spacing: .16em !important; }
   [data-fx-tilt], [data-fx-magnet] { transform: none !important; }
   .fx-sweep { display: none !important; }
   .to-top::after { display: none; }
