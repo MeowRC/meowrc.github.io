@@ -129,6 +129,26 @@
     doc.body.appendChild(grain);
   }
 
+  /* --------------------------------------------------- Hero 漂浮光球 */
+  function buildHeroOrb() {
+    if (reduced) { return; }
+    var hero = doc.querySelector('.hero') || doc.querySelector('.page-hero');
+    if (!hero) { return; }
+    var orb = make('div', 'fx-hero-orb');
+    orb.setAttribute('aria-hidden', 'true');
+    hero.insertBefore(orb, hero.firstChild);
+  }
+
+  /* --------------------------------------------------- Hero 漂浮光球 */
+  function buildHeroOrb() {
+    if (reduced) { return; }
+    var hero = doc.querySelector('.hero') || doc.querySelector('.page-hero');
+    if (!hero) { return; }
+    var orb = make('div', 'fx-hero-orb');
+    orb.setAttribute('aria-hidden', 'true');
+    hero.insertBefore(orb, hero.firstChild);
+  }
+
   /* ------------------------------------------------------------ 滚动进度条 */
   function buildProgress() {
     var bar = make('div', 'fx-progress');
@@ -238,6 +258,8 @@
         function (v) {
           h.style.setProperty('--fx-mx', v[2].toFixed(2) + '%');
           h.style.setProperty('--fx-my', v[3].toFixed(2) + '%');
+          h.style.setProperty('--fx-sx', (-v[1] * 1.6).toFixed(2) + 'px');
+          h.style.setProperty('--fx-sy', (v[0] * 1.6).toFixed(2) + 'px');
           h.style.transform =
             'perspective(950px) rotateX(' + v[0].toFixed(3) + 'deg) rotateY(' + v[1].toFixed(3) + 'deg) ' +
             'translate3d(0,' + v[4].toFixed(2) + 'px,0) scale(' + v[5].toFixed(4) + ')';
@@ -552,7 +574,7 @@
     if (!wrap || reduced) { return; }
 
     var frag = doc.createDocumentFragment();
-    var n = lowEnd ? 6 : 14;
+    var n = lowEnd ? 5 : 10;
     for (var i = 0; i < n; i++) {
       var p = make('i');
       var s = (3 + Math.random() * 7).toFixed(1);
@@ -577,10 +599,13 @@
 
     var halo = make('div', 'fx-load-halo');
     var ring = make('div', 'fx-load-ring');
+    var ring2 = make('div', 'fx-load-ring-2');
     halo.setAttribute('aria-hidden', 'true');
     ring.setAttribute('aria-hidden', 'true');
+    ring2.setAttribute('aria-hidden', 'true');
     loader.insertBefore(halo, loader.firstChild);
     loader.insertBefore(ring, loader.firstChild);
+    loader.insertBefore(ring2, loader.firstChild);
 
     var dots = make('div', 'fx-load-dots');
     dots.setAttribute('aria-hidden', 'true');
@@ -626,13 +651,14 @@
       ticks++;
       if (!loader.isConnected) { startExit(); openGate(); return; }
       if (isOut()) { startExit(); return; }
-      if (ticks > 300) { clearInterval(poll); openGate(); }   /* 兜底，约 18s */
-    }, 60);
+      if (ticks > 100) { clearInterval(poll); openGate(); }   /* 兜底，约 18s */
+    }, 180);
   }
 
   /* ------------------------------------------------------------------ 启动 */
   function boot() {
     buildDecor();
+    buildHeroOrb();
     var bar = buildProgress();
     initLoader();
     /* 先给卡片挂上 data-fx，再开启入场观察，保证子层动画与落定逻辑生效 */
