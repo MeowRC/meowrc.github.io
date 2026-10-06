@@ -21,6 +21,8 @@
   --fx-glow: rgba(245, 160, 184, .34);
   --fx-halo: rgba(245, 160, 184, .5);
   --fx-sweep-color: rgba(245, 160, 184, .30);
+  /* 暖桃色点缀，拓宽极光色域，让渐变更通透有层次 */
+  --fx-wash-3: rgba(255, 198, 168, .20);
 }
 
 [data-theme="dark"] {
@@ -29,6 +31,7 @@
   --fx-glow: rgba(245, 160, 184, .20);
   --fx-halo: rgba(245, 160, 184, .32);
   --fx-sweep-color: rgba(255, 255, 255, .16);
+  --fx-wash-3: rgba(255, 170, 140, .14);
 }
 
 /* ==========================================================================
@@ -89,6 +92,19 @@
   100% { transform: translate3d(6vw, 3vh, 0) scale(1); opacity: .42; }
 }
 
+/* 第 4 个光斑：暖桃色调，柔化粉色与紫色之间的过渡，色域更丰富 */
+.fx-aurora i:nth-child(4) {
+  width: 34vmax; height: 34vmax;
+  right: 12vmax; bottom: 6vmax;
+  background: radial-gradient(circle at 50% 50%, var(--fx-wash-3), transparent 70%);
+  animation: fxDrift4 48s var(--fx-breath) infinite alternate;
+}
+@keyframes fxDrift4 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: .3; }
+  50%  { transform: translate3d(-7vw, -5vh, 0) scale(1.1); opacity: .46; }
+  100% { transform: translate3d(5vw, 4vh, 0) scale(.9); opacity: .3; }
+}
+
 /* ==========================================================================
    2. 颗粒质感（Grain）—— 极细噪点，消除渐变色带
    ========================================================================== */
@@ -120,6 +136,19 @@
   transform-origin: 0 50%;
   background: linear-gradient(90deg, var(--accent), var(--accent-strong), var(--accent));
   box-shadow: 0 0 14px var(--fx-halo);
+}
+/* 进度条上的流光：随加载进度一起露出的高光，观感更灵动 */
+.fx-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .9), transparent);
+  transform: translateX(-120%);
+  animation: fxProgSheen 2.6s var(--fx-ease-soft) infinite;
+}
+@keyframes fxProgSheen {
+  0%   { transform: translateX(-120%); }
+  55%, 100% { transform: translateX(420%); }
 }
 
 /* ==========================================================================
@@ -205,6 +234,13 @@
   to   { opacity: 1; letter-spacing: .16em; transform: none; }
 }
 
+/* 章节大标题：随章节入场轻微上浮 + 字重呼吸，排版更有呼吸感 */
+.section-head.fx-in .section-title { animation: fxTitleIn 1.05s var(--fx-silk) .16s both; }
+@keyframes fxTitleIn {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
 /* 页脚分隔线：随页脚入场向两侧展开 */
 .fx-on .footer.fx-in::before { animation: fxLineOpen 1.15s var(--fx-silk) .1s both; }
 @keyframes fxLineOpen {
@@ -239,6 +275,10 @@
 [data-fx-tilt].fx-tilting {
   /* 只在交互期间提升为合成层，避免常驻大量 will-change */
   will-change: transform;
+  /* 阴影方向随光斑（光标）反向偏移，卡片看起来真的被鼠标「托起」 */
+  box-shadow:
+    var(--shadow-md),
+    calc(var(--fx-sx, 0px)) calc(var(--fx-sy, 0px)) 32px var(--accent-shadow);
 }
 /* 下载卡片用 top 做悬浮位移，需保留其过渡 */
 .dl-card[data-fx-tilt] {
@@ -512,6 +552,24 @@
   animation: fxSpin 9s linear infinite;
 }
 
+/* 第二层细环：反向旋转，与外层形成交织的光轨，退场时一并淡出 */
+.fx-load-ring-2 {
+  position: absolute;
+  left: 50%; top: 46%;
+  width: 300px; height: 300px;
+  margin: -150px 0 0 -150px;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: .26;
+  background: conic-gradient(from 180deg,
+    transparent 60%, var(--accent-strong) 80%, transparent 96%);
+  -webkit-mask: radial-gradient(circle, transparent 85%, #000 85.4%, #000 86.4%, transparent 86.8%);
+          mask: radial-gradient(circle, transparent 85%, #000 85.4%, #000 86.4%, transparent 86.8%);
+  animation: fxSpinRev 6s linear infinite;
+}
+@keyframes fxSpinRev { to { transform: rotate(-360deg); } }
+
 .loader-logo.fx-logo {
   animation:
     fxLogoIn 1.6s var(--fx-silk) both,
@@ -565,13 +623,39 @@
   to { transform: translateY(-16px) scale(.9); opacity: 0; filter: blur(6px); }
 }
 #loader.fx-out .fx-load-dots,
-#loader.fx-out .fx-load-ring { animation: fxFadeQuick .52s var(--fx-silk) forwards; }
+#loader.fx-out .fx-load-ring,
+#loader.fx-out .fx-load-ring-2 { animation: fxFadeQuick .52s var(--fx-silk) forwards; }
 @keyframes fxFadeQuick { to { opacity: 0; transform: scale(.94); } }
 #loader.fx-out .fx-load-halo { animation: fxFadeQuick .8s var(--fx-ease) forwards; }
 
 @media (max-width: 720px) {
   .fx-load-ring { width: 300px; height: 300px; margin: -150px 0 0 -150px; }
   .fx-load-halo { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
+}
+
+/* ==========================================================================
+   13. Hero 漂浮光球 —— 柔光呼吸，增强首屏空间感（仅在 Hero 内注入）
+   ========================================================================== */
+.fx-hero-orb {
+  position: absolute;
+  z-index: -1;
+  top: 14%;
+  left: 58%;
+  width: 40vmax; height: 40vmax;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, var(--fx-wash-2), transparent 68%);
+  filter: blur(50px);
+  opacity: .5;
+  will-change: transform;
+  animation: fxOrbFloat 18s var(--fx-breath) infinite alternate;
+}
+@keyframes fxOrbFloat {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-8vw, 6vh, 0) scale(1.12); }
+}
+@media (max-width: 720px) {
+  .fx-hero-orb { opacity: .34; }
 }
 
 /* ==========================================================================
@@ -585,7 +669,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .fx-aurora, .fx-grain, .fx-cursor, .fx-cursor-dot, .fx-flash,
-  .fx-load-halo, .fx-load-ring, .fx-load-dots { display: none !important; }
+  .fx-hero-orb, .fx-load-halo, .fx-load-ring, .fx-load-ring-2, .fx-load-dots { display: none !important; }
   #loader.fx-out,
   #loader.fx-out .loader-logo,
   #loader.fx-out .fx-load-dots { animation: none !important; }
