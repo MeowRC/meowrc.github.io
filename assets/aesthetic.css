@@ -16,22 +16,39 @@
   --fx-breath: cubic-bezier(.45, 0, .55, 1);
 
   /* 增强层专用色（各主题下单独覆盖） */
-  --fx-wash: rgba(245, 160, 184, .16);
-  --fx-wash-2: rgba(214, 188, 255, .26);
-  --fx-glow: rgba(245, 160, 184, .34);
-  --fx-halo: rgba(245, 160, 184, .5);
-  --fx-sweep-color: rgba(245, 160, 184, .30);
-  /* 暖桃色点缀，拓宽极光色域，让渐变更通透有层次 */
-  --fx-wash-3: rgba(255, 198, 168, .20);
+  --fx-wash: rgba(255, 95, 162, .22);
+  --fx-wash-2: rgba(168, 85, 247, .34);
+  --fx-glow: rgba(255, 60, 140, .52);
+  --fx-halo: rgba(255, 60, 140, .62);
+  --fx-sweep-color: rgba(255, 95, 162, .42);
+  /* 暖橙点缀，拓宽极光色域，让渐变更通透有层次 */
+  --fx-wash-3: rgba(255, 138, 76, .30);
+
+  /* 主色板：覆盖页面内联变量，统一为更大胆的粉色主调 */
+  --accent: #ff5fa2;
+  --accent-strong: #ff1f7a;
+  --accent-soft: #ffe1ef;
+  --accent-wash: rgba(255, 95, 162, .16);
+  --accent-line: rgba(255, 95, 162, .35);
+  --accent-shadow: rgba(255, 60, 140, .20);
+  --accent-glow: rgba(255, 95, 162, .45);
 }
 
 [data-theme="dark"] {
-  --fx-wash: rgba(245, 160, 184, .10);
-  --fx-wash-2: rgba(150, 120, 220, .16);
-  --fx-glow: rgba(245, 160, 184, .20);
-  --fx-halo: rgba(245, 160, 184, .32);
-  --fx-sweep-color: rgba(255, 255, 255, .16);
-  --fx-wash-3: rgba(255, 170, 140, .14);
+  --fx-wash: rgba(255, 95, 162, .12);
+  --fx-wash-2: rgba(150, 90, 230, .20);
+  --fx-glow: rgba(255, 60, 140, .30);
+  --fx-halo: rgba(255, 60, 140, .40);
+  --fx-sweep-color: rgba(255, 150, 190, .24);
+  --fx-wash-3: rgba(255, 140, 80, .18);
+
+  /* 主色板（深色）：保持粉色主调，提高饱和度以适配暗底 */
+  --accent-strong: #ff7ab4;
+  --accent-soft: #3a1f30;
+  --accent-wash: rgba(255, 95, 162, .10);
+  --accent-line: rgba(255, 95, 162, .20);
+  --accent-shadow: rgba(0, 0, 0, .3);
+  --accent-glow: rgba(255, 95, 162, .32);
 }
 
 /* ==========================================================================
