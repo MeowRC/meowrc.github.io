@@ -1293,6 +1293,67 @@ a:focus, button:focus, .card:focus, .dl-card:focus {
 
 /* IE 无 mask-image，网格背景无法淡出，降低不透明度 */
 .page-hero::after { opacity: .14; }
+
+/* ===== 在线分区导航（Hub） ===== */
+.online-hub { padding: 44px 0 6px; }
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 30px 26px 26px;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform .4s var(--ease-out), box-shadow .4s var(--ease-out), border-color .4s var(--ease-out);
+}
+.hub-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .5s var(--ease-out);
+}
+.hub-icon {
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border-radius: 14px;
+  color: var(--accent-strong);
+  background: linear-gradient(135deg, var(--accent-soft), var(--accent-wash));
+  border: 1px solid var(--accent-line);
+  box-shadow: 0 4px 12px var(--accent-shadow);
+}
+.hub-icon svg { width: 26px; height: 26px; }
+.hub-name { font-size: 1.32rem; font-weight: 800; letter-spacing: -.02em; }
+.hub-desc { font-size: .88rem; line-height: 1.6; color: var(--text-2); }
+.hub-go {
+  margin-top: 2px;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .82rem; font-weight: 600; color: var(--accent-strong);
+}
+.hub-go svg { width: 15px; height: 15px; transition: transform .3s var(--ease-out); }
+@media (hover: hover) {
+  .hub-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+  }
+  .hub-card:hover::after { transform: scaleX(1); }
+  .hub-card:hover .hub-go svg { transform: translateX(4px); }
+}
+@media (max-width: 720px) {
+  .hub-grid { grid-template-columns: 1fr; }
+}
 </style>
 <noscript><style>#loader{display:none!important;}#blog{display:block!important;}[data-reveal]{opacity:1!important;-webkit-transform:none!important;transform:none!important;}</style></noscript>
 </head>
@@ -1342,9 +1403,53 @@ a:focus, button:focus, .card:focus, .dl-card:focus {
       在线
     </div>
     <h2 class="page-title">在线</h2>
-    <p class="page-desc">获取最新的软件与工具发布版本，全部开源免费。</p>
+    <p class="page-desc">选择下方分区，进入下载、音乐或游戏。</p>
   </div>
 </header>
+
+<section class="online-hub" aria-label="选择分区">
+  <div class="hub-grid">
+    <a class="hub-card" href="#download" data-reveal>
+      <span class="hub-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
+        </svg>
+      </span>
+      <span class="hub-name">下载</span>
+      <span class="hub-desc">软件、工具与刷机资源，全部开源免费。</span>
+      <span class="hub-go">进入下载
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+    <a class="hub-card" href="#music" data-reveal>
+      <span class="hub-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l10-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="16" cy="16" r="3"/>
+        </svg>
+      </span>
+      <span class="hub-name">音乐</span>
+      <span class="hub-desc">MeowRc 音乐收藏，边听边逛。</span>
+      <span class="hub-go">进入音乐
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+    <a class="hub-card" href="#game" data-reveal>
+      <span class="hub-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="4"/>
+          <path d="M6 11v3M4.5 12.5h3M15 10.5h.01M18 13h.01"/>
+        </svg>
+      </span>
+      <span class="hub-name">游戏</span>
+      <span class="hub-desc">在线小游戏与游戏板块。</span>
+      <span class="hub-go">进入游戏
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  </div>
+</section>
 
 <main class="main">
 
