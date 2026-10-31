@@ -41,77 +41,49 @@
                 p.substring(p.length - suffix.length) === suffix;
   if (!current) location.replace(target + location.search + location.hash);
 })();
-</script>
 
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="MeowRc" />
-<meta name="format-detection" content="telephone=no" />
-<meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
-<meta name="theme-color" content="#f5a0b8" />
-<title>在线 · MeowRc Blog</title>
-
-<script>
 (function () {
-  var OVERRIDE_TTL = 6 * 60 * 60 * 1000;
+  var TTL = 6 * 60 * 60 * 1000;
+  var root = document.documentElement;
+  var colors = { light: '#fdfbfc', dark: '#14121a' };
 
-  function autoTheme() {
+  function auto() {
     try {
       var h = new Date().getHours();
       return (h >= 6 && h < 18) ? 'light' : 'dark';
     } catch (e) {
-      try {
-        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      } catch (err) {
-        return 'light';
-      }
+      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
   }
 
-  function hasManualOverride() {
+  function stored() {
     try {
-      var stored = localStorage.getItem('theme');
+      var v = localStorage.getItem('theme');
       var at = parseInt(localStorage.getItem('themeAt') || '0', 10);
-      return (stored === 'dark' || stored === 'light') &&
-             (Date.now() - at < OVERRIDE_TTL);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function resolveTheme() {
-    if (hasManualOverride()) {
-      try { return localStorage.getItem('theme'); } catch (e) {}
-    }
-    return autoTheme();
-  }
-
-  function setThemeAttr(val) {
-    try {
-      document.documentElement.dataset.theme = val;
-    } catch (e) {
-      document.documentElement.setAttribute('data-theme', val);
-    }
-  }
-  function getThemeAttr() {
-    var el = document.documentElement;
-    try {
-      if (el.dataset && el.dataset.theme) return el.dataset.theme;
+      if ((v === 'dark' || v === 'light') && Date.now() - at < TTL) return v;
     } catch (e) {}
-    return el.getAttribute('data-theme');
+    return null;
   }
 
-  setThemeAttr(resolveTheme());
+  function apply(theme) {
+    if (root.dataset.theme === theme) return;
+    root.dataset.theme = theme;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = colors[theme];
+  }
+
+  apply(stored() || auto());
 
   setInterval(function () {
-    if (hasManualOverride()) return;
-    var next = autoTheme();
-    if (getThemeAttr() !== next) setThemeAttr(next);
+    if (!stored()) apply(auto());
   }, 60000);
 })();
 </script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
+<meta name="theme-color" content="#f5a0b8" />
+<title>在线 · MeowRc Blog</title>
 
 <style>
 :root {
@@ -132,8 +104,14 @@
   --radius-pill: 999px;
   --nav-h: 64px;
   --maxw: 880px;
-  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-io: cubic-bezier(.4, 0, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-shift: cubic-bezier(.16, 1, .3, 1);
+  --ease-fade: cubic-bezier(.25, .46, .45, .94);
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
   --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+  color-scheme: light;
 }
 
 [data-theme="dark"] {
@@ -149,14 +127,16 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, .35);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, .45);
   --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
+  color-scheme: dark;
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -178,6 +158,8 @@ button {
   color: inherit;
 }
 
+[hidden] { display: none !important; }
+
 ::-webkit-selection { background: var(--accent); color: #fff; }
 ::selection { background: var(--accent); color: #fff; }
 
@@ -186,6 +168,7 @@ button {
   outline-offset: 3px;
   border-radius: 6px;
 }
+:focus:not(:focus-visible) { outline: none; }
 
 .sr-only {
   position: absolute;
@@ -197,21 +180,26 @@ button {
   border: 0;
 }
 
+/* ===== 导航栏 ===== */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: var(--nav-h);
   z-index: 100;
   background: rgba(255, 255, 255, .78);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
   backdrop-filter: blur(18px) saturate(1.6);
   border-bottom: 1px solid var(--border);
-  transition: box-shadow .3s ease, background-color .3s ease;
+  transform: translateY(-100%);
+  transition:
+    transform .75s cubic-bezier(.22, 1, .36, 1),
+    box-shadow .3s ease,
+    background-color .3s ease;
 }
 
 [data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
+
+.page-enter .navbar { transform: translateY(0); }
 
 .navbar.scrolled {
   background: rgba(255, 255, 255, .92);
@@ -237,6 +225,7 @@ button {
   text-decoration: none;
   white-space: nowrap;
   margin-right: 16px;
+  transition: transform .3s var(--ease-spring);
 }
 
 .nav-brand em {
@@ -244,14 +233,16 @@ button {
   color: var(--accent-strong);
 }
 
+@media (hover: hover) {
+  .nav-brand:hover { transform: scale(1.04); }
+}
+
 .nav-links {
   display: flex;
   align-items: center;
+  gap: 4px;
   list-style: none;
 }
-
-.nav-links li { margin-left: 4px; }
-.nav-links li:first-child { margin-left: 0; }
 
 .nav-links a {
   display: block;
@@ -264,44 +255,38 @@ button {
   transition: color .2s, background-color .2s;
 }
 
-.nav-links a:hover {
-  color: var(--text);
-  background: var(--accent-soft);
-}
-
 .nav-links a.active {
   color: var(--accent-strong);
   background: var(--accent-soft);
   font-weight: 600;
 }
 
+@media (hover: hover) {
+  .nav-links a:hover {
+    color: var(--text);
+    background: var(--accent-soft);
+  }
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
+  gap: 4px;
   margin-left: 16px;
 }
-
-.nav-actions > * { margin-left: 4px; }
-.nav-actions > *:first-child { margin-left: 0; }
 
 .icon-btn {
   width: 38px;
   height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 10px;
   border-radius: 50%;
   color: var(--text-2);
   transition: background-color .2s, color .2s, transform .2s;
 }
 
-.icon-btn:hover {
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.icon-btn:active { -webkit-transform: scale(.92); transform: scale(.92); }
+.icon-btn:active { transform: scale(.92); }
 
 .icon-btn svg {
   width: 18px;
@@ -314,12 +299,20 @@ button {
   stroke-linejoin: round;
 }
 
+@media (hover: hover) {
+  .icon-btn:hover {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+}
+
 .theme-toggle .icon-moon { display: none; }
 [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
 [data-theme="dark"] .theme-toggle .icon-sun  { display: none; }
 
 .mobile-menu-btn { display: none; }
 
+/* ===== 页头 ===== */
 .page-hero {
   position: relative;
   padding: 136px 24px 40px;
@@ -330,7 +323,7 @@ button {
 .page-hero::before {
   content: '';
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
+  inset: 0;
   z-index: -2;
   background:
     radial-gradient(50% 60% at 20% 20%, var(--accent-glow), transparent 70%),
@@ -341,7 +334,7 @@ button {
 .page-hero::after {
   content: '';
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
   background-image:
@@ -350,7 +343,7 @@ button {
   background-size: 64px 64px;
   opacity: .35;
   -webkit-mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
-  mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+          mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
 }
 
 .page-hero-inner {
@@ -396,21 +389,14 @@ button {
 }
 
 .page-title {
-  font-size: 2.2rem;
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -.035em;
   background: linear-gradient(120deg, var(--text) 30%, var(--accent-strong));
   -webkit-background-clip: text;
-  background-clip: text;
+          background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-@media (min-width: 480px) {
-  .page-title { font-size: 2.8rem; }
-}
-@media (min-width: 720px) {
-  .page-title { font-size: 3.4rem; }
 }
 
 .page-desc {
@@ -420,6 +406,7 @@ button {
   max-width: 52ch;
 }
 
+/* ===== 主体 ===== */
 .main {
   max-width: var(--maxw);
   margin: 0 auto;
@@ -469,13 +456,9 @@ button {
 }
 
 .section-title {
-  font-size: 1.35rem;
-  font-weight: 750;
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-weight: 700;
   letter-spacing: -.02em;
-}
-
-@media (min-width: 560px) {
-  .section-title { font-size: 1.7rem; }
 }
 
 .section-desc {
@@ -484,10 +467,11 @@ button {
   color: var(--text-2);
 }
 
+/* ===== 下载卡片 ===== */
 .downloads {
-  display: flex;
-  flex-wrap: wrap;
-  margin: -8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
 }
 
 .dl-card {
@@ -495,9 +479,6 @@ button {
   top: 0;
   display: flex;
   flex-direction: column;
-  flex: 0 0 calc(50% - 16px);
-  max-width: calc(50% - 16px);
-  margin: 8px;
   padding: 24px 26px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -505,25 +486,9 @@ button {
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition:
-    top .25s cubic-bezier(.4, 0, .2, 1),
+    top .25s var(--ease-io),
     box-shadow .3s ease,
     border-color .3s ease;
-}
-
-@media (max-width: 640px) {
-  .dl-card {
-    flex: 0 0 calc(100% - 16px);
-    max-width: calc(100% - 16px);
-  }
-}
-
-.dl-card[data-reveal] {
-  transition:
-    top .25s cubic-bezier(.4, 0, .2, 1),
-    box-shadow .3s ease,
-    border-color .3s ease,
-    opacity .6s cubic-bezier(.25, .46, .45, .94),
-    transform .9s cubic-bezier(.16, 1, .3, 1);
 }
 
 .dl-card::before {
@@ -533,11 +498,9 @@ button {
   width: 100%;
   height: 3px;
   background: linear-gradient(90deg, var(--accent), #f7b8c8);
-  -webkit-transform: scaleX(0);
   transform: scaleX(0);
-  -webkit-transform-origin: left;
   transform-origin: left;
-  transition: transform .42s cubic-bezier(.4, 0, .2, 1);
+  transition: transform .42s var(--ease-io);
 }
 
 .dl-card:hover {
@@ -546,41 +509,38 @@ button {
   border-color: var(--accent);
 }
 
-.dl-card:hover::before { -webkit-transform: scaleX(1); transform: scaleX(1); }
+.dl-card:hover::before { transform: scaleX(1); }
 
 .dl-card.expanded { border-color: var(--accent); }
-.dl-card.expanded::before { -webkit-transform: scaleX(1); transform: scaleX(1); }
+.dl-card.expanded::before { transform: scaleX(1); }
 
 .dl-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 14px;
 }
-
-.dl-head > * + * { margin-left: 14px; }
 
 .dl-title-wrap {
   display: flex;
   align-items: center;
+  gap: 12px;
   min-width: 0;
 }
-
-.dl-title-wrap > * + * { margin-left: 12px; }
 
 .dl-icon {
   flex: none;
   width: 46px;
   height: 46px;
   padding: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   color: var(--accent-strong);
   border-radius: 13px;
   background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(245, 160, 184, .12) 100%);
   border: 1px solid rgba(245, 160, 184, .18);
   box-shadow: 0 2px 8px rgba(245, 160, 184, .12);
-  transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease;
+  transition: transform .4s var(--ease-spring), box-shadow .3s ease;
 }
 
 [data-theme="dark"] .dl-icon {
@@ -589,7 +549,6 @@ button {
 }
 
 .dl-card:hover .dl-icon {
-  -webkit-transform: scale(1.1) rotate(-6deg);
   transform: scale(1.1) rotate(-6deg);
   box-shadow: 0 6px 18px rgba(245, 160, 184, .3);
 }
@@ -607,7 +566,7 @@ button {
 
 .dl-name {
   font-size: 1.05rem;
-  font-weight: 680;
+  font-weight: 700;
   letter-spacing: -.012em;
   line-height: 1.3;
 }
@@ -620,10 +579,12 @@ button {
   margin-top: 2px;
 }
 
+/* ===== 下载按钮 ===== */
 .dl-btn {
   flex: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 9px 20px;
   border-radius: 999px;
   font-size: .86rem;
@@ -632,10 +593,7 @@ button {
   color: #fff;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   box-shadow: 0 4px 14px rgba(245, 160, 184, .35);
-  transition:
-    transform .25s cubic-bezier(.34, 1.56, .64, 1),
-    box-shadow .25s,
-    filter .25s;
+  transition: transform .25s var(--ease-spring), box-shadow .25s, filter .25s;
 }
 
 .dl-btn svg {
@@ -651,14 +609,12 @@ button {
 }
 
 .dl-btn:hover {
-  -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(245, 160, 184, .5);
-  -webkit-filter: brightness(1.05);
   filter: brightness(1.05);
 }
 
-.dl-btn:active { -webkit-transform: translateY(0); transform: translateY(0); }
+.dl-btn:active { transform: translateY(0); }
 
 .dl-btn--sm {
   padding: 6px 16px;
@@ -682,10 +638,9 @@ button {
 .dl-info {
   display: flex;
   flex-wrap: wrap;
-  margin: 10px -4px -4px;
+  gap: 8px;
+  margin-top: 10px;
 }
-
-.dl-info > * { margin: 4px; }
 
 .dl-info span {
   display: inline-flex;
@@ -713,44 +668,41 @@ button {
 .dl-links {
   display: flex;
   flex-wrap: wrap;
-  margin: 16px -4px -4px;
+  gap: 8px;
+  margin-top: 16px;
 }
-
-.dl-links > * { margin: 4px; }
 
 .dl-links .dl-btn {
   flex: 1 1 auto;
-  justify-content: center;
   padding: 8px 16px;
   font-size: .8rem;
 }
 
+/* ===== 可展开卡片 ===== */
 .dl-expand-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
   width: 100%;
   padding: 0;
   text-align: left;
   border-radius: 12px;
 }
 
-.dl-expand-head > * + * { margin-left: 14px; }
-
 .dl-chevron {
   flex: none;
   width: 34px;
   height: 34px;
   padding: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   color: var(--text-2);
   border-radius: 50%;
   background: var(--surface-2);
   border: 1px solid var(--border);
   transition:
-    transform .4s cubic-bezier(.34, 1.56, .64, 1),
+    transform .4s var(--ease-spring),
     background-color .25s,
     color .25s,
     border-color .25s;
@@ -774,7 +726,6 @@ button {
 }
 
 .dl-card.expanded .dl-chevron {
-  -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
   color: var(--accent-strong);
   border-color: var(--accent);
@@ -786,7 +737,7 @@ button {
   overflow: hidden;
   opacity: 0;
   transition:
-    max-height .5s cubic-bezier(.22, 1, .36, 1),
+    max-height .5s var(--ease-out),
     opacity .35s ease,
     margin-top .35s ease;
 }
@@ -801,6 +752,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 11px 16px;
   border-radius: 11px;
   background: var(--surface-2);
@@ -808,15 +760,13 @@ button {
   transition: border-color .2s ease, background-color .2s ease;
 }
 
-.dl-version-row > * + * { margin-left: 12px; }
-
 .dl-version-row + .dl-version-row { margin-top: 8px; }
 
 .dl-version-row:hover { border-color: var(--accent); }
 
 .dl-version-name {
   font-size: .87rem;
-  font-weight: 550;
+  font-weight: 500;
   letter-spacing: -.005em;
   color: var(--text);
   min-width: 0;
@@ -825,6 +775,7 @@ button {
   white-space: nowrap;
 }
 
+/* ===== 页脚 / 回到顶部 ===== */
 .footer {
   position: relative;
   padding: 36px 24px 40px;
@@ -848,9 +799,8 @@ button {
   z-index: 90;
   width: 44px;
   height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 12px;
   border-radius: 50%;
   background: var(--surface);
@@ -859,15 +809,10 @@ button {
   box-shadow: var(--shadow-md);
   opacity: 0;
   visibility: hidden;
-  -webkit-transform: translateY(10px);
   transform: translateY(10px);
   transition:
-    opacity .3s,
-    transform .3s,
-    visibility .3s,
-    background-color .2s,
-    color .2s,
-    border-color .2s;
+    opacity .3s, transform .3s, visibility .3s,
+    background-color .2s, color .2s, border-color .2s;
 }
 
 .to-top svg {
@@ -881,69 +826,66 @@ button {
   stroke-linejoin: round;
 }
 
-.to-top.show {
-  opacity: 1;
-  visibility: visible;
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-}
-.to-top:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.to-top:active { -webkit-transform: scale(.94); transform: scale(.94); }
+.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top:active { transform: scale(.94); }
 
+@media (hover: hover) {
+  .to-top:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+}
+
+/* ===== 滚动显现 ===== */
 [data-reveal] {
   opacity: 0;
-  -webkit-transform: translateY(64px) scale(.97);
   transform: translateY(64px) scale(.97);
   transition:
-    opacity .6s cubic-bezier(.25, .46, .45, .94),
-    transform .9s cubic-bezier(.16, 1, .3, 1);
+    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
+    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
 }
 
 [data-reveal].from-above {
-  -webkit-transform: translateY(-64px) scale(.97);
   transform: translateY(-64px) scale(.97);
 }
 
 [data-reveal].is-in {
   opacity: 1;
-  -webkit-transform: translateY(0) scale(1);
   transform: translateY(0) scale(1);
 }
 
 [data-reveal].no-transition { transition: none !important; }
 
+/* ===== 响应式 ===== */
 @media (max-width: 720px) {
-  .mobile-menu-btn { display: flex; }
+  .mobile-menu-btn { display: grid; }
 
   .nav-links {
     position: fixed;
     top: var(--nav-h);
     left: 0;
     right: 0;
-    display: flex;
     flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
     padding: 12px 16px 18px;
+    max-height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow-md);
     border-radius: 0 0 20px 20px;
     opacity: 0;
     visibility: hidden;
-    -webkit-transform: translateY(-10px);
     transform: translateY(-10px);
     transition: opacity .25s ease, transform .25s ease, visibility .25s;
   }
 
-  .nav-links li { margin: 1px 0; }
-
-  .nav-links.open {
-    opacity: 1;
-    visibility: visible;
-    -webkit-transform: translateY(0);
-    transform: translateY(0);
-  }
-
+  .nav-links.open { opacity: 1; visibility: visible; transform: none; }
   .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
+
+  .nav-actions { margin-left: 0; }
 
   .page-hero { padding: 120px 20px 32px; }
   .page-hero-inner { padding-left: 18px; }
@@ -953,9 +895,9 @@ button {
   .dl-head {
     flex-direction: column;
     align-items: stretch;
+    gap: 14px;
   }
-  .dl-head > * + * { margin-left: 0; margin-top: 14px; }
-  .dl-head > .dl-btn { justify-content: center; width: 100%; }
+  .dl-head > .dl-btn { width: 100%; }
 
   .dl-links .dl-btn { flex: 1 1 100%; }
 
@@ -963,18 +905,9 @@ button {
   .dl-version-name { font-size: .82rem; }
   .dl-btn--sm { padding: 6px 13px; font-size: .74rem; }
 
-  [data-reveal] {
-    -webkit-transform: translateY(44px) scale(.98);
-    transform: translateY(44px) scale(.98);
-  }
-  [data-reveal].from-above {
-    -webkit-transform: translateY(-44px) scale(.98);
-    transform: translateY(-44px) scale(.98);
-  }
-  [data-reveal].is-in {
-    -webkit-transform: translateY(0) scale(1);
-    transform: translateY(0) scale(1);
-  }
+  [data-reveal] { transform: translateY(44px) scale(.98); }
+  [data-reveal].from-above { transform: translateY(-44px) scale(.98); }
+  [data-reveal].is-in { transform: translateY(0) scale(1); }
 }
 
 @media (max-width: 400px) {
@@ -987,57 +920,1138 @@ button {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
   }
   [data-reveal] {
     opacity: 1 !important;
-    -webkit-transform: none !important;
     transform: none !important;
+  }
+  .navbar { transform: none !important; }
+}
+
+/* ===== 歌单 ===== */
+.music-wrap { margin-top: 2px; }
+/* 曲目较多，整卡独占一行，列表内部滚动 */
+.dl-card--music { flex: 0 0 100%; max-width: 100%; margin: 0; }
+.song-list,
+.file-list {
+  margin: 16px 0 0;
+  padding: 2px 8px 2px 0;
+  list-style: none;
+  max-height: 380px;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+.song-list::-webkit-scrollbar,
+.file-list::-webkit-scrollbar { width: 6px; }
+.song-list::-webkit-scrollbar-thumb,
+.file-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.song-row,
+.file-row {
+  display: flex;
+  align-items: baseline;
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: .86rem;
+  transition: background-color .22s ease, color .22s ease;
+}
+.song-row:hover,
+.file-row:hover { background: var(--accent-soft); }
+.song-no {
+  flex: none;
+  width: 34px;
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--text-2);
+  opacity: .65;
+}
+.song-name,
+.file-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.song-fmt {
+  flex: none;
+  margin-left: 10px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+}
+.song-size,
+.file-size {
+  flex: none;
+  margin-left: 10px;
+  min-width: 62px;
+  text-align: right;
+  font-size: .74rem;
+  color: var(--text-2);
+}
+@media (max-width: 640px) {
+  .song-size, .file-size { display: none; }
+  .song-list, .file-list { max-height: 300px; }
+}
+
+/* ===== 内核文件清单 ===== */
+/* 文件较多时整卡独占一行；展开高度需覆盖全部条目（默认 600px 会截断） */
+.dl-card--wide { flex: 0 0 100%; max-width: 100%; margin: 0; grid-column: 1 / -1; }
+.dl-card--wide.expanded .dl-versions { max-height: 1800px; }
+.dl-group + .dl-group { margin-top: 14px; }
+.dl-group-name {
+  display: flex;
+  align-items: center;
+  margin-bottom: 7px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+.dl-group-name::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.dl-file-size {
+  flex: none;
+  font-size: .74rem;
+  color: var(--text-2);
+}
+@media (max-width: 640px) {
+  .dl-file-size { display: none; }
+}
+
+/* ===== 刷机资源文件清单 ===== */
+.file-group-name {
+  margin: 13px 0 3px;
+  padding: 0 8px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--accent-strong);
+  opacity: .9;
+}
+.file-group-name:first-child { margin-top: 0; }
+.dl-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+}
+.dl-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 12px -4px -4px;
+}
+.dl-tags > * { margin: 4px; }
+
+/* ===== 在线分区导航（Hub） ===== */
+.online-hub { padding: 44px 0 6px; }
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 30px 26px 26px;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform .4s var(--ease-out), box-shadow .4s var(--ease-out), border-color .4s var(--ease-out);
+}
+.hub-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .5s var(--ease-out);
+}
+.hub-icon {
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border-radius: 14px;
+  color: var(--accent-strong);
+  background: linear-gradient(135deg, var(--accent-soft), var(--accent-wash));
+  border: 1px solid var(--accent-line);
+  box-shadow: 0 4px 12px var(--accent-shadow);
+}
+.hub-icon svg { width: 26px; height: 26px; }
+.hub-name { font-size: 1.32rem; font-weight: 800; letter-spacing: -.02em; }
+.hub-desc { font-size: .88rem; line-height: 1.6; color: var(--text-2); }
+.hub-go {
+  margin-top: 2px;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .82rem; font-weight: 600; color: var(--accent-strong);
+}
+.hub-go svg { width: 15px; height: 15px; transition: transform .3s var(--ease-out); }
+@media (hover: hover) {
+  .hub-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+  }
+  .hub-card:hover::after { transform: scaleX(1); }
+  .hub-card:hover .hub-go svg { transform: translateX(4px); }
+}
+@media (max-width: 720px) {
+  .hub-grid { grid-template-columns: 1fr; }
+}
+</style>
+<link rel="stylesheet" href="../../assets/aesthetic.css">
+<style>.online-back{display:inline-flex;align-items:center;gap:6px;margin:22px auto 0;padding:9px 18px;border:1px solid var(--accent-line,#ffb3d4);border-radius:999px;color:var(--accent-strong,#ff1f7a);text-decoration:none;font-weight:600;width:max-content}.online-back:hover{background:var(--accent-soft,#ffe1ef)}</style></head><!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+
+<script>
+(function () {
+  var ua = navigator.userAgent || '';
+  var dm = document.documentMode;
+
+  /* IE8 ~ IE11（含 IE11 兼容视图）走专门的 ie 版本 */
+  function isLegacyIE() {
+    if (dm && dm <= 11) return true;
+    return (/MSIE |Trident\//).test(ua);
+  }
+
+  function isSafariFamily() {
+    if ((/iPad|iPhone|iPod/).test(ua)) return true;
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+    if ((/Safari/).test(ua) &&
+        !(/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/).test(ua)) return true;
+    return false;
+  }
+
+  function isModern() {
+    if (!window.CSS || !CSS.supports) return false;
+    try {
+      return !!CSS.supports('translate', '0 64px') && !!CSS.supports('inset', '0');
+    } catch (e) { return false; }
+  }
+
+  var target;
+  if (isLegacyIE())          target = 'index-ie.html';
+  else if (isSafariFamily()) target = 'index-apple.html';
+  else if (isModern())       target = 'index.html';
+  else                       target = 'index-legacy.html';
+
+  var p = location.pathname || '';
+  var suffix = '/' + target;
+  var current = p.length >= suffix.length &&
+                p.substring(p.length - suffix.length) === suffix;
+  if (!current) location.replace(target + location.search + location.hash);
+})();
+
+(function () {
+  var TTL = 6 * 60 * 60 * 1000;
+  var root = document.documentElement;
+  var colors = { light: '#fdfbfc', dark: '#14121a' };
+
+  function auto() {
+    try {
+      var h = new Date().getHours();
+      return (h >= 6 && h < 18) ? 'light' : 'dark';
+    } catch (e) {
+      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+  }
+
+  function stored() {
+    try {
+      var v = localStorage.getItem('theme');
+      var at = parseInt(localStorage.getItem('themeAt') || '0', 10);
+      if ((v === 'dark' || v === 'light') && Date.now() - at < TTL) return v;
+    } catch (e) {}
+    return null;
+  }
+
+  function apply(theme) {
+    if (root.dataset.theme === theme) return;
+    root.dataset.theme = theme;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = colors[theme];
+  }
+
+  apply(stored() || auto());
+
+  setInterval(function () {
+    if (!stored()) apply(auto());
+  }, 60000);
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MeowRc 在线 —— 软件与工具下载。" />
+<meta name="theme-color" content="#f5a0b8" />
+<title>在线 · MeowRc Blog</title>
+
+<style>
+:root {
+  --bg: #fdfbfc;
+  --surface: #ffffff;
+  --surface-2: #fff7fa;
+  --text: #1f1d1e;
+  --text-2: #6b6567;
+  --accent: #f5a0b8;
+  --accent-strong: #e4708f;
+  --accent-soft: #fce8ee;
+  --accent-glow: rgba(245, 160, 184, .34);
+  --border: #f0e6e9;
+  --shadow-sm: 0 1px 3px rgba(180, 120, 140, .06);
+  --shadow-md: 0 6px 24px rgba(180, 120, 140, .10);
+  --shadow-lg: 0 18px 48px rgba(180, 120, 140, .16);
+  --radius: 16px;
+  --radius-pill: 999px;
+  --nav-h: 64px;
+  --maxw: 880px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-io: cubic-bezier(.4, 0, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-shift: cubic-bezier(.16, 1, .3, 1);
+  --ease-fade: cubic-bezier(.25, .46, .45, .94);
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #14121a;
+  --surface: #1c1923;
+  --surface-2: #241f2c;
+  --text: #f0eaf0;
+  --text-2: #a49aa6;
+  --accent-strong: #ffb8cc;
+  --accent-soft: #3a2733;
+  --accent-glow: rgba(245, 160, 184, .22);
+  --border: #2e2836;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .35);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, .45);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color .4s ease, color .4s ease;
+}
+
+a { color: inherit; }
+button {
+  font: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+[hidden] { display: none !important; }
+
+::-webkit-selection { background: var(--accent); color: #fff; }
+::selection { background: var(--accent); color: #fff; }
+
+:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== 导航栏 ===== */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 100;
+  background: rgba(255, 255, 255, .78);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  border-bottom: 1px solid var(--border);
+  transform: translateY(-100%);
+  transition:
+    transform .75s cubic-bezier(.22, 1, .36, 1),
+    box-shadow .3s ease,
+    background-color .3s ease;
+}
+
+[data-theme="dark"] .navbar { background: rgba(20, 18, 26, .78); }
+
+.page-enter .navbar { transform: translateY(0); }
+
+.navbar.scrolled {
+  background: rgba(255, 255, 255, .92);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .navbar.scrolled { background: rgba(20, 18, 26, .92); }
+
+.navbar-inner {
+  max-width: var(--maxw);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-size: 1.22rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  margin-right: 16px;
+  transition: transform .3s var(--ease-spring);
+}
+
+.nav-brand em {
+  font-style: normal;
+  color: var(--accent-strong);
+}
+
+@media (hover: hover) {
+  .nav-brand:hover { transform: scale(1.04); }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+}
+
+.nav-links a {
+  display: block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: .92rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-2);
+  transition: color .2s, background-color .2s;
+}
+
+.nav-links a.active {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .nav-links a:hover {
+    color: var(--text);
+    background: var(--accent-soft);
   }
 }
 
-.card, .post, .project, .dl-card, .dl-btn, .social-link, .icon-btn,
-.nav-brand, .nav-links a, .tag, .to-top, .dl-expand-head, .dl-chevron,
-.dl-version-row {
-  -webkit-touch-callout: none;
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 16px;
 }
 
-.navbar {
-  padding-top: constant(safe-area-inset-top);
-  padding-top: env(safe-area-inset-top);
-  height: calc(64px + env(safe-area-inset-top));
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border-radius: 50%;
+  color: var(--text-2);
+  transition: background-color .2s, color .2s, transform .2s;
 }
 
-.navbar-inner { height: 64px; }
+.icon-btn:active { transform: scale(.92); }
 
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (hover: hover) {
+  .icon-btn:hover {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+}
+
+.theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] .theme-toggle .icon-sun  { display: none; }
+
+.mobile-menu-btn { display: none; }
+
+/* ===== 页头 ===== */
+.page-hero {
+  position: relative;
+  padding: 136px 24px 40px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(50% 60% at 20% 20%, var(--accent-glow), transparent 70%),
+    radial-gradient(40% 50% at 85% 80%, var(--accent-glow), transparent 70%);
+  opacity: .8;
+}
+
+.page-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: .35;
+  -webkit-mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+          mask-image: radial-gradient(circle at 40% 40%, #000 0%, transparent 70%);
+}
+
+.page-hero-inner {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: 22px;
+}
+
+.page-hero-inner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), #f7b8c8);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 6px;
+}
+
+.page-eyebrow svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  margin-right: 7px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.page-title {
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  background: linear-gradient(120deg, var(--text) 30%, var(--accent-strong));
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-desc {
+  margin-top: 8px;
+  font-size: .96rem;
+  color: var(--text-2);
+  max-width: 52ch;
+}
+
+/* ===== 主体 ===== */
 .main {
-  padding-left:  calc(24px + env(safe-area-inset-left));
-  padding-right: calc(24px + env(safe-area-inset-right));
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 8px 24px 80px;
 }
 
+.section { padding: 24px 0 36px; }
+
+.section-head {
+  position: relative;
+  margin-bottom: 20px;
+  padding-left: 18px;
+}
+
+.section-head::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent), #f7b8c8);
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin-bottom: 4px;
+}
+
+.section-label svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  margin-right: 6px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.section-title {
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.section-desc {
+  margin-top: 2px;
+  font-size: .9rem;
+  color: var(--text-2);
+}
+
+/* ===== 下载卡片 ===== */
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.dl-card {
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition:
+    top .25s var(--ease-io),
+    box-shadow .3s ease,
+    border-color .3s ease;
+}
+
+.dl-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #f7b8c8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .42s var(--ease-io);
+}
+
+.dl-card:hover {
+  top: -3px;
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.dl-card:hover::before { transform: scaleX(1); }
+
+.dl-card.expanded { border-color: var(--accent); }
+.dl-card.expanded::before { transform: scaleX(1); }
+
+.dl-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.dl-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dl-icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  padding: 11px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-strong);
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(245, 160, 184, .12) 100%);
+  border: 1px solid rgba(245, 160, 184, .18);
+  box-shadow: 0 2px 8px rgba(245, 160, 184, .12);
+  transition: transform .4s var(--ease-spring), box-shadow .3s ease;
+}
+
+[data-theme="dark"] .dl-icon {
+  border-color: rgba(245, 160, 184, .12);
+  background: linear-gradient(135deg, rgba(245, 160, 184, .14) 0%, rgba(245, 160, 184, .06) 100%);
+}
+
+.dl-card:hover .dl-icon {
+  transform: scale(1.1) rotate(-6deg);
+  box-shadow: 0 6px 18px rgba(245, 160, 184, .3);
+}
+
+.dl-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -.012em;
+  line-height: 1.3;
+}
+
+.dl-version {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--accent-strong);
+  margin-top: 2px;
+}
+
+/* ===== 下载按钮 ===== */
+.dl-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: .86rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 4px 14px rgba(245, 160, 184, .35);
+  transition: transform .25s var(--ease-spring), box-shadow .25s, filter .25s;
+}
+
+.dl-btn svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin-right: 6px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(245, 160, 184, .5);
+  filter: brightness(1.05);
+}
+
+.dl-btn:active { transform: translateY(0); }
+
+.dl-btn--sm {
+  padding: 6px 16px;
+  font-size: .78rem;
+  box-shadow: 0 3px 10px rgba(245, 160, 184, .3);
+}
+
+.dl-btn--sm svg {
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+}
+
+.dl-desc {
+  margin-top: 14px;
+  font-size: .9rem;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.dl-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dl-info span {
+  display: inline-flex;
+  align-items: center;
+  font-size: .76rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.dl-info svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  margin-right: 5px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dl-links .dl-btn {
+  flex: 1 1 auto;
+  padding: 8px 16px;
+  font-size: .8rem;
+}
+
+/* ===== 可展开卡片 ===== */
+.dl-expand-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  border-radius: 12px;
+}
+
+.dl-chevron {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 9px;
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition:
+    transform .4s var(--ease-spring),
+    background-color .25s,
+    color .25s,
+    border-color .25s;
+}
+
+.dl-chevron svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dl-expand-head:hover .dl-chevron {
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dl-card.expanded .dl-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dl-versions {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height .5s var(--ease-out),
+    opacity .35s ease,
+    margin-top .35s ease;
+}
+
+.dl-card.expanded .dl-versions {
+  max-height: 600px;
+  opacity: 1;
+  margin-top: 18px;
+}
+
+.dl-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: border-color .2s ease, background-color .2s ease;
+}
+
+.dl-version-row + .dl-version-row { margin-top: 8px; }
+
+.dl-version-row:hover { border-color: var(--accent); }
+
+.dl-version-name {
+  font-size: .87rem;
+  font-weight: 500;
+  letter-spacing: -.005em;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== 页脚 / 回到顶部 ===== */
 .footer {
-  padding-left:  calc(24px + env(safe-area-inset-left));
-  padding-right: calc(24px + env(safe-area-inset-right));
+  position: relative;
+  padding: 36px 24px 40px;
+  margin-top: 24px;
+  text-align: center;
+  font-size: .86rem;
+  color: var(--text-2);
+  border-top: 1px solid var(--border);
+}
+
+.footer em {
+  font-style: normal;
+  color: var(--accent-strong);
+  font-weight: 600;
 }
 
 .to-top {
-  right:  calc(22px + env(safe-area-inset-right));
-  bottom: calc(22px + env(safe-area-inset-bottom));
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition:
+    opacity .3s, transform .3s, visibility .3s,
+    background-color .2s, color .2s, border-color .2s;
 }
 
-@media (max-width: 720px) {
-  .main {
-    padding-left:  calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right));
+.to-top svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top:active { transform: scale(.94); }
+
+@media (hover: hover) {
+  .to-top:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
   }
 }
 
-html { scroll-behavior: auto; }
+/* ===== 滚动显现 ===== */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(64px) scale(.97);
+  transition:
+    opacity .6s var(--ease-fade) var(--reveal-delay, 0ms),
+    transform .9s var(--ease-shift) var(--reveal-delay, 0ms);
+}
 
+[data-reveal].from-above {
+  transform: translateY(-64px) scale(.97);
+}
+
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+[data-reveal].no-transition { transition: none !important; }
+
+/* ===== 响应式 ===== */
 @media (max-width: 720px) {
+  .mobile-menu-btn { display: grid; }
+
   .nav-links {
-    padding-left:  calc(16px + env(safe-area-inset-left));
-    padding-right: calc(16px + env(safe-area-inset-right));
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 12px 16px 18px;
+    max-height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    border-radius: 0 0 20px 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s;
   }
+
+  .nav-links.open { opacity: 1; visibility: visible; transform: none; }
+  .nav-links a { padding: 13px; text-align: center; font-size: .95rem; }
+
+  .nav-actions { margin-left: 0; }
+
+  .page-hero { padding: 120px 20px 32px; }
+  .page-hero-inner { padding-left: 18px; }
+
+  .main { padding-left: 20px; padding-right: 20px; }
+
+  .dl-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .dl-head > .dl-btn { width: 100%; }
+
+  .dl-links .dl-btn { flex: 1 1 100%; }
+
+  .dl-version-row { padding: 10px 13px; }
+  .dl-version-name { font-size: .82rem; }
+  .dl-btn--sm { padding: 6px 13px; font-size: .74rem; }
+
+  [data-reveal] { transform: translateY(44px) scale(.98); }
+  [data-reveal].from-above { transform: translateY(-44px) scale(.98); }
+  [data-reveal].is-in { transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 400px) {
+  .dl-card { padding: 20px 22px; }
+  .dl-version-name { font-size: .78rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .navbar { transform: none !important; }
 }
 
 /* ===== 歌单 ===== */
@@ -1242,14 +2256,14 @@ html { scroll-behavior: auto; }
 
 <nav class="navbar" id="navbar" aria-label="主导航">
   <div class="navbar-inner">
-    <a href="../index-apple.html" class="nav-brand"><em>MeowRc</em> Blog</a>
+    <a href="../../index.html" class="nav-brand"><em>MeowRc</em> Blog</a>
 
     <ul class="nav-links" id="navLinks">
-      <li><a href="../index-apple.html" class="nav-link">主页</a></li>
-      <li><a href="../index-apple.html#projects" class="nav-link">项目</a></li>
-      <li><a href="../index-apple.html#contact" class="nav-link">联系</a></li>
-      <li><a href="index-apple.html" class="nav-link active">在线</a></li>
-      <li><a href="#game" class="nav-link">游戏</a></li>
+      <li><a href="../../index.html" class="nav-link">主页</a></li>
+      <li><a href="../../index.html#projects" class="nav-link">项目</a></li>
+      <li><a href="../../index.html#contact" class="nav-link">联系</a></li>
+      <li><a href="/online/" class="nav-link active" aria-current="true">在线</a></li>
+      <li><a href="/online/game/" class="nav-link">游戏</a></li>
     </ul>
 
     <div class="nav-actions">
@@ -1285,53 +2299,11 @@ html { scroll-behavior: auto; }
   </div>
 </header>
 
-<section class="online-hub" aria-label="选择分区">
-  <div class="hub-grid">
-    <a class="hub-card" href="#download" data-reveal>
-      <span class="hub-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
-        </svg>
-      </span>
-      <span class="hub-name">下载</span>
-      <span class="hub-desc">软件、工具与刷机资源，全部开源免费。</span>
-      <span class="hub-go">进入下载
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </span>
-    </a>
-    <a class="hub-card" href="#music" data-reveal>
-      <span class="hub-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18V5l10-2v13"/>
-          <circle cx="6" cy="18" r="3"/>
-          <circle cx="16" cy="16" r="3"/>
-        </svg>
-      </span>
-      <span class="hub-name">音乐</span>
-      <span class="hub-desc">MeowRc 音乐收藏，边听边逛。</span>
-      <span class="hub-go">进入音乐
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </span>
-    </a>
-    <a class="hub-card" href="#game" data-reveal>
-      <span class="hub-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="6" width="20" height="12" rx="4"/>
-          <path d="M6 11v3M4.5 12.5h3M15 10.5h.01M18 13h.01"/>
-        </svg>
-      </span>
-      <span class="hub-name">游戏</span>
-      <span class="hub-desc">在线小游戏与游戏板块。</span>
-      <span class="hub-go">进入游戏
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </span>
-    </a>
-  </div>
-</section>
+
 
 <main class="main">
-
-  <section class="section" id="download" aria-labelledby="download-title">
+<a class="online-back" href="/online/">← 返回 Online</a>
+<section class="section" id="download" aria-labelledby="download-title">
     <header class="section-head" data-reveal>
       <span class="section-label">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1543,7 +2515,7 @@ html { scroll-behavior: auto; }
                 id="romToggle">
           <div class="dl-title-wrap">
             <div class="dl-icon" aria-hidden="true">
-              <svg class="icon-svg" viewBox="0 0 24 24">
+              <svg viewBox="0 0 24 24">
                 <rect x="5" y="2" width="14" height="20" rx="2"/>
                 <path d="M12 18h.01"/>
                 <path d="M9 7l3-3 3 3M12 4v8"/>
@@ -1555,7 +2527,7 @@ html { scroll-behavior: auto; }
             </div>
           </div>
           <span class="dl-chevron" aria-hidden="true">
-            <svg class="icon-svg" viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24">
               <path d="M6 9l6 6 6-6"/>
             </svg>
           </span>
@@ -1568,7 +2540,7 @@ html { scroll-behavior: auto; }
           <div class="dl-version-row">
             <span class="dl-version-name">Hyper2.0 A14（25.2.8）</span>
             <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-rXMt3" target="_blank" rel="noopener noreferrer">
-              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
               </svg>
               下载
@@ -1578,7 +2550,7 @@ html { scroll-behavior: auto; }
           <div class="dl-version-row">
             <span class="dl-version-name">Hyper2.0 A14（25.7.10）</span>
             <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-hkIu3" target="_blank" rel="noopener noreferrer">
-              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
               </svg>
               下载
@@ -1588,7 +2560,7 @@ html { scroll-behavior: auto; }
           <div class="dl-version-row">
             <span class="dl-version-name">Hyper2.0 A14（26.1.13）</span>
             <a class="dl-btn dl-btn--sm" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-JPSe3" target="_blank" rel="noopener noreferrer">
-              <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
               </svg>
               下载
@@ -1808,9 +2780,7 @@ html { scroll-behavior: auto; }
 
     </div>
   </section>
-
-
-  <section class="section" id="flash" aria-labelledby="flash-title">
+<section class="section" id="flash" aria-labelledby="flash-title">
     <header class="section-head" data-reveal>
       <span class="section-label">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2696,340 +3666,8 @@ html { scroll-behavior: auto; }
 
     </div>
   </section>
-
-  <section class="section" id="music" aria-labelledby="music-title">
-    <header class="section-head" data-reveal>
-      <span class="section-label">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M9 18V5l12-2v13"/>
-          <circle cx="6" cy="18" r="3"/>
-          <circle cx="18" cy="16" r="3"/>
-        </svg>
-        音乐
-      </span>
-      <h2 class="section-title" id="music-title">歌单收藏</h2>
-      <p class="section-desc">197 首单曲 · 约 11.40 GB，按曲名排列。</p>
-    </header>
-
-    <div class="music-wrap">
-      <article class="dl-card dl-card--music" data-reveal>
-        <div class="dl-head">
-          <div class="dl-title-wrap">
-            <div class="dl-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v11.5A3.5 3.5 0 1 0 14 17V8h5V5h-7z"/>
-              </svg>
-            </div>
-            <div>
-              <div class="dl-name">MeowRc 音乐收藏</div>
-              <div class="dl-version">197 首 · 193 FLAC / 4 MP3</div>
-            </div>
-          </div>
-          <a class="dl-btn" href="https://1824953623.share.123pan.cn/123pan/iZB2jv-Ypie3" target="_blank" rel="noopener noreferrer">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/>
-            </svg>
-            下载
-          </a>
-        </div>
-        <p class="dl-desc">网盘里整理好的无损歌单，含 69 个艺人与专辑目录，共 197 首。FLAC 为主，少量 MP3。</p>
-        <div class="dl-info">
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 18V5l12-2v13"/>
-              <circle cx="6" cy="18" r="3"/>
-              <circle cx="18" cy="16" r="3"/>
-            </svg>
-            FLAC / MP3
-          </span>
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M21 8l-9 12-9-12 9-4z"/>
-              <path d="M3 8h18M12 4v16"/>
-            </svg>
-            11.40 GB
-          </span>
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="2" y="4" width="20" height="14" rx="2"/>
-              <path d="M8 22h8M12 18v4"/>
-            </svg>
-            123 云盘
-          </span>
-        </div>
-
-        <ol class="song-list" aria-label="曲目列表">
-          <li class="song-row"><span class="song-no">1</span><span class="song-name" title="埃玛 - 草东没有派对">埃玛 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">23.8 MB</span></li>
-          <li class="song-row"><span class="song-no">2</span><span class="song-name" title="爱 - 小虎队">爱 - 小虎队</span><span class="song-fmt">FLAC</span><span class="song-size">30.8 MB</span></li>
-          <li class="song-row"><span class="song-no">3</span><span class="song-name" title="爱爱爱 - 方大同">爱爱爱 - 方大同</span><span class="song-fmt">FLAC</span><span class="song-size">41.5 MB</span></li>
-          <li class="song-row"><span class="song-no">4</span><span class="song-name" title="闇に溶けてく - トゲナシトゲアリ">闇に溶けてく - トゲナシトゲアリ</span><span class="song-fmt">FLAC</span><span class="song-size">20.3 MB</span></li>
-          <li class="song-row"><span class="song-no">5</span><span class="song-name" title="才二十三 - 方大同">才二十三 - 方大同</span><span class="song-fmt">FLAC</span><span class="song-size">43.0 MB</span></li>
-          <li class="song-row"><span class="song-no">6</span><span class="song-name" title="蔡依林,周杰伦 - 骑士精神">蔡依林,周杰伦 - 骑士精神</span><span class="song-fmt">FLAC</span><span class="song-size">98.6 MB</span></li>
-          <li class="song-row"><span class="song-no">7</span><span class="song-name" title="草东没有派对 - 埃玛">草东没有派对 - 埃玛</span><span class="song-fmt">FLAC</span><span class="song-size">77.6 MB</span></li>
-          <li class="song-row"><span class="song-no">8</span><span class="song-name" title="草东没有派对 - 丑">草东没有派对 - 丑</span><span class="song-fmt">FLAC</span><span class="song-size">43.0 MB</span></li>
-          <li class="song-row"><span class="song-no">9</span><span class="song-name" title="草东没有派对 - 床">草东没有派对 - 床</span><span class="song-fmt">FLAC</span><span class="song-size">82.4 MB</span></li>
-          <li class="song-row"><span class="song-no">10</span><span class="song-name" title="草东没有派对 - 大风吹">草东没有派对 - 大风吹</span><span class="song-fmt">FLAC</span><span class="song-size">84.1 MB</span></li>
-          <li class="song-row"><span class="song-no">11</span><span class="song-name" title="草东没有派对 - 但">草东没有派对 - 但</span><span class="song-fmt">FLAC</span><span class="song-size">49.8 MB</span></li>
-          <li class="song-row"><span class="song-no">12</span><span class="song-name" title="草东没有派对 - 缸">草东没有派对 - 缸</span><span class="song-fmt">FLAC</span><span class="song-size">69.2 MB</span></li>
-          <li class="song-row"><span class="song-no">13</span><span class="song-name" title="草东没有派对 - 鬼">草东没有派对 - 鬼</span><span class="song-fmt">FLAC</span><span class="song-size">58.0 MB</span></li>
-          <li class="song-row"><span class="song-no">14</span><span class="song-name" title="草东没有派对 - 空">草东没有派对 - 空</span><span class="song-fmt">FLAC</span><span class="song-size">67.6 MB</span></li>
-          <li class="song-row"><span class="song-no">15</span><span class="song-name" title="草东没有派对 - 烂泥">草东没有派对 - 烂泥</span><span class="song-fmt">FLAC</span><span class="song-size">55.7 MB</span></li>
-          <li class="song-row"><span class="song-no">16</span><span class="song-name" title="草东没有派对 - 山海">草东没有派对 - 山海</span><span class="song-fmt">FLAC</span><span class="song-size">91.6 MB</span></li>
-          <li class="song-row"><span class="song-no">17</span><span class="song-name" title="草东没有派对 - 勇敢的人">草东没有派对 - 勇敢的人</span><span class="song-fmt">FLAC</span><span class="song-size">81.3 MB</span></li>
-          <li class="song-row"><span class="song-no">18</span><span class="song-name" title="丑 - 草东没有派对">丑 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">12.7 MB</span></li>
-          <li class="song-row"><span class="song-no">19</span><span class="song-name" title="床 - 草东没有派对">床 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">47.9 MB</span></li>
-          <li class="song-row"><span class="song-no">20</span><span class="song-name" title="春を告げる - yama">春を告げる - yama</span><span class="song-fmt">FLAC</span><span class="song-size">40.7 MB</span></li>
-          <li class="song-row"><span class="song-no">21</span><span class="song-name" title="大风吹 - 草东没有派对">大风吹 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">25.9 MB</span></li>
-          <li class="song-row"><span class="song-no">22</span><span class="song-name" title="大石碎胸口 - 万能青年旅店">大石碎胸口 - 万能青年旅店</span><span class="song-fmt">FLAC</span><span class="song-size">50.5 MB</span></li>
-          <li class="song-row"><span class="song-no">23</span><span class="song-name" title="但 - 草东没有派对">但 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">29.1 MB</span></li>
-          <li class="song-row"><span class="song-no">24</span><span class="song-name" title="第57次取消发送 - 菲菲公主（陆绮菲）">第57次取消发送 - 菲菲公主（陆绮菲）</span><span class="song-fmt">FLAC</span><span class="song-size">35.2 MB</span></li>
-          <li class="song-row"><span class="song-no">25</span><span class="song-name" title="東京フラッシュ - Vaundy">東京フラッシュ - Vaundy</span><span class="song-fmt">FLAC</span><span class="song-size">55.0 MB</span></li>
-          <li class="song-row"><span class="song-no">26</span><span class="song-name" title="都落ち - ヨルシカ">都落ち - ヨルシカ</span><span class="song-fmt">FLAC</span><span class="song-size">89.8 MB</span></li>
-          <li class="song-row"><span class="song-no">27</span><span class="song-name" title="扉をあけて - ANZA">扉をあけて - ANZA</span><span class="song-fmt">FLAC</span><span class="song-size">111.0 MB</span></li>
-          <li class="song-row"><span class="song-no">28</span><span class="song-name" title="缸 - 草东没有派对">缸 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">40.2 MB</span></li>
-          <li class="song-row"><span class="song-no">29</span><span class="song-name" title="高阶无穷小O_o - 苦茶子-素祥">高阶无穷小O_o - 苦茶子-素祥</span><span class="song-fmt">MP3</span><span class="song-size">7.5 MB</span></li>
-          <li class="song-row"><span class="song-no">30</span><span class="song-name" title="鬼 - 草东没有派对">鬼 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">17.0 MB</span></li>
-          <li class="song-row"><span class="song-no">31</span><span class="song-name" title="郭静 - 爱情讯息">郭静 - 爱情讯息</span><span class="song-fmt">FLAC</span><span class="song-size">102.9 MB</span></li>
-          <li class="song-row"><span class="song-no">32</span><span class="song-name" title="好きだから">好きだから</span><span class="song-fmt">FLAC</span><span class="song-size">78.9 MB</span></li>
-          <li class="song-row"><span class="song-no">33</span><span class="song-name" title="红绣花">红绣花</span><span class="song-fmt">FLAC</span><span class="song-size">79.4 MB</span></li>
-          <li class="song-row"><span class="song-no">34</span><span class="song-name" title="花,太阳,彩虹,你 - Mai,法老,肯迪仔">花,太阳,彩虹,你 - Mai,法老,肯迪仔</span><span class="song-fmt">FLAC</span><span class="song-size">47.4 MB</span></li>
-          <li class="song-row"><span class="song-no">35</span><span class="song-name" title="結束バンド - 青春コンプレックス">結束バンド - 青春コンプレックス</span><span class="song-fmt">FLAC</span><span class="song-size">79.8 MB</span></li>
-          <li class="song-row"><span class="song-no">36</span><span class="song-name" title="結束バンド - 忘れてやらない">結束バンド - 忘れてやらない</span><span class="song-fmt">FLAC</span><span class="song-size">87.3 MB</span></li>
-          <li class="song-row"><span class="song-no">37</span><span class="song-name" title="結束バンド - 星座になれたら">結束バンド - 星座になれたら</span><span class="song-fmt">FLAC</span><span class="song-size">99.7 MB</span></li>
-          <li class="song-row"><span class="song-no">38</span><span class="song-name" title="結束バンド - 転がる岩、君に朝が降る">結束バンド - 転がる岩、君に朝が降る</span><span class="song-fmt">FLAC</span><span class="song-size">102.6 MB</span></li>
-          <li class="song-row"><span class="song-no">39</span><span class="song-name" title="結束バンド - Distortion!!">結束バンド - Distortion!!</span><span class="song-fmt">FLAC</span><span class="song-size">79.5 MB</span></li>
-          <li class="song-row"><span class="song-no">40</span><span class="song-name" title="結束バンド - ReRe">結束バンド - ReRe</span><span class="song-fmt">FLAC</span><span class="song-size">61.4 MB</span></li>
-          <li class="song-row"><span class="song-no">41</span><span class="song-name" title="結束バンド - あのバンド">結束バンド - あのバンド</span><span class="song-fmt">FLAC</span><span class="song-size">82.8 MB</span></li>
-          <li class="song-row"><span class="song-no">42</span><span class="song-name" title="結束バンド - カラカラ">結束バンド - カラカラ</span><span class="song-fmt">FLAC</span><span class="song-size">101.1 MB</span></li>
-          <li class="song-row"><span class="song-no">43</span><span class="song-name" title="結束バンド - ギターと孤独と蒼い惑星">結束バンド - ギターと孤独と蒼い惑星</span><span class="song-fmt">FLAC</span><span class="song-size">86.2 MB</span></li>
-          <li class="song-row"><span class="song-no">44</span><span class="song-name" title="結束バンド - なにが悪い">結束バンド - なにが悪い</span><span class="song-fmt">FLAC</span><span class="song-size">86.8 MB</span></li>
-          <li class="song-row"><span class="song-no">45</span><span class="song-name" title="勘ぐれい - ずっと真夜中でいいのに。">勘ぐれい - ずっと真夜中でいいのに。</span><span class="song-fmt">FLAC</span><span class="song-size">28.7 MB</span></li>
-          <li class="song-row"><span class="song-no">46</span><span class="song-name" title="空 - 草东没有派对">空 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">39.8 MB</span></li>
-          <li class="song-row"><span class="song-no">47</span><span class="song-name" title="烂泥 - 草东没有派对">烂泥 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">16.8 MB</span></li>
-          <li class="song-row"><span class="song-no">48</span><span class="song-name" title="零距离的思念 - TINY7">零距离的思念 - TINY7</span><span class="song-fmt">FLAC</span><span class="song-size">39.7 MB</span></li>
-          <li class="song-row"><span class="song-no">49</span><span class="song-name" title="莫愁乡 - 亞細亞曠世奇才">莫愁乡 - 亞細亞曠世奇才</span><span class="song-fmt">FLAC</span><span class="song-size">27.9 MB</span></li>
-          <li class="song-row"><span class="song-no">50</span><span class="song-name" title="脳裏上のクラッカー - ずっと真夜中でいいのに。">脳裏上のクラッカー - ずっと真夜中でいいのに。</span><span class="song-fmt">FLAC</span><span class="song-size">33.5 MB</span></li>
-          <li class="song-row"><span class="song-no">51</span><span class="song-name" title="漂泊 - 亞細亞曠世奇才">漂泊 - 亞細亞曠世奇才</span><span class="song-fmt">FLAC</span><span class="song-size">45.1 MB</span></li>
-          <li class="song-row"><span class="song-no">52</span><span class="song-name" title="拼图爱 - 蒋孜怡,岳燃">拼图爱 - 蒋孜怡,岳燃</span><span class="song-fmt">FLAC</span><span class="song-size">32.5 MB</span></li>
-          <li class="song-row"><span class="song-no">53</span><span class="song-name" title="气象限定Quadrant - Don't be afraid">气象限定Quadrant - Don't be afraid</span><span class="song-fmt">FLAC</span><span class="song-size">81.3 MB</span></li>
-          <li class="song-row"><span class="song-no">54</span><span class="song-name" title="前前前世 (movie ver.) - RADWIMPS">前前前世 (movie ver.) - RADWIMPS</span><span class="song-fmt">FLAC</span><span class="song-size">63.0 MB</span></li>
-          <li class="song-row"><span class="song-no">55</span><span class="song-name" title="山海 - 草东没有派对">山海 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">27.3 MB</span></li>
-          <li class="song-row"><span class="song-no">56</span><span class="song-name" title="死神 - 米津玄師">死神 - 米津玄師</span><span class="song-fmt">FLAC</span><span class="song-size">40.2 MB</span></li>
-          <li class="song-row"><span class="song-no">57</span><span class="song-name" title="素颜 - 许嵩,何曼婷">素颜 - 许嵩,何曼婷</span><span class="song-fmt">FLAC</span><span class="song-size">26.3 MB</span></li>
-          <li class="song-row"><span class="song-no">58</span><span class="song-name" title="陶喆 - 爱我还是他">陶喆 - 爱我还是他</span><span class="song-fmt">FLAC</span><span class="song-size">97.9 MB</span></li>
-          <li class="song-row"><span class="song-no">59</span><span class="song-name" title="陶喆 - 二十二">陶喆 - 二十二</span><span class="song-fmt">FLAC</span><span class="song-size">98.8 MB</span></li>
-          <li class="song-row"><span class="song-no">60</span><span class="song-name" title="陶喆 - 黑色柳丁">陶喆 - 黑色柳丁</span><span class="song-fmt">FLAC</span><span class="song-size">88.8 MB</span></li>
-          <li class="song-row"><span class="song-no">61</span><span class="song-name" title="陶喆 - 普通朋友">陶喆 - 普通朋友</span><span class="song-fmt">FLAC</span><span class="song-size">85.5 MB</span></li>
-          <li class="song-row"><span class="song-no">62</span><span class="song-name" title="陶喆 - 讨厌红楼梦">陶喆 - 讨厌红楼梦</span><span class="song-fmt">FLAC</span><span class="song-size">88.0 MB</span></li>
-          <li class="song-row"><span class="song-no">63</span><span class="song-name" title="陶喆 - 天天">陶喆 - 天天</span><span class="song-fmt">FLAC</span><span class="song-size">91.0 MB</span></li>
-          <li class="song-row"><span class="song-no">64</span><span class="song-name" title="陶喆 - 小镇姑娘">陶喆 - 小镇姑娘</span><span class="song-fmt">FLAC</span><span class="song-size">102.2 MB</span></li>
-          <li class="song-row"><span class="song-no">65</span><span class="song-name" title="陶喆 - 找自己">陶喆 - 找自己</span><span class="song-fmt">FLAC</span><span class="song-size">111.3 MB</span></li>
-          <li class="song-row"><span class="song-no">66</span><span class="song-name" title="天气先生 - 方大同">天气先生 - 方大同</span><span class="song-fmt">FLAC</span><span class="song-size">31.8 MB</span></li>
-          <li class="song-row"><span class="song-no">67</span><span class="song-name" title="透明人間 - 東京事変">透明人間 - 東京事変</span><span class="song-fmt">FLAC</span><span class="song-size">34.5 MB</span></li>
-          <li class="song-row"><span class="song-no">68</span><span class="song-name" title="我的悲伤是水做的 - ChiliChill,洛天依Official">我的悲伤是水做的 - ChiliChill,洛天依Official</span><span class="song-fmt">FLAC</span><span class="song-size">24.2 MB</span></li>
-          <li class="song-row"><span class="song-no">69</span><span class="song-name" title="下一个天亮 - 郭静">下一个天亮 - 郭静</span><span class="song-fmt">FLAC</span><span class="song-size">28.1 MB</span></li>
-          <li class="song-row"><span class="song-no">70</span><span class="song-name" title="星降る夜のアデニウム - Yunomi,nicamoq">星降る夜のアデニウム - Yunomi,nicamoq</span><span class="song-fmt">MP3</span><span class="song-size">10.4 MB</span></li>
-          <li class="song-row"><span class="song-no">71</span><span class="song-name" title="星野源 - 恋">星野源 - 恋</span><span class="song-fmt">FLAC</span><span class="song-size">93.1 MB</span></li>
-          <li class="song-row"><span class="song-no">72</span><span class="song-name" title="星座になれたら-Anime Ver.- - 結束バンド">星座になれたら-Anime Ver.- - 結束バンド</span><span class="song-fmt">FLAC</span><span class="song-size">23.8 MB</span></li>
-          <li class="song-row"><span class="song-no">73</span><span class="song-name" title="形 - ずっと真夜中でいいのに。">形 - ずっと真夜中でいいのに。</span><span class="song-fmt">FLAC</span><span class="song-size">24.4 MB</span></li>
-          <li class="song-row"><span class="song-no">74</span><span class="song-name" title="虚拟 - 陈粒">虚拟 - 陈粒</span><span class="song-fmt">FLAC</span><span class="song-size">22.1 MB</span></li>
-          <li class="song-row"><span class="song-no">75</span><span class="song-name" title="徐佳瑩 LaLa【一樣的月光】[Official Music Video]">徐佳瑩 LaLa【一樣的月光】[Official Music Video]</span><span class="song-fmt">FLAC</span><span class="song-size">35.2 MB</span></li>
-          <li class="song-row"><span class="song-no">76</span><span class="song-name" title="一样的月光 - 徐佳莹">一样的月光 - 徐佳莹</span><span class="song-fmt">FLAC</span><span class="song-size">48.4 MB</span></li>
-          <li class="song-row"><span class="song-no">77</span><span class="song-name" title="永远永远永远">永远永远永远</span><span class="song-fmt">FLAC</span><span class="song-size">63.6 MB</span></li>
-          <li class="song-row"><span class="song-no">78</span><span class="song-name" title="勇敢的人 - 草东没有派对">勇敢的人 - 草东没有派对</span><span class="song-fmt">FLAC</span><span class="song-size">24.1 MB</span></li>
-          <li class="song-row"><span class="song-no">79</span><span class="song-name" title="踊り子 - Vaundy">踊り子 - Vaundy</span><span class="song-fmt">FLAC</span><span class="song-size">42.0 MB</span></li>
-          <li class="song-row"><span class="song-no">80</span><span class="song-name" title="雨爱 - 杨丞琳">雨爱 - 杨丞琳</span><span class="song-fmt">FLAC</span><span class="song-size">32.7 MB</span></li>
-          <li class="song-row"><span class="song-no">81</span><span class="song-name" title="月に吠える - ヨルシカ">月に吠える - ヨルシカ</span><span class="song-fmt">FLAC</span><span class="song-size">90.5 MB</span></li>
-          <li class="song-row"><span class="song-no">82</span><span class="song-name" title="周杰伦 - 爱在西元前">周杰伦 - 爱在西元前</span><span class="song-fmt">FLAC</span><span class="song-size">28.6 MB</span></li>
-          <li class="song-row"><span class="song-no">83</span><span class="song-name" title="周杰伦 - 半岛铁盒">周杰伦 - 半岛铁盒</span><span class="song-fmt">FLAC</span><span class="song-size">66.1 MB</span></li>
-          <li class="song-row"><span class="song-no">84</span><span class="song-name" title="周杰伦 - 稻香">周杰伦 - 稻香</span><span class="song-fmt">FLAC</span><span class="song-size">25.3 MB</span></li>
-          <li class="song-row"><span class="song-no">85</span><span class="song-name" title="周杰伦 - 等你下课 (with 杨瑞代)">周杰伦 - 等你下课 (with 杨瑞代)</span><span class="song-fmt">FLAC</span><span class="song-size">54.4 MB</span></li>
-          <li class="song-row"><span class="song-no">86</span><span class="song-name" title="周杰伦 - 东风破">周杰伦 - 东风破</span><span class="song-fmt">FLAC</span><span class="song-size">34.4 MB</span></li>
-          <li class="song-row"><span class="song-no">87</span><span class="song-name" title="周杰伦 - 反方向的钟">周杰伦 - 反方向的钟</span><span class="song-fmt">FLAC</span><span class="song-size">27.5 MB</span></li>
-          <li class="song-row"><span class="song-no">88</span><span class="song-name" title="周杰伦 - 告白气球">周杰伦 - 告白气球</span><span class="song-fmt">FLAC</span><span class="song-size">74.5 MB</span></li>
-          <li class="song-row"><span class="song-no">89</span><span class="song-name" title="周杰伦 - 搁浅">周杰伦 - 搁浅</span><span class="song-fmt">FLAC</span><span class="song-size">48.1 MB</span></li>
-          <li class="song-row"><span class="song-no">90</span><span class="song-name" title="周杰伦 - 给我一首歌的时间">周杰伦 - 给我一首歌的时间</span><span class="song-fmt">FLAC</span><span class="song-size">30.2 MB</span></li>
-          <li class="song-row"><span class="song-no">91</span><span class="song-name" title="周杰伦 - 花海">周杰伦 - 花海</span><span class="song-fmt">FLAC</span><span class="song-size">53.5 MB</span></li>
-          <li class="song-row"><span class="song-no">92</span><span class="song-name" title="周杰伦 - 简单爱">周杰伦 - 简单爱</span><span class="song-fmt">FLAC</span><span class="song-size">32.0 MB</span></li>
-          <li class="song-row"><span class="song-no">93</span><span class="song-name" title="周杰伦 - 兰亭序">周杰伦 - 兰亭序</span><span class="song-fmt">FLAC</span><span class="song-size">27.6 MB</span></li>
-          <li class="song-row"><span class="song-no">94</span><span class="song-name" title="周杰伦 - 明明就">周杰伦 - 明明就</span><span class="song-fmt">FLAC</span><span class="song-size">27.1 MB</span></li>
-          <li class="song-row"><span class="song-no">95</span><span class="song-name" title="周杰伦 - 蒲公英的约定">周杰伦 - 蒲公英的约定</span><span class="song-fmt">FLAC</span><span class="song-size">25.6 MB</span></li>
-          <li class="song-row"><span class="song-no">96</span><span class="song-name" title="周杰伦 - 七里香">周杰伦 - 七里香</span><span class="song-fmt">FLAC</span><span class="song-size">35.2 MB</span></li>
-          <li class="song-row"><span class="song-no">97</span><span class="song-name" title="周杰伦 - 青花瓷">周杰伦 - 青花瓷</span><span class="song-fmt">FLAC</span><span class="song-size">25.7 MB</span></li>
-          <li class="song-row"><span class="song-no">98</span><span class="song-name" title="周杰伦 - 晴天">周杰伦 - 晴天</span><span class="song-fmt">FLAC</span><span class="song-size">56.5 MB</span></li>
-          <li class="song-row"><span class="song-no">99</span><span class="song-name" title="周杰伦 - 说了再见">周杰伦 - 说了再见</span><span class="song-fmt">FLAC</span><span class="song-size">29.6 MB</span></li>
-          <li class="song-row"><span class="song-no">100</span><span class="song-name" title="周杰伦 - 听妈妈的话">周杰伦 - 听妈妈的话</span><span class="song-fmt">FLAC</span><span class="song-size">30.0 MB</span></li>
-          <li class="song-row"><span class="song-no">101</span><span class="song-name" title="周杰伦 - 我落泪情绪零碎">周杰伦 - 我落泪情绪零碎</span><span class="song-fmt">FLAC</span><span class="song-size">52.6 MB</span></li>
-          <li class="song-row"><span class="song-no">102</span><span class="song-name" title="周杰伦 - 烟花易冷">周杰伦 - 烟花易冷</span><span class="song-fmt">FLAC</span><span class="song-size">52.8 MB</span></li>
-          <li class="song-row"><span class="song-no">103</span><span class="song-name" title="周杰伦 - 夜曲">周杰伦 - 夜曲</span><span class="song-fmt">FLAC</span><span class="song-size">47.8 MB</span></li>
-          <li class="song-row"><span class="song-no">104</span><span class="song-name" title="周杰伦 - 一路向北">周杰伦 - 一路向北</span><span class="song-fmt">FLAC</span><span class="song-size">62.7 MB</span></li>
-          <li class="song-row"><span class="song-no">105</span><span class="song-name" title="周杰伦 - 最长的电影">周杰伦 - 最长的电影</span><span class="song-fmt">FLAC</span><span class="song-size">45.8 MB</span></li>
-          <li class="song-row"><span class="song-no">106</span><span class="song-name" title="珠玉">珠玉</span><span class="song-fmt">FLAC</span><span class="song-size">57.9 MB</span></li>
-          <li class="song-row"><span class="song-no">107</span><span class="song-name" title="Assumptions - Sam Gellaitry">Assumptions - Sam Gellaitry</span><span class="song-fmt">FLAC</span><span class="song-size">47.1 MB</span></li>
-          <li class="song-row"><span class="song-no">108</span><span class="song-name" title="Ave Mujica - Ave Mujica">Ave Mujica - Ave Mujica</span><span class="song-fmt">FLAC</span><span class="song-size">98.5 MB</span></li>
-          <li class="song-row"><span class="song-no">109</span><span class="song-name" title="Away With Me">Away With Me</span><span class="song-fmt">FLAC</span><span class="song-size">30.8 MB</span></li>
-          <li class="song-row"><span class="song-no">110</span><span class="song-name" title="BB88 - 方大同">BB88 - 方大同</span><span class="song-fmt">FLAC</span><span class="song-size">21.7 MB</span></li>
-          <li class="song-row"><span class="song-no">111</span><span class="song-name" title="Charlie Puth - Light Switch [Official Music Video]">Charlie Puth - Light Switch [Official Music Video]</span><span class="song-fmt">FLAC</span><span class="song-size">34.2 MB</span></li>
-          <li class="song-row"><span class="song-no">112</span><span class="song-name" title="cherry-pop">cherry-pop</span><span class="song-fmt">FLAC</span><span class="song-size">43.2 MB</span></li>
-          <li class="song-row"><span class="song-no">113</span><span class="song-name" title="Color Your Night">Color Your Night</span><span class="song-fmt">FLAC</span><span class="song-size">41.6 MB</span></li>
-          <li class="song-row"><span class="song-no">114</span><span class="song-name" title="Die-for-you">Die-for-you</span><span class="song-fmt">FLAC</span><span class="song-size">61.8 MB</span></li>
-          <li class="song-row"><span class="song-no">115</span><span class="song-name" title="FUN!! - MORE MORE JUMP！">FUN!! - MORE MORE JUMP！</span><span class="song-fmt">FLAC</span><span class="song-size">24.4 MB</span></li>
-          <li class="song-row"><span class="song-no">116</span><span class="song-name" title="Here, the world! - sumimi">Here, the world! - sumimi</span><span class="song-fmt">FLAC</span><span class="song-size">99.1 MB</span></li>
-          <li class="song-row"><span class="song-no">117</span><span class="song-name" title="Last Surprise - Lyn">Last Surprise - Lyn</span><span class="song-fmt">FLAC</span><span class="song-size">27.2 MB</span></li>
-          <li class="song-row"><span class="song-no">118</span><span class="song-name" title="Last Surprise">Last Surprise</span><span class="song-fmt">FLAC</span><span class="song-size">44.7 MB</span></li>
-          <li class="song-row"><span class="song-no">119</span><span class="song-name" title="MAGENTA POTION (Extended Mix) - EmoCosine">MAGENTA POTION (Extended Mix) - EmoCosine</span><span class="song-fmt">FLAC</span><span class="song-size">47.2 MB</span></li>
-          <li class="song-row"><span class="song-no">120</span><span class="song-name" title="MV「死別」 ⧸ Shannon feat. GUMI">MV「死別」 ⧸ Shannon feat. GUMI</span><span class="song-fmt">FLAC</span><span class="song-size">34.6 MB</span></li>
-          <li class="song-row"><span class="song-no">121</span><span class="song-name" title="My Boo - Brasstracks">My Boo - Brasstracks</span><span class="song-fmt">FLAC</span><span class="song-size">14.7 MB</span></li>
-          <li class="song-row"><span class="song-no">122</span><span class="song-name" title="MyGO!!!!! - 春日影 (MyGO!!!!! ver.)">MyGO!!!!! - 春日影 (MyGO!!!!! ver.)</span><span class="song-fmt">FLAC</span><span class="song-size">96.6 MB</span></li>
-          <li class="song-row"><span class="song-no">123</span><span class="song-name" title="MyGO!!!!! - 端程山">MyGO!!!!! - 端程山</span><span class="song-fmt">FLAC</span><span class="song-size">104.0 MB</span></li>
-          <li class="song-row"><span class="song-no">124</span><span class="song-name" title="MyGO!!!!! - 歌いましょう鳴らしましょう">MyGO!!!!! - 歌いましょう鳴らしましょう</span><span class="song-fmt">FLAC</span><span class="song-size">69.0 MB</span></li>
-          <li class="song-row"><span class="song-no">125</span><span class="song-name" title="MyGO!!!!! - 迷星叫">MyGO!!!!! - 迷星叫</span><span class="song-fmt">FLAC</span><span class="song-size">80.5 MB</span></li>
-          <li class="song-row"><span class="song-no">126</span><span class="song-name" title="MyGO!!!!! - 名無声">MyGO!!!!! - 名無声</span><span class="song-fmt">FLAC</span><span class="song-size">104.9 MB</span></li>
-          <li class="song-row"><span class="song-no">127</span><span class="song-name" title="MyGO!!!!! - 潜在表明">MyGO!!!!! - 潜在表明</span><span class="song-fmt">FLAC</span><span class="song-size">98.5 MB</span></li>
-          <li class="song-row"><span class="song-no">128</span><span class="song-name" title="MyGO!!!!! - 壱雫空">MyGO!!!!! - 壱雫空</span><span class="song-fmt">FLAC</span><span class="song-size">74.2 MB</span></li>
-          <li class="song-row"><span class="song-no">129</span><span class="song-name" title="MyGO!!!!! - 影色舞">MyGO!!!!! - 影色舞</span><span class="song-fmt">FLAC</span><span class="song-size">80.8 MB</span></li>
-          <li class="song-row"><span class="song-no">130</span><span class="song-name" title="MyGO!!!!! - 聿日箋秋">MyGO!!!!! - 聿日箋秋</span><span class="song-fmt">FLAC</span><span class="song-size">90.5 MB</span></li>
-          <li class="song-row"><span class="song-no">131</span><span class="song-name" title="Phoenix - Netrum,Halvorsen">Phoenix - Netrum,Halvorsen</span><span class="song-fmt">FLAC</span><span class="song-size">30.3 MB</span></li>
-          <li class="song-row"><span class="song-no">132</span><span class="song-name" title="purrfect">purrfect</span><span class="song-fmt">FLAC</span><span class="song-size">16.0 MB</span></li>
-          <li class="song-row"><span class="song-no">133</span><span class="song-name" title="Shake It Off - Taylor Swift">Shake It Off - Taylor Swift</span><span class="song-fmt">FLAC</span><span class="song-size">27.3 MB</span></li>
-          <li class="song-row"><span class="song-no">134</span><span class="song-name" title="Symbol I ： △ - Ave Mujica">Symbol I ： △ - Ave Mujica</span><span class="song-fmt">FLAC</span><span class="song-size">41.8 MB</span></li>
-          <li class="song-row"><span class="song-no">135</span><span class="song-name" title="The Walters - I Love You So">The Walters - I Love You So</span><span class="song-fmt">FLAC</span><span class="song-size">52.3 MB</span></li>
-          <li class="song-row"><span class="song-no">136</span><span class="song-name" title="Wake Up, Get Up, Get Out There">Wake Up, Get Up, Get Out There</span><span class="song-fmt">FLAC</span><span class="song-size">53.0 MB</span></li>
-          <li class="song-row"><span class="song-no">137</span><span class="song-name" title="イガク feat. 重音テト - 原口沙輔,重音テト">イガク feat. 重音テト - 原口沙輔,重音テト</span><span class="song-fmt">FLAC</span><span class="song-size">26.6 MB</span></li>
-          <li class="song-row"><span class="song-no">138</span><span class="song-name" title="おしんこ - 田中ユウスケ,agehasprings">おしんこ - 田中ユウスケ,agehasprings</span><span class="song-fmt">FLAC</span><span class="song-size">5.3 MB</span></li>
-          <li class="song-row"><span class="song-no">139</span><span class="song-name" title="クリームで会いにいけますか - ずっと真夜中でいいのに。">クリームで会いにいけますか - ずっと真夜中でいいのに。</span><span class="song-fmt">FLAC</span><span class="song-size">52.6 MB</span></li>
-          <li class="song-row"><span class="song-no">140</span><span class="song-name" title="サターン - ずっと真夜中でいいのに。">サターン - ずっと真夜中でいいのに。</span><span class="song-fmt">FLAC</span><span class="song-size">30.5 MB</span></li>
-          <li class="song-row"><span class="song-no">141</span><span class="song-name" title="ずっと真夜中でいいのに。 - 残機">ずっと真夜中でいいのに。 - 残機</span><span class="song-fmt">FLAC</span><span class="song-size">91.1 MB</span></li>
-          <li class="song-row"><span class="song-no">142</span><span class="song-name" title="ずっと真夜中でいいのに。 - 花一匁">ずっと真夜中でいいのに。 - 花一匁</span><span class="song-fmt">FLAC</span><span class="song-size">100.4 MB</span></li>
-          <li class="song-row"><span class="song-no">143</span><span class="song-name" title="ずっと真夜中でいいのに。 - 勘冴えて悔しいわ">ずっと真夜中でいいのに。 - 勘冴えて悔しいわ</span><span class="song-fmt">FLAC</span><span class="song-size">94.5 MB</span></li>
-          <li class="song-row"><span class="song-no">144</span><span class="song-name" title="ずっと真夜中でいいのに。 - 猫リセット">ずっと真夜中でいいのに。 - 猫リセット</span><span class="song-fmt">FLAC</span><span class="song-size">101.6 MB</span></li>
-          <li class="song-row"><span class="song-no">145</span><span class="song-name" title="ずっと真夜中でいいのに。 - 秒針を噛む">ずっと真夜中でいいのに。 - 秒針を噛む</span><span class="song-fmt">FLAC</span><span class="song-size">101.4 MB</span></li>
-          <li class="song-row"><span class="song-no">146</span><span class="song-name" title="ずっと真夜中でいいのに。 - 微熱魔">ずっと真夜中でいいのに。 - 微熱魔</span><span class="song-fmt">FLAC</span><span class="song-size">85.1 MB</span></li>
-          <li class="song-row"><span class="song-no">147</span><span class="song-name" title="ずっと真夜中でいいのに。 - 消えてしまいそうです">ずっと真夜中でいいのに。 - 消えてしまいそうです</span><span class="song-fmt">FLAC</span><span class="song-size">101.7 MB</span></li>
-          <li class="song-row"><span class="song-no">148</span><span class="song-name" title="ずっと真夜中でいいのに。 - 嘘じゃない">ずっと真夜中でいいのに。 - 嘘じゃない</span><span class="song-fmt">FLAC</span><span class="song-size">101.2 MB</span></li>
-          <li class="song-row"><span class="song-no">149</span><span class="song-name" title="ずっと真夜中でいいのに。 - MILABO">ずっと真夜中でいいのに。 - MILABO</span><span class="song-fmt">FLAC</span><span class="song-size">102.6 MB</span></li>
-          <li class="song-row"><span class="song-no">150</span><span class="song-name" title="ずっと真夜中でいいのに。 - TAIDADA">ずっと真夜中でいいのに。 - TAIDADA</span><span class="song-fmt">FLAC</span><span class="song-size">90.0 MB</span></li>
-          <li class="song-row"><span class="song-no">151</span><span class="song-name" title="ずっと真夜中でいいのに。 - あいつら全員同窓会">ずっと真夜中でいいのに。 - あいつら全員同窓会</span><span class="song-fmt">FLAC</span><span class="song-size">101.1 MB</span></li>
-          <li class="song-row"><span class="song-no">152</span><span class="song-name" title="ずっと真夜中でいいのに。 - お勉強しといてよ">ずっと真夜中でいいのに。 - お勉強しといてよ</span><span class="song-fmt">FLAC</span><span class="song-size">105.9 MB</span></li>
-          <li class="song-row"><span class="song-no">153</span><span class="song-name" title="ずっと真夜中でいいのに。 - ハゼ馳せる果てるまで">ずっと真夜中でいいのに。 - ハゼ馳せる果てるまで</span><span class="song-fmt">FLAC</span><span class="song-size">94.7 MB</span></li>
-          <li class="song-row"><span class="song-no">154</span><span class="song-name" title="ずっと真夜中でいいのに。 - ミラーチューン">ずっと真夜中でいいのに。 - ミラーチューン</span><span class="song-fmt">FLAC</span><span class="song-size">96.5 MB</span></li>
-          <li class="song-row"><span class="song-no">155</span><span class="song-name" title="ずっと真夜中でいいのに。-  クリームで会いにいけますか">ずっと真夜中でいいのに。-  クリームで会いにいけますか</span><span class="song-fmt">FLAC</span><span class="song-size">43.2 MB</span></li>
-          <li class="song-row"><span class="song-no">156</span><span class="song-name" title="ずっと真夜中でいいのに。- 居眠り遠征隊">ずっと真夜中でいいのに。- 居眠り遠征隊</span><span class="song-fmt">FLAC</span><span class="song-size">39.9 MB</span></li>
-          <li class="song-row"><span class="song-no">157</span><span class="song-name" title="ずっと真夜中でいいのに。,森カリオペ - 綺羅キラー (feat. Mori Calliope)">ずっと真夜中でいいのに。,森カリオペ - 綺羅キラー (feat. Mori Calliope)</span><span class="song-fmt">FLAC</span><span class="song-size">99.3 MB</span></li>
-          <li class="song-row"><span class="song-no">158</span><span class="song-name" title="ただ君に晴れ - ヨルシカ">ただ君に晴れ - ヨルシカ</span><span class="song-fmt">FLAC</span><span class="song-size">22.9 MB</span></li>
-          <li class="song-row"><span class="song-no">159</span><span class="song-name" title="ダンスホール - Mrs. GREEN APPLE">ダンスホール - Mrs. GREEN APPLE</span><span class="song-fmt">FLAC</span><span class="song-size">74.2 MB</span></li>
-          <li class="song-row"><span class="song-no">160</span><span class="song-name" title="てらてら (feat. 星乃一歌&amp;天馬咲希&amp;望月穂波&amp;日野森志歩&amp;初音ミク) - Leo／need,初音ミク">てらてら (feat. 星乃一歌&amp;天馬咲希&amp;望月穂波&amp;日野森志歩&amp;初音ミク) - Leo／need,初音ミク</span><span class="song-fmt">FLAC</span><span class="song-size">25.8 MB</span></li>
-          <li class="song-row"><span class="song-no">161</span><span class="song-name" title="とあ - ツギハギスタッカート">とあ - ツギハギスタッカート</span><span class="song-fmt">FLAC</span><span class="song-size">43.6 MB</span></li>
-          <li class="song-row"><span class="song-no">162</span><span class="song-name" title="トゲナシトゲアリ - 闇に溶けてく">トゲナシトゲアリ - 闇に溶けてく</span><span class="song-fmt">FLAC</span><span class="song-size">61.4 MB</span></li>
-          <li class="song-row"><span class="song-no">163</span><span class="song-name" title="トゲナシトゲアリ - 爆ぜて咲く">トゲナシトゲアリ - 爆ぜて咲く</span><span class="song-fmt">FLAC</span><span class="song-size">84.6 MB</span></li>
-          <li class="song-row"><span class="song-no">164</span><span class="song-name" title="トゲナシトゲアリ - 蝶に結いた赤い糸">トゲナシトゲアリ - 蝶に結いた赤い糸</span><span class="song-fmt">FLAC</span><span class="song-size">76.3 MB</span></li>
-          <li class="song-row"><span class="song-no">165</span><span class="song-name" title="トゲナシトゲアリ - 極私的極彩色アンサー">トゲナシトゲアリ - 極私的極彩色アンサー</span><span class="song-fmt">FLAC</span><span class="song-size">58.4 MB</span></li>
-          <li class="song-row"><span class="song-no">166</span><span class="song-name" title="トゲナシトゲアリ - 空白とカタルシス">トゲナシトゲアリ - 空白とカタルシス</span><span class="song-fmt">FLAC</span><span class="song-size">71.4 MB</span></li>
-          <li class="song-row"><span class="song-no">167</span><span class="song-name" title="トゲナシトゲアリ - 空の箱 (井芹仁菜、河原木桃香)">トゲナシトゲアリ - 空の箱 (井芹仁菜、河原木桃香)</span><span class="song-fmt">FLAC</span><span class="song-size">68.9 MB</span></li>
-          <li class="song-row"><span class="song-no">168</span><span class="song-name" title="トゲナシトゲアリ - 黎明を穿つ">トゲナシトゲアリ - 黎明を穿つ</span><span class="song-fmt">FLAC</span><span class="song-size">72.2 MB</span></li>
-          <li class="song-row"><span class="song-no">169</span><span class="song-name" title="トゲナシトゲアリ - 理想的パラドクスとは">トゲナシトゲアリ - 理想的パラドクスとは</span><span class="song-fmt">FLAC</span><span class="song-size">87.7 MB</span></li>
-          <li class="song-row"><span class="song-no">170</span><span class="song-name" title="トゲナシトゲアリ - 名もなき何もかも">トゲナシトゲアリ - 名もなき何もかも</span><span class="song-fmt">FLAC</span><span class="song-size">72.1 MB</span></li>
-          <li class="song-row"><span class="song-no">171</span><span class="song-name" title="トゲナシトゲアリ - 気鬱、白濁す">トゲナシトゲアリ - 気鬱、白濁す</span><span class="song-fmt">FLAC</span><span class="song-size">70.9 MB</span></li>
-          <li class="song-row"><span class="song-no">172</span><span class="song-name" title="トゲナシトゲアリ - 傷つき傷つけ痛くて辛い">トゲナシトゲアリ - 傷つき傷つけ痛くて辛い</span><span class="song-fmt">FLAC</span><span class="song-size">76.2 MB</span></li>
-          <li class="song-row"><span class="song-no">173</span><span class="song-name" title="トゲナシトゲアリ - 声なき魚 (新川崎(仮))">トゲナシトゲアリ - 声なき魚 (新川崎(仮))</span><span class="song-fmt">FLAC</span><span class="song-size">69.0 MB</span></li>
-          <li class="song-row"><span class="song-no">174</span><span class="song-name" title="トゲナシトゲアリ - 視界の隅 朽ちる音 (新川崎（仮）)">トゲナシトゲアリ - 視界の隅 朽ちる音 (新川崎（仮）)</span><span class="song-fmt">FLAC</span><span class="song-size">71.8 MB</span></li>
-          <li class="song-row"><span class="song-no">175</span><span class="song-name" title="トゲナシトゲアリ - 誰にもなれない私だから">トゲナシトゲアリ - 誰にもなれない私だから</span><span class="song-fmt">FLAC</span><span class="song-size">70.2 MB</span></li>
-          <li class="song-row"><span class="song-no">176</span><span class="song-name" title="トゲナシトゲアリ - 偽りの理">トゲナシトゲアリ - 偽りの理</span><span class="song-fmt">FLAC</span><span class="song-size">70.1 MB</span></li>
-          <li class="song-row"><span class="song-no">177</span><span class="song-name" title="トゲナシトゲアリ - 心象的フラクタル (beni-shouga)">トゲナシトゲアリ - 心象的フラクタル (beni-shouga)</span><span class="song-fmt">FLAC</span><span class="song-size">69.1 MB</span></li>
-          <li class="song-row"><span class="song-no">178</span><span class="song-name" title="トゲナシトゲアリ - 運命に賭けたい論理">トゲナシトゲアリ - 運命に賭けたい論理</span><span class="song-fmt">FLAC</span><span class="song-size">77.9 MB</span></li>
-          <li class="song-row"><span class="song-no">179</span><span class="song-name" title="トゲナシトゲアリ - 運命の華">トゲナシトゲアリ - 運命の華</span><span class="song-fmt">FLAC</span><span class="song-size">75.8 MB</span></li>
-          <li class="song-row"><span class="song-no">180</span><span class="song-name" title="トゲナシトゲアリ - 雑踏、僕らの街">トゲナシトゲアリ - 雑踏、僕らの街</span><span class="song-fmt">FLAC</span><span class="song-size">69.3 MB</span></li>
-          <li class="song-row"><span class="song-no">181</span><span class="song-name" title="トゲナシトゲアリ - サヨナラサヨナラサヨナラ">トゲナシトゲアリ - サヨナラサヨナラサヨナラ</span><span class="song-fmt">FLAC</span><span class="song-size">60.1 MB</span></li>
-          <li class="song-row"><span class="song-no">182</span><span class="song-name" title="トゲナシトゲアリ - ダレモ">トゲナシトゲアリ - ダレモ</span><span class="song-fmt">FLAC</span><span class="song-size">75.0 MB</span></li>
-          <li class="song-row"><span class="song-no">183</span><span class="song-name" title="ねこみみスイッチ - 初音ミク">ねこみみスイッチ - 初音ミク</span><span class="song-fmt">MP3</span><span class="song-size">7.3 MB</span></li>
-          <li class="song-row"><span class="song-no">184</span><span class="song-name" title="ハート111（heart 111） - ゆーり">ハート111（heart 111） - ゆーり</span><span class="song-fmt">FLAC</span><span class="song-size">21.1 MB</span></li>
-          <li class="song-row"><span class="song-no">185</span><span class="song-name" title="パステルレイン - 三月のパンタシア">パステルレイン - 三月のパンタシア</span><span class="song-fmt">FLAC</span><span class="song-size">43.0 MB</span></li>
-          <li class="song-row"><span class="song-no">186</span><span class="song-name" title="ヒューマノイド - ずっと真夜中でいいのに。">ヒューマノイド - ずっと真夜中でいいのに。</span><span class="song-fmt">FLAC</span><span class="song-size">33.5 MB</span></li>
-          <li class="song-row"><span class="song-no">187</span><span class="song-name" title="へび - ヨルシカ">へび - ヨルシカ</span><span class="song-fmt">FLAC</span><span class="song-size">27.9 MB</span></li>
-          <li class="song-row"><span class="song-no">188</span><span class="song-name" title="ヨッシーストーリー (ヨッシーストーリー)［64］ - 安藤浩和">ヨッシーストーリー (ヨッシーストーリー)［64］ - 安藤浩和</span><span class="song-fmt">MP3</span><span class="song-size">8.7 MB</span></li>
-          <li class="song-row"><span class="song-no">189</span><span class="song-name" title="ヨルシカ - 春泥棒">ヨルシカ - 春泥棒</span><span class="song-fmt">FLAC</span><span class="song-size">103.0 MB</span></li>
-          <li class="song-row"><span class="song-no">190</span><span class="song-name" title="ヨルシカ - 盗作">ヨルシカ - 盗作</span><span class="song-fmt">FLAC</span><span class="song-size">88.0 MB</span></li>
-          <li class="song-row"><span class="song-no">191</span><span class="song-name" title="ヨルシカ - 花に亡霊">ヨルシカ - 花に亡霊</span><span class="song-fmt">FLAC</span><span class="song-size">83.1 MB</span></li>
-          <li class="song-row"><span class="song-no">192</span><span class="song-name" title="ヨルシカ - 老人と海">ヨルシカ - 老人と海</span><span class="song-fmt">FLAC</span><span class="song-size">89.8 MB</span></li>
-          <li class="song-row"><span class="song-no">193</span><span class="song-name" title="ヨルシカ - 晴る">ヨルシカ - 晴る</span><span class="song-fmt">FLAC</span><span class="song-size">98.0 MB</span></li>
-          <li class="song-row"><span class="song-no">194</span><span class="song-name" title="ヨルシカ - 言って。">ヨルシカ - 言って。</span><span class="song-fmt">FLAC</span><span class="song-size">89.2 MB</span></li>
-          <li class="song-row"><span class="song-no">195</span><span class="song-name" title="ヨルシカ - 又三郎 ">ヨルシカ - 又三郎 </span><span class="song-fmt">FLAC</span><span class="song-size">86.5 MB</span></li>
-          <li class="song-row"><span class="song-no">196</span><span class="song-name" title="ヨルシカ - だから僕は音楽を辞めた">ヨルシカ - だから僕は音楽を辞めた</span><span class="song-fmt">FLAC</span><span class="song-size">82.6 MB</span></li>
-          <li class="song-row"><span class="song-no">197</span><span class="song-name" title="ヨルシカ - レプリカント">ヨルシカ - レプリカント</span><span class="song-fmt">FLAC</span><span class="song-size">81.9 MB</span></li>
-        </ol>
-      </article>
-    </div>
-  </section>
-
-  <section class="section" id="game" aria-labelledby="game-title">
-    <header class="section-head" data-reveal>
-      <span class="section-label">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="2" y="6" width="20" height="12" rx="4"/>
-          <path d="M7 12h3M8.5 10.5v3"/>
-          <circle cx="16" cy="11" r="1.1"/>
-          <circle cx="18.5" cy="13.5" r="1.1"/>
-        </svg>
-        游戏
-      </span>
-      <h2 class="section-title" id="game-title">游戏板块</h2>
-      <p class="section-desc">把数学、创意与对战装进浏览器 —— 在线即玩，无需下载。</p>
-    </header>
-
-    <div class="downloads">
-      <article class="dl-card dl-card--wide" data-reveal>
-        <div class="dl-head">
-          <div class="dl-title-wrap">
-            <div class="dl-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="4"/>
-                <path d="M7 12h3M8.5 10.5v3"/>
-                <circle cx="16" cy="11" r="1.1"/>
-                <circle cx="18.5" cy="13.5" r="1.1"/>
-              </svg>
-            </div>
-            <div>
-              <div class="dl-name">MeowRc 游戏板块</div>
-              <div class="dl-version">在线游玩 · 纯浏览器运行</div>
-            </div>
-          </div>
-          <a class="dl-btn" href="game/index.html">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6"/>
-            </svg>
-            进入游戏
-          </a>
-        </div>
-        <p class="dl-desc">浏览器里的轻量小游戏合集。目前收录「函数棋」—— 把函数画在坐标系上，用函数图像进行攻防对战的创意策略游戏，支持单机闯关、本地双人、在线对战与 AI 对局。</p>
-        <div class="dl-info">
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="2" y="4" width="20" height="14" rx="2"/>
-              <path d="M8 22h8M12 18v4"/>
-            </svg>
-            浏览器 / 在线
-          </span>
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2l9 5-9 5-9-5 9-5z"/>
-              <path d="M3 12l9 5 9-5"/>
-              <path d="M3 17l9 5 9-5"/>
-            </svg>
-            函数棋 v2.0.0.2
-          </span>
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M21 8l-9 12-9-12 9-4z"/>
-              <path d="M3 8h18M12 4v16"/>
-            </svg>
-            开源免费
-          </span>
-        </div>
-      </article>
-    </div>
-  </section>
-
 </main>
+
 
 <footer class="footer">
   &copy; 2026 <em>MeowRc</em> Blog
@@ -3045,38 +3683,24 @@ html { scroll-behavior: auto; }
 (function () {
   'use strict';
 
+  var reduced = false;
+  try {
+    reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (e) {}
+
   function $(sel) { return document.querySelector(sel); }
   function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
-  var prefersReduced = false;
-  try {
-    prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch (e) { prefersReduced = false; }
+  var navbar = $('#navbar');
+  var toTop  = $('#toTop');
 
-  var raf = window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            function (fn) { return setTimeout(fn, 16); };
-
-  function setThemeAttr(val) {
-    try {
-      document.documentElement.dataset.theme = val;
-    } catch (e) {
-      document.documentElement.setAttribute('data-theme', val);
-    }
-  }
-  function getThemeAttr() {
-    var el = document.documentElement;
-    try {
-      if (el.dataset && el.dataset.theme) return el.dataset.theme;
-    } catch (e) {}
-    return el.getAttribute('data-theme');
-  }
+  var raf = window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); };
 
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var next = getThemeAttr() === 'dark' ? 'light' : 'dark';
-      setThemeAttr(next);
+      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
       var meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.content = next === 'dark' ? '#14121a' : '#fdfbfc';
       try {
@@ -3092,52 +3716,40 @@ html { scroll-behavior: auto; }
       if (!head) return;
 
       head.addEventListener('click', function () {
-        var expanded = card.classList.contains('expanded');
-        if (expanded) {
-          card.classList.remove('expanded');
-        } else {
-          card.classList.add('expanded');
-        }
-        head.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        var expanded = card.classList.toggle('expanded');
+        head.setAttribute('aria-expanded', String(expanded));
       });
     });
   }
 
   function initReveal() {
     var els = $$('[data-reveal]');
-    if (!els.length) return;
 
-    if (prefersReduced) {
+    if (!('IntersectionObserver' in window) || reduced) {
       els.forEach(function (el) { el.classList.add('from-below', 'is-in'); });
       return;
     }
 
-    els.forEach(function (el) {
+    els.forEach(function (el, i) {
       el.classList.add('from-below');
+      el.style.setProperty('--reveal-delay', ((i % 4) * 75) + 'ms');
     });
 
-    function check() {
-      var vh = window.innerHeight || document.documentElement.clientHeight;
-      var triggerTop = 60;
-      var triggerBottom = vh - 60;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var el = entry.target;
 
-      for (var i = 0; i < els.length; i++) {
-        var el = els[i];
-        var r = el.getBoundingClientRect();
-        var inView = r.top < triggerBottom && r.bottom > triggerTop;
+        if (entry.isIntersecting) {
+          if (el.classList.contains('is-in')) return;
 
-        if (inView) {
-          if (el.classList.contains('is-in')) continue;
-
-          var fromBelow = r.top >= 0;
+          var fromBelow = entry.boundingClientRect.top >= 0;
           var wanted = fromBelow ? 'from-below' : 'from-above';
           var current = el.classList.contains('from-below') ? 'from-below' :
                        (el.classList.contains('from-above') ? 'from-above' : null);
 
           if (current !== wanted) {
             el.classList.add('no-transition');
-            el.classList.remove('from-below');
-            el.classList.remove('from-above');
+            el.classList.remove('from-below', 'from-above');
             el.classList.add(wanted);
             void el.offsetWidth;
             el.classList.remove('no-transition');
@@ -3151,73 +3763,29 @@ html { scroll-behavior: auto; }
             el.classList.remove('no-transition');
           }
         }
-      }
-    }
-
-    var ticking = false;
-    function onScrollOrResize() {
-      if (ticking) return;
-      ticking = true;
-      raf(function () {
-        check();
-        ticking = false;
       });
-    }
+    }, { threshold: 0, rootMargin: '-60px 0px -60px 0px' });
 
-    window.addEventListener('scroll', onScrollOrResize);
-    window.addEventListener('resize', onScrollOrResize);
-    check();
-  }
-
-  function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  }
-
-  function smoothScrollTo(targetY, duration) {
-    if (duration == null) duration = 500;
-    var startY = window.pageYOffset || document.documentElement.scrollTop || 0;
-    var distance = targetY - startY;
-    var startTime = null;
-
-    function step(ts) {
-      if (startTime === null) startTime = ts;
-      var elapsed = ts - startTime;
-      var progress = elapsed / duration;
-      if (progress > 1) progress = 1;
-      var eased = easeInOutCubic(progress);
-      window.scrollTo(0, Math.round(startY + distance * eased));
-      if (progress < 1) raf(step);
-    }
-
-    raf(step);
+    els.forEach(function (el) { io.observe(el); });
   }
 
   function initScrollUI() {
-    var navbar = $('#navbar');
-    var toTop = $('#toTop');
     var ticking = false;
 
     window.addEventListener('scroll', function () {
       if (ticking) return;
       ticking = true;
       raf(function () {
-        var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-        if (navbar) {
-          if (y > 10) navbar.classList.add('scrolled');
-          else navbar.classList.remove('scrolled');
-        }
-        if (toTop) {
-          if (y > 500) toTop.classList.add('show');
-          else toTop.classList.remove('show');
-        }
+        var y = window.scrollY;
+        if (navbar) navbar.classList.toggle('scrolled', y > 10);
+        if (toTop) toTop.classList.toggle('show', y > 500);
         ticking = false;
       });
-    });
+    }, { passive: true });
 
     if (toTop) {
       toTop.addEventListener('click', function () {
-        if (prefersReduced) window.scrollTo(0, 0);
-        else smoothScrollTo(0, 500);
+        window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
       });
     }
   }
@@ -3234,13 +3802,8 @@ html { scroll-behavior: auto; }
 
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      var open = list.classList.contains('open');
-      if (open) {
-        close();
-      } else {
-        list.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-      }
+      var open = list.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
     });
 
     list.addEventListener('click', function (e) {
@@ -3254,23 +3817,22 @@ html { scroll-behavior: auto; }
     });
 
     document.addEventListener('keydown', function (e) {
-      var key = e.key || e.keyCode;
-      if (key === 'Escape' || key === 'Esc' || key === 27) close();
+      if (e.key === 'Escape') close();
     });
   }
 
   try {
+    document.body.classList.add('page-enter');
     initExpandCards();
     initReveal();
     initScrollUI();
     initMobileMenu();
   } catch (e) {
-    var fb = $$('[data-reveal]');
-    for (var i = 0; i < fb.length; i++) fb[i].classList.add('is-in');
+    $$('[data-reveal]').forEach(function (el) { el.classList.add('is-in'); });
   }
 })();
 </script>
 
-<script src="../assets/aesthetic.js" defer></script>
+<script src="../../assets/aesthetic.js" defer></script>
 </body>
 </html>
