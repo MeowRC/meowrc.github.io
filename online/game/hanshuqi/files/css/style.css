@@ -6410,3 +6410,28 @@ body.float-keypad-mode #clear-btn { display: none !important; }
         width: 220px;
     }
 }
+
+/* ============================================================
+   老旧设备 / 减少动态效果 兼容层
+   由 CompatManager 向 <html> 注入 data-compat / data-reduced-motion。
+   仅在对应模式下生效，不影响正常设备的视觉与交互。
+   ============================================================ */
+
+/* 系统开启「减少动态效果」时，全局关闭动画与过渡 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 轻量模式（低端设备自动开启）：移除高开销装饰，降低 GPU / CPU 负担 */
+html[data-compat="lite"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  transition-duration: 0.06ms !important;
+}

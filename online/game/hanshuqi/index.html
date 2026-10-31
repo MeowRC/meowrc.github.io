@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>函数棋2.0.0.2 - Function Chess</title>
+    <title>函数棋2.0.1.0 - Function Chess</title>
     <link rel="stylesheet" href="files/css/style.css">
     <link rel="stylesheet" href="files/css/shaihai-theme.css">
     <link rel="stylesheet" href="files/css/editor.css">
     <link rel="stylesheet" href="files/css/race-battle.css">
     <link rel="stylesheet" href="files/css/lobby-watch.css">
     <link rel="stylesheet" href="files/vendor/katex/katex.min.css">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
 </head>
 <body>
     <!-- 启动界面（仅首次加载时显示） -->
@@ -1220,43 +1223,44 @@
       </button>
     </div>
 
-    <script src="files/vendor/katex/katex.min.js"></script>
-    <script src="files/js/GridSystem.js"></script>
-    <script src="files/js/CollisionDetector.js"></script>
-    <script src="files/js/ComplexMath.js"></script>
-    <script src="files/js/FunctionParser.js"></script>
+        <script src="files/js/CompatManager.js" defer></script>
+    <script src="files/vendor/katex/katex.min.js" defer></script>
+    <script src="files/js/GridSystem.js" defer></script>
+    <script src="files/js/CollisionDetector.js" defer></script>
+    <script src="files/js/ComplexMath.js" defer></script>
+    <script src="files/js/FunctionParser.js" defer></script>
     <!-- MathLatex：表达式 → LaTeX 转换器（运行时依赖 FunctionParser） -->
-    <script src="files/js/MathLatex.js"></script>
+    <script src="files/js/MathLatex.js" defer></script>
     <!-- geogebra-lite 核心引擎（采样+裁剪） -->
-    <script src="files/geogebra-lite/plot/Gap.js"></script>
-    <script src="files/geogebra-lite/plot/PathPlotter.js"></script>
-    <script src="files/geogebra-lite/plot/CurveSegmentInfo.js"></script>
-    <script src="files/geogebra-lite/plot/SegmentParams.js"></script>
-    <script src="files/geogebra-lite/plot/CurvePlotterStackItem.js"></script>
-    <script src="files/geogebra-lite/plot/CurvePlotterStack.js"></script>
-    <script src="files/geogebra-lite/plot/CurvePlotterUtils.js"></script>
-    <script src="files/geogebra-lite/plot/TupleNeighbours.js"></script>
-    <script src="files/geogebra-lite/plot/LabelPositionCalculator.js"></script>
-    <script src="files/geogebra-lite/plot/GeneralPathClippedForCurvePlotter.js"></script>
-    <script src="files/geogebra-lite/plot/CurveSegmentPlotter.js"></script>
-    <script src="files/geogebra-lite/plot/CurvePlotter.js"></script>
-    <script src="files/js/FunctionRenderer.js"></script>
+    <script src="files/geogebra-lite/plot/Gap.js" defer></script>
+    <script src="files/geogebra-lite/plot/PathPlotter.js" defer></script>
+    <script src="files/geogebra-lite/plot/CurveSegmentInfo.js" defer></script>
+    <script src="files/geogebra-lite/plot/SegmentParams.js" defer></script>
+    <script src="files/geogebra-lite/plot/CurvePlotterStackItem.js" defer></script>
+    <script src="files/geogebra-lite/plot/CurvePlotterStack.js" defer></script>
+    <script src="files/geogebra-lite/plot/CurvePlotterUtils.js" defer></script>
+    <script src="files/geogebra-lite/plot/TupleNeighbours.js" defer></script>
+    <script src="files/geogebra-lite/plot/LabelPositionCalculator.js" defer></script>
+    <script src="files/geogebra-lite/plot/GeneralPathClippedForCurvePlotter.js" defer></script>
+    <script src="files/geogebra-lite/plot/CurveSegmentPlotter.js" defer></script>
+    <script src="files/geogebra-lite/plot/CurvePlotter.js" defer></script>
+    <script src="files/js/FunctionRenderer.js" defer></script>
     <!-- 全局音频管理器和角色管理器 -->
-    <script src="files/js/AudioManager.js"></script>
+    <script src="files/js/AudioManager.js" defer></script>
     <!-- SummaAnimator 必须在 SummaCharacter 之前加载 -->
-    <script src="files/Summa形象处理/SummaAnimator.js"></script>
-    <script src="files/Summa形象处理/SummaCharacter.js"></script>
+    <script src="files/Summa形象处理/SummaAnimator.js" defer></script>
+    <script src="files/Summa形象处理/SummaCharacter.js" defer></script>
     
     <!-- Ai子模块（按依赖顺序加载） -->
-    <script src="files/js/ai/AIFunctionBuilderSingle.js"></script>
-    <script src="files/js/ai/AIFunctionBuilderMulti.js"></script>
-    <script src="files/js/ai/AIFunctionBuilder.js"></script>
-    <script src="files/js/ai/AITargetSelector.js"></script>
-    <script src="files/js/ai/AIConstraintManager.js"></script>
-    <script src="files/js/ai/AILearningSystem.js"></script>
-    <script src="files/js/ai/AIExpressionHandler.js"></script>
-    <script src="files/js/ai/AIPersistence.js"></script>
-    <script src="files/js/AIController.js"></script>
+    <script src="files/js/ai/AIFunctionBuilderSingle.js" defer></script>
+    <script src="files/js/ai/AIFunctionBuilderMulti.js" defer></script>
+    <script src="files/js/ai/AIFunctionBuilder.js" defer></script>
+    <script src="files/js/ai/AITargetSelector.js" defer></script>
+    <script src="files/js/ai/AIConstraintManager.js" defer></script>
+    <script src="files/js/ai/AILearningSystem.js" defer></script>
+    <script src="files/js/ai/AIExpressionHandler.js" defer></script>
+    <script src="files/js/ai/AIPersistence.js" defer></script>
+    <script src="files/js/AIController.js" defer></script>
     <!-- 联机信令服务器配置（必须在 P2PController.js 之前） -->
     <script>
         window.P2P_SIGNALING = {
@@ -1268,69 +1272,69 @@
         };
     </script>
     <!-- 核心控制器 -->
-    <script src="files/js/P2PController.js"></script>
+    <script src="files/js/P2PController.js" defer></script>
     <!-- 匹配大厅控制器（依赖 P2PController.signaling 构建 WebSocket 地址） -->
-    <script src="files/js/MatchLobby.js"></script>
+    <script src="files/js/MatchLobby.js" defer></script>
     <!-- 竞速对战多人房间控制器（2-4 人星型拓扑，独立于 1v1 的 P2PController，依赖 PeerJS） -->
-    <script src="files/js/RaceRoomController.js"></script>
-    <script src="files/js/GameController.js"></script>
-    <script src="files/js/campaignLevels.js"></script>
-    <script src="files/js/RaceMode/RaceModeManager.js"></script>
-    <script src="files/js/RaceMode/RaceModeController.js"></script>
-    <script src="files/js/UIController.js"></script>
+    <script src="files/js/RaceRoomController.js" defer></script>
+    <script src="files/js/GameController.js" defer></script>
+    <script src="files/js/campaignLevels.js" defer></script>
+    <script src="files/js/RaceMode/RaceModeManager.js" defer></script>
+    <script src="files/js/RaceMode/RaceModeController.js" defer></script>
+    <script src="files/js/UIController.js" defer></script>
     <!-- UIController 方法已拆分到以下模块（运行时挂回 UIController.prototype），须在 UIController.js 之后、实例化之前加载 -->
-    <script src="files/js/ui/UIModals.js"></script>
-    <script src="files/js/ui/UIStart.js"></script>
-    <script src="files/js/ui/UIInput.js"></script>
-    <script src="files/js/ui/UICanvas.js"></script>
-    <script src="files/js/ui/UIPhase.js"></script>
-    <script src="files/js/ui/UICampaign.js"></script>
-    <script src="files/js/ui/UICampaignImport.js"></script>
-    <script src="files/js/ui/UIRace.js"></script>
+    <script src="files/js/ui/UIModals.js" defer></script>
+    <script src="files/js/ui/UIStart.js" defer></script>
+    <script src="files/js/ui/UIInput.js" defer></script>
+    <script src="files/js/ui/UICanvas.js" defer></script>
+    <script src="files/js/ui/UIPhase.js" defer></script>
+    <script src="files/js/ui/UICampaign.js" defer></script>
+    <script src="files/js/ui/UICampaignImport.js" defer></script>
+    <script src="files/js/ui/UIRace.js" defer></script>
     <!-- 竞速对战 UI（批次11 拆分：原 UIRaceBattle.js 3054 行 → 9 个连续切片，全部挂载 UIController.prototype）
          UIRaceBattleBase 必须最先加载（含 RACE_BATTLE_DIFFICULTIES / RACE_BATTLE_STAMINA 顶层 const） -->
-    <script src="files/js/ui/racebattle/UIRaceBattleBase.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleRoom.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattlePanel.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleResult.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleResume.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleMatch.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattlePlay.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleView.js"></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleLobby.js"></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleBase.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleRoom.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattlePanel.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleResult.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleResume.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleMatch.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattlePlay.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleView.js" defer></script>
+    <script src="files/js/ui/racebattle/UIRaceBattleLobby.js" defer></script>
     <!-- P2P 联机 UI（批次11 拆分：原 UIP2P.js 1777 行/64 方法 → 9 个连续切片，全部挂载 UIController.prototype，无加载期依赖，按职责分组） -->
-    <script src="files/js/ui/uip2p/UIP2PRoom.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PSelectors.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PEmoji.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PDisconnect.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PSpectate.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PVSIntro.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PSync.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PHealth.js"></script>
-    <script src="files/js/ui/uip2p/UIP2PResume.js"></script>
-    <script src="files/js/ui/UILobby.js"></script>
+    <script src="files/js/ui/uip2p/UIP2PRoom.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PSelectors.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PEmoji.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PDisconnect.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PSpectate.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PVSIntro.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PSync.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PHealth.js" defer></script>
+    <script src="files/js/ui/uip2p/UIP2PResume.js" defer></script>
+    <script src="files/js/ui/UILobby.js" defer></script>
     <!-- 排行榜：身份 + 数据服务 + UI（UILeaderboard 依赖 UIController 原型） -->
-    <script src="files/js/PlayerProfile.js"></script>
+    <script src="files/js/PlayerProfile.js" defer></script>
     <!-- 排行榜防作弊：签名工具（须在 LeaderboardService 之前加载） -->
-    <script src="files/js/VerifyCrypto.js"></script>
-    <script src="files/js/LeaderboardService.js"></script>
-    <script src="files/js/ui/UILeaderboard.js"></script>
-    <script src="files/js/ui/UISpectator.js"></script>
-    <script src="files/js/GameVersion.js"></script>
-    <script src="files/js/ui/UINotice.js"></script>
+    <script src="files/js/VerifyCrypto.js" defer></script>
+    <script src="files/js/LeaderboardService.js" defer></script>
+    <script src="files/js/ui/UILeaderboard.js" defer></script>
+    <script src="files/js/ui/UISpectator.js" defer></script>
+    <script src="files/js/GameVersion.js" defer></script>
+    <script src="files/js/ui/UINotice.js" defer></script>
     <!-- 核心对战 UI（批次11 拆分：原 UICore.js 2327 行/53 方法 → 8 个连续切片，全部挂载 UIController.prototype，无加载期依赖，按职责分组） -->
-    <script src="files/js/ui/uicore/UICoreInit.js"></script>
-    <script src="files/js/ui/uicore/UICoreGameEvents.js"></script>
-    <script src="files/js/ui/uicore/UICoreEvents.js"></script>
-    <script src="files/js/ui/uicore/UICoreTestFunc.js"></script>
-    <script src="files/js/ui/uicore/UICoreAI.js"></script>
-    <script src="files/js/ui/uicore/UICoreP2PSync.js"></script>
-    <script src="files/js/ui/uicore/UICoreBattle.js"></script>
-    <script src="files/js/ui/uicore/UICoreMisc.js"></script>
-<script src="files/js/ui/UIEditor.js"></script>
-<script src="files/js/ui/UIFloatKeypad.js"></script>
-    <script src="files/js/SummaTrainer.js"></script>
-    <script src="files/js/ui/uicore/UILobbyWatch.js"></script>
+    <script src="files/js/ui/uicore/UICoreInit.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreGameEvents.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreEvents.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreTestFunc.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreAI.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreP2PSync.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreBattle.js" defer></script>
+    <script src="files/js/ui/uicore/UICoreMisc.js" defer></script>
+<script src="files/js/ui/UIEditor.js" defer></script>
+<script src="files/js/ui/UIFloatKeypad.js" defer></script>
+    <script src="files/js/SummaTrainer.js" defer></script>
+    <script src="files/js/ui/uicore/UILobbyWatch.js" defer></script>
     
     <script>
         // 初始化游戏

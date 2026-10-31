@@ -174,6 +174,9 @@ class AudioManager {
 
     startBgm() {
         if (!this.bgmEnabled) return;
+        // 轻量模式（低端设备）默认不自动播放 BGM，降低解码 / CPU / 电量开销；
+        // 用户通过界面显式开启后（_userEnabledBgm）才会播放。
+        if (window.Compat && window.Compat.lite && !this._userEnabledBgm) return;
         if (this._bgmStarted && this._bgmAudio && !this._bgmAudio.paused) return;
         this._bgmStarted = true;
 
@@ -198,6 +201,7 @@ class AudioManager {
 
     setBgmEnabled(enabled) {
         this.bgmEnabled = !!enabled;
+        if (enabled) this._userEnabledBgm = true; // 用户显式开启，绕过轻量模式静音
         if (!this.bgmEnabled) {
             this.stopBgm();
         } else {
