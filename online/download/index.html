@@ -77,86 +77,8 @@
 })();
 </script>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0" /> <meta name="description" content="MeowRc 在线 —— 软件与工具下载。" /> <meta name="theme-color" content="#f5a0b8" /> <title>在线 · MeowRc Blog</title> <link rel="stylesheet" href="../../assets/online-base.css"> <link rel="stylesheet" href="../../assets/aesthetic.css"> </head><!DOCTYPE html> <html lang="zh-CN" data-theme="light"> <head> <meta charset="UTF-8" />
-
-<script>
-(function () {
-  var ua = navigator.userAgent || '';
-  var dm = document.documentMode;
-
-  /* IE8 ~ IE11（含 IE11 兼容视图）走专门的 ie 版本 */
-  function isLegacyIE() {
-    if (dm && dm <= 11) return true;
-    return (/MSIE |Trident\//).test(ua);
-  }
-
-  function isSafariFamily() {
-    if ((/iPad|iPhone|iPod/).test(ua)) return true;
-    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
-    if ((/Safari/).test(ua) &&
-        !(/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/).test(ua)) return true;
-    return false;
-  }
-
-  function isModern() {
-    if (!window.CSS || !CSS.supports) return false;
-    try {
-      return !!CSS.supports('translate', '0 64px') && !!CSS.supports('inset', '0');
-    } catch (e) { return false; }
-  }
-
-  var target;
-  if (isLegacyIE())          target = 'index-ie.html';
-  else if (isSafariFamily()) target = 'index-apple.html';
-  else if (isModern())       target = 'index.html';
-  else                       target = 'index-legacy.html';
-
-  var p = location.pathname || '';
-  var suffix = '/' + target;
-  var current = p.length >= suffix.length &&
-                p.substring(p.length - suffix.length) === suffix;
-  if (!current) location.replace(target + location.search + location.hash);
-})();
-
-(function () {
-  var TTL = 6 * 60 * 60 * 1000;
-  var root = document.documentElement;
-  var colors = { light: '#fdfbfc', dark: '#14121a' };
-
-  function auto() {
-    try {
-      var h = new Date().getHours();
-      return (h >= 6 && h < 18) ? 'light' : 'dark';
-    } catch (e) {
-      return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-  }
-
-  function stored() {
-    try {
-      var v = localStorage.getItem('theme');
-      var at = parseInt(localStorage.getItem('themeAt') || '0', 10);
-      if ((v === 'dark' || v === 'light') && Date.now() - at < TTL) return v;
-    } catch (e) {}
-    return null;
-  }
-
-  function apply(theme) {
-    if (root.dataset.theme === theme) return;
-    root.dataset.theme = theme;
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = colors[theme];
-  }
-
-  apply(stored() || auto());
-
-  setInterval(function () {
-    if (!stored()) apply(auto());
-  }, 60000);
-})();
-</script>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0" /> <meta name="description" content="MeowRc 在线 —— 软件与工具下载。" /> <meta name="theme-color" content="#f5a0b8" /> <title>在线 · MeowRc Blog</title> <link rel="stylesheet" href="../assets/aesthetic.css"> </head> <body> <h1 class="sr-only">在线 — MeowRc Blog</h1> <nav class="navbar" id="navbar" aria-label="主导航"> <div class="navbar-inner"> <a href="../../index.html" class="nav-brand"><em>MeowRc</em> Blog</a> <ul class="nav-links" id="navLinks"> <li><a href="../../index.html" class="nav-link">主页</a></li> <li><a href="../../index.html#projects" class="nav-link">项目</a></li> <li><a href="../../index.html#contact" class="nav-link">联系</a></li> <li><a href="/online/" class="nav-link active" aria-current="true">在线</a></li> </ul> <div class="nav-actions"> <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="切换主题"> <svg viewBox="0 0 24 24" class="icon-sun" aria-hidden="true"> <circle cx="12" cy="12" r="4"/> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/> </svg> <svg viewBox="0 0 24 24" class="icon-moon" aria-hidden="true"> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/> </svg> </button> <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="菜单" aria-expanded="false" aria-controls="navLinks"> <svg viewBox="0 0 24 24" aria-hidden="true"> <path d="M4 7h16M4 12h16M4 17h16"/> </svg> </button> </div> </div> </nav> <header class="page-hero"> <div class="page-hero-inner"> <div class="page-eyebrow"> <svg viewBox="0 0 24 24" aria-hidden="true"> <path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6L5.7 21 8 14 2 9.2h7.6z"/> </svg>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /> <meta name="description" content="MeowRc 在线 —— 软件与工具下载。" /> <meta name="theme-color" content="#f5a0b8" /> <title>在线 · MeowRc Blog</title> <link rel="stylesheet" href="../../assets/online-base.css"> <link rel="stylesheet" href="../../assets/aesthetic.css"> <link rel="stylesheet" href="../../assets/polish.css">
+</head> <body> <h1 class="sr-only">在线 — MeowRc Blog</h1> <nav class="navbar" id="navbar" aria-label="主导航"> <div class="navbar-inner"> <a href="../../index.html" class="nav-brand"><em>MeowRc</em> Blog</a> <ul class="nav-links" id="navLinks"> <li><a href="../../index.html" class="nav-link">主页</a></li> <li><a href="../../index.html#projects" class="nav-link">项目</a></li> <li><a href="../../index.html#contact" class="nav-link">联系</a></li> <li><a href="/online/" class="nav-link active" aria-current="true">在线</a></li> </ul> <div class="nav-actions"> <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="切换主题"> <svg viewBox="0 0 24 24" class="icon-sun" aria-hidden="true"> <circle cx="12" cy="12" r="4"/> <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/> </svg> <svg viewBox="0 0 24 24" class="icon-moon" aria-hidden="true"> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/> </svg> </button> <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="菜单" aria-expanded="false" aria-controls="navLinks"> <svg viewBox="0 0 24 24" aria-hidden="true"> <path d="M4 7h16M4 12h16M4 17h16"/> </svg> </button> </div> </div> </nav> <header class="page-hero"> <div class="page-hero-inner"> <div class="page-eyebrow"> <svg viewBox="0 0 24 24" aria-hidden="true"> <path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.6L5.7 21 8 14 2 9.2h7.6z"/> </svg>
       在线
     </div> <h2 class="page-title">在线</h2> <p class="page-desc">选择下方分区，进入下载、音乐或游戏。</p> </div> </header> <main class="main"> <a class="online-back" href="/online/">← 返回 Online</a> <section class="section" id="download" aria-labelledby="download-title"> <header class="section-head" data-reveal> <span class="section-label"> <svg viewBox="0 0 24 24" aria-hidden="true"> <path d="M12 3v12M6 11l6 6 6-6M4 21h16"/> </svg>
         下载

@@ -4,67 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="MeowRC 在线游戏板块 —— 把数学、创意与对战装进浏览器，在线即玩。">
+<meta name="theme-color" content="#f5a0b8" id="metaTheme">
 <title>游戏板块 · MeowRC Online</title>
+<link rel="stylesheet" href="../../assets/online-base.css">
+<link rel="stylesheet" href="../../assets/aesthetic.css">
+<link rel="stylesheet" href="../../assets/polish.css">
 <style>
   :root{
-    --pink:#ff5fa2; --pink-deep:#ff1f7a; --ink:#2b2b33; --muted:#7a7a86;
-    --bg:#fdf6f9; --card:#ffffff; --line:#ffe1ef; --shadow:0 10px 30px rgba(255,95,162,.16);
+    --g-pink:#ff5fa2; --g-pink-deep:#ff1f7a;
+    --g-ink:var(--text,#2b2b33); --g-muted:var(--text-2,#7a7a86);
+    --g-bg:var(--bg,#fdf6f9); --g-card:var(--surface,#ffffff);
+    --g-line:var(--border,#ffe1ef);
+    --g-shadow:var(--shadow-md,0 10px 30px rgba(255,95,162,.16));
+    --g-shadow-hover:var(--shadow-lg,0 16px 40px rgba(232,118,155,.2));
+    --g-thumb:linear-gradient(135deg,#ff5fa2,#ffd1e0);
+    --g-btn-ghost-bg:var(--surface,#fff);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  [data-theme=dark]{
+    --g-pink:#ff7ab4; --g-pink-deep:#ff9ac4;
+    --g-thumb:linear-gradient(135deg,#a63a68,#4a2036);
+  }
+  html,body{margin:0;padding:0}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    background:linear-gradient(180deg,#fff 0%,var(--bg) 42%);
-    color:var(--ink); line-height:1.6; padding:32px 16px 64px; min-height:100vh;
+    background:radial-gradient(1200px 600px at 50% -10%,var(--accent-wash,rgba(255,95,162,.10)),transparent 70%),var(--g-bg);
+    color:var(--g-ink); line-height:1.6; padding:32px 16px 64px; min-height:100vh;
+    transition:background-color .35s ease,color .35s ease;
   }
-  .wrap{max-width:960px;margin:0 auto}
+  .wrap{max-width:960px;margin:0 auto;position:relative}
   header.hero{text-align:center;margin-bottom:40px}
   .badge{
-    display:inline-block;font-size:13px;letter-spacing:.18em;color:var(--pink-deep);
-    background:var(--line);padding:6px 14px;border-radius:999px;margin-bottom:18px;
+    display:inline-block;font-size:13px;letter-spacing:.18em;color:var(--g-pink-deep);
+    background:var(--accent-soft,var(--g-line));padding:6px 14px;border-radius:999px;margin-bottom:18px;
   }
   h1{
-    font-size:clamp(28px,5vw,44px);font-weight:800;
-    background:linear-gradient(90deg,var(--pink-deep),var(--pink));
+    font-size:clamp(28px,5vw,44px);font-weight:800;margin:0 0 10px;
+    background:linear-gradient(90deg,var(--g-pink-deep),var(--g-pink));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .sub{color:var(--muted);margin-top:10px;font-size:16px}
+  .sub{color:var(--g-muted);margin:10px 0 0;font-size:16px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px}
   .card{
-    background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;
-    box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s ease;
+    background:var(--g-card);border:1px solid var(--g-line);border-radius:20px;padding:24px;
+    box-shadow:var(--g-shadow);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background-color .3s ease;
     display:flex;flex-direction:column;
   }
-  .card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(232,118,155,.2)}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--g-shadow-hover);border-color:var(--accent-line,var(--g-line))}
   .thumb{
-    height:120px;border-radius:14px;background:linear-gradient(135deg,var(--pink),#ffd1e0);
+    height:120px;border-radius:14px;background:var(--g-thumb);
     display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px;
   }
-  .card h2{font-size:22px;margin-bottom:8px}
-  .card p{color:var(--muted);font-size:15px;flex:1}
+  .card h2{font-size:22px;margin:0 0 8px}
+  .card p{color:var(--g-muted);font-size:15px;flex:1;margin:0}
   .tags{margin:14px 0}
   .tag{
-    display:inline-block;font-size:12px;color:var(--pink-deep);background:var(--line);
+    display:inline-block;font-size:12px;color:var(--g-pink-deep);background:var(--accent-soft,var(--g-line));
     padding:4px 10px;border-radius:8px;margin:0 6px 6px 0;
   }
   .btns{display:flex;gap:10px;margin-top:8px}
   .btn{
     flex:1;text-align:center;text-decoration:none;padding:11px 14px;border-radius:12px;
-    font-weight:600;font-size:15px;transition:.15s;
+    font-weight:600;font-size:15px;transition:.18s ease;
   }
-  .btn-primary{background:var(--pink-deep);color:#fff}
-  .btn-primary:hover{background:#ff1f7a}
-  .btn-ghost{background:#fff;color:var(--pink-deep);border:1px solid var(--line)}
-  .btn-ghost:hover{background:var(--bg)}
-  .note{font-size:13px;color:var(--muted);margin-top:28px;text-align:center}
+  .btn-primary{background:var(--g-pink-deep);color:#fff}
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-ghost{background:var(--g-btn-ghost-bg);color:var(--g-pink-deep);border:1px solid var(--g-line)}
+  .btn-ghost:hover{background:var(--accent-wash,var(--g-bg))}
+  .note{font-size:13px;color:var(--g-muted);margin-top:28px;text-align:center}
   .foot{text-align:center;margin-top:48px}
   .back{
-    display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--pink-deep);
-    font-weight:600;padding:10px 18px;border:1px solid var(--line);border-radius:999px;background:#fff;
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--g-pink-deep);
+    font-weight:600;padding:10px 18px;border:1px solid var(--g-line);border-radius:999px;background:var(--g-btn-ghost-bg);
   }
-  .back:hover{background:var(--bg)}
+  .back:hover{background:var(--accent-wash,var(--g-bg))}
+
+  /* 主题切换控件 */
+  .theme-ctl{
+    position:fixed;top:16px;right:16px;z-index:50;display:flex;gap:6px;
+    background:var(--g-card);border:1px solid var(--g-line);border-radius:999px;
+    padding:6px;box-shadow:var(--g-shadow);
+  }
+  .theme-ctl button{
+    border:0;background:transparent;color:var(--g-muted);font-size:13px;font-weight:600;
+    padding:7px 12px;border-radius:999px;cursor:pointer;line-height:1;
+  }
+  .theme-ctl button[aria-pressed=true]{background:var(--accent-soft,var(--g-line));color:var(--g-pink-deep)}
+  @media (max-width:520px){
+    .theme-ctl{top:auto;bottom:16px;right:16px}
+    .theme-ctl button{padding:8px 10px;font-size:12px}
+  }
 </style>
 </head>
 <body>
+
+<div class="theme-ctl" role="group" aria-label="明暗主题">
+  <button type="button" data-mode="auto" aria-pressed="true" title="跟随时间自动切换">自动</button>
+  <button type="button" data-mode="light" aria-pressed="false" title="始终亮色">亮</button>
+  <button type="button" data-mode="dark" aria-pressed="false" title="始终暗色">暗</button>
+</div>
+
 <div class="wrap">
   <header class="hero">
     <span class="badge">MEOWRC · GAME ZONE</span>
@@ -74,7 +112,7 @@
 
   <main class="grid">
     <article class="card">
-      <div class="thumb">♟️</div>
+      <div class="thumb">??</div>
       <h2>函数棋</h2>
       <p>把函数画在坐标系上，用函数图像进行攻防对战的创意策略游戏。支持单机闯关、本地双人、在线对战与 AI 对局。</p>
       <div class="tags">
@@ -95,5 +133,67 @@
     <a class="back" href="/online/">← 返回 Online 主页</a>
   </div>
 </div>
+
+<script>
+(function(){
+  var KEY='game-theme-mode';
+  var root=document.documentElement;
+  var meta=document.getElementById('metaTheme');
+  var btns=document.querySelectorAll('.theme-ctl button');
+
+  function autoThemeByHour(){
+    var h=new Date().getHours();
+    return (h>=7 && h<19) ? 'light' : 'dark';
+  }
+  function preferred(){
+    try{ if(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) return 'dark'; }catch(e){}
+    return 'light';
+  }
+  function resolve(mode){
+    if(mode==='light'||mode==='dark') return mode;
+    return autoThemeByHour();
+  }
+  function apply(mode){
+    var t=resolve(mode);
+    root.setAttribute('data-theme',t);
+    if(meta) meta.setAttribute('content', t==='dark' ? '#14121a' : '#f5a0b8');
+    for(var i=0;i<btns.length;i++){
+      btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-mode')===mode ? 'true':'false');
+    }
+  }
+  function getMode(){
+    try{ var v=localStorage.getItem(KEY); if(v==='light'||v==='dark'||v==='auto') return v; }catch(e){}
+    return 'auto';
+  }
+  function setMode(m){
+    try{ localStorage.setItem(KEY,m); }catch(e){}
+    apply(m);
+  }
+
+  var mode=getMode();
+  apply(mode);
+
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener('click',function(){
+      setMode(this.getAttribute('data-mode'));
+    });
+  }
+
+  // 每 60s 复查；自动模式下跨时段会切换
+  setInterval(function(){
+    if(getMode()==='auto') apply('auto');
+  }, 60000);
+
+  // 系统主题变化时，自动模式下重新评估（分钟级已覆盖，这里做即时响应）
+  try{
+    if(window.matchMedia){
+      var mq=matchMedia('(prefers-color-scheme: dark)');
+      var onCh=function(){ if(getMode()==='auto') apply('auto'); };
+      if(mq.addEventListener) mq.addEventListener('change',onCh);
+      else if(mq.addListener) mq.addListener(onCh);
+    }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

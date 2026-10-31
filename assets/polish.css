@@ -1,0 +1,75 @@
+/* v8.3 polish layer — 统一视觉增强，不改业务结构 */
+:root{
+  --pl-radius-sm:10px; --pl-radius:16px; --pl-radius-lg:22px;
+  --pl-ring:0 0 0 3px rgba(255,95,162,.28);
+  --pl-ring-dark:0 0 0 3px rgba(255,122,180,.32);
+  --pl-ease:cubic-bezier(.22,1,.36,1);
+  --pl-dur:.22s;
+}
+html{ -webkit-text-size-adjust:100%; text-rendering:optimizeLegibility; scroll-behavior:smooth; }
+body{ -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+::selection{ background:var(--accent-wash,rgba(255,95,162,.16)); color:inherit; }
+[data-theme=dark] ::selection{ background:rgba(255,122,180,.28); }
+
+/* 统一焦点可见性，键盘可达 */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{
+  outline:none; box-shadow:var(--pl-ring); border-radius:var(--pl-radius-sm);
+}
+[data-theme=dark] a:focus-visible,[data-theme=dark] button:focus-visible,[data-theme=dark] input:focus-visible,[data-theme=dark] select:focus-visible,[data-theme=dark] textarea:focus-visible,[data-theme=dark] [tabindex]:focus-visible{
+  box-shadow:var(--pl-ring-dark);
+}
+
+/* 链接与按钮的通用过渡 */
+a,button{ transition:color var(--pl-dur) var(--pl-ease),background-color var(--pl-dur) var(--pl-ease),border-color var(--pl-dur) var(--pl-ease),box-shadow var(--pl-dur) var(--pl-ease),transform var(--pl-dur) var(--pl-ease); }
+a:active,button:active{ transform:translateY(1px); }
+
+/* 卡片统一悬浮质感（仅作用于常见语义） */
+article.card,.card,.panel,.box{
+  transition:transform var(--pl-dur) var(--pl-ease),box-shadow var(--pl-dur) var(--pl-ease),border-color var(--pl-dur) var(--pl-ease);
+}
+article.card:hover,.card:hover{
+  box-shadow:var(--shadow-lg,0 18px 48px rgba(180,120,140,.16));
+}
+
+/* 图片与媒体自适应 */
+img,video,canvas,svg{ max-width:100%; height:auto; }
+img{ background:transparent; }
+
+/* 滚动条（WebKit） */
+*::-webkit-scrollbar{ width:10px; height:10px; }
+*::-webkit-scrollbar-track{ background:transparent; }
+*::-webkit-scrollbar-thumb{
+  background:var(--accent-line,rgba(255,95,162,.35)); border-radius:999px;
+  border:2px solid transparent; background-clip:padding-box;
+}
+*::-webkit-scrollbar-thumb:hover{ background:var(--accent,rgba(255,95,162,.6)); background-clip:padding-box; }
+[data-theme=dark] *::-webkit-scrollbar-thumb{ background:rgba(255,122,180,.34); background-clip:padding-box; }
+[data-theme=dark] *::-webkit-scrollbar-thumb:hover{ background:rgba(255,122,180,.55); background-clip:padding-box; }
+html{ scrollbar-width:thin; scrollbar-color:var(--accent-line,rgba(255,95,162,.35)) transparent; }
+
+/* 标题与正文可读性微调 */
+h1,h2,h3,h4{ text-wrap:balance; }
+p,li{ text-wrap:pretty; }
+
+/* 键盘/触屏可达热区最小尺寸 */
+button,.btn,[role=button]{ min-height:36px; }
+
+/* 动效降级统一 */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  a,button,article.card,.card{ transition:none !important; }
+  a:active,button:active{ transform:none !important; }
+}
+
+/* 移动端细节 */
+@media (max-width:640px){
+  body{ padding-left:12px; padding-right:12px; }
+  h1{ letter-spacing:.01em; }
+}
+
+/* 打印 */
+@media print{
+  .fx-aurora,.fx-grain,.fx-progress,.to-top{ display:none !important; }
+  body{ background:#fff !important; color:#000 !important; }
+  a[href^="http"]::after{ content:" (" attr(href) ")"; font-size:.85em; color:#555; }
+}
