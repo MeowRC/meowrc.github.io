@@ -1,0 +1,183 @@
+/*!
+ * glow-fx.css — v8.5 conditional light effects
+ *
+ * ALL rules are gated behind html[data-glow="on"], which is set only by
+ * assets/glow-fx.js after a capability + performance check. With no marker
+ * this stylesheet is a complete no-op: no layout change, no extra paint,
+ * no effect on legacy / low-end devices.
+ *
+ * Design constraints:
+ *   - Decorative only. No pseudo-elements that are already owned by
+ *     index*.css / online-base.css / aesthetic.css are reused.
+ *   - Animated properties are limited to transform, opacity and
+ *     background-position (small surfaces only); no animated filters,
+ *     box-shadows or full-page repaints.
+ *   - Every decorative layer is pointer-events:none.
+ *   - Honours prefers-reduced-motion, visibility pause and print.
+ */
+/* Even the custom properties are scoped to the marker, so on a device that
+   fails the capability check this stylesheet has literally zero effect. */
+html[data-glow="on"] {
+  --glow-pink: 255, 95, 162;
+  --glow-lilac: 186, 140, 255;
+}
+
+/* ------------------------------------------------------------------ aurora */
+/* z-index:0 puts the layer above the body background; content containers are
+   lifted to z-index:1 below. No element is re-positioned if it is already
+   fixed / sticky (navbar, to-top, theme-ctl already carry high z-index). */
+html[data-glow="on"] body::before {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  /* v8.3 already renders fx-aurora at z-index:-1. Static sources here are
+     kept deliberately faint; the pointer-tracked source is the main effect. */
+  background:
+    radial-gradient(620px circle at var(--px, 50%) var(--py, 22%), rgba(var(--glow-pink), .16), transparent 68%),
+    radial-gradient(780px circle at 14% 84%, rgba(255, 150, 190, .09), transparent 70%),
+    radial-gradient(700px circle at 86% 12%, rgba(var(--glow-lilac), .07), transparent 70%);
+  background-repeat: no-repeat;
+  animation: glowDrift 22s ease-in-out infinite alternate,
+             glowFadeIn .9s ease-out both;
+  will-change: transform;
+}
+
+html[data-glow="on"][data-theme="dark"] body::before {
+  background:
+    radial-gradient(620px circle at var(--px, 50%) var(--py, 22%), rgba(255, 110, 180, .19), transparent 68%),
+    radial-gradient(780px circle at 14% 84%, rgba(160, 90, 220, .11), transparent 70%),
+    radial-gradient(700px circle at 86% 12%, rgba(90, 140, 255, .08), transparent 70%);
+}
+
+/* Lift real content above the aurora. Selectors cover every site page. */
+html[data-glow="on"] #blog,
+html[data-glow="on"] .hero,
+html[data-glow="on"] .page-hero,
+html[data-glow="on"] .main,
+html[data-glow="on"] .footer,
+html[data-glow="on"] .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------- navbar beam */
+html[data-glow="on"] .navbar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+  opacity: .9;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(var(--glow-pink), 0) 18%,
+    rgba(255, 130, 185, .95) 50%,
+    rgba(var(--glow-pink), 0) 82%, transparent 100%);
+  background-size: 200% 100%;
+  animation: glowBeam 6.5s linear infinite;
+}
+
+/* ------------------------------------------------------- card pointer halo */
+/* background-image (not a pseudo-element) so existing ::before/::after
+   decorations in index*.css and online-base.css stay untouched. */
+html[data-glow="on"] .card,
+html[data-glow="on"] .dl-card,
+html[data-glow="on"] .hub-card,
+html[data-glow="on"] .project,
+html[data-glow="on"] .post,
+html[data-glow="on"] .contact {
+  background-image: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(var(--glow-pink), .15), transparent 62%);
+}
+
+html[data-glow="on"][data-theme="dark"] .card,
+html[data-glow="on"][data-theme="dark"] .dl-card,
+html[data-glow="on"][data-theme="dark"] .hub-card,
+html[data-glow="on"][data-theme="dark"] .project,
+html[data-glow="on"][data-theme="dark"] .post,
+html[data-glow="on"][data-theme="dark"] .contact {
+  background-image: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 122, 180, .17), transparent 62%);
+}
+
+/* ------------------------------------------------------------ hover bloom */
+html[data-glow="on"] .hub-card:hover,
+html[data-glow="on"] .card:hover,
+html[data-glow="on"] .dl-card:hover,
+html[data-glow="on"] .project:hover,
+html[data-glow="on"] .post:hover {
+  box-shadow: 0 0 0 1px rgba(var(--glow-pink), .28),
+              0 12px 34px rgba(var(--glow-pink), .22);
+}
+
+html[data-glow="on"] .dl-btn:hover,
+html[data-glow="on"] .btn-primary:hover,
+html[data-glow="on"] .online-back:hover,
+html[data-glow="on"] .back:hover {
+  box-shadow: 0 0 20px rgba(var(--glow-pink), .42);
+}
+
+/* -------------------------------------------------------------- typography */
+html[data-glow="on"] .hero-title {
+  animation: glowSweep 9s linear infinite;
+}
+
+html[data-glow="on"] .page-title,
+html[data-glow="on"] .section-title {
+  animation: glowPulse 5.5s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------- keyframes */
+@keyframes glowDrift {
+  0%   { transform: translate3d(-2%, -1%, 0) scale(1); }
+  100% { transform: translate3d(2%, 1.5%, 0) scale(1.06); }
+}
+
+@keyframes glowFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes glowBeam {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes glowSweep {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 0 rgba(var(--glow-pink), 0); }
+  50%      { text-shadow: 0 0 22px rgba(var(--glow-pink), .34); }
+}
+
+/* ------------------------------------------------- pauses and degradation */
+html[data-glow-paused] body::before,
+html[data-glow-paused] .navbar::before,
+html[data-glow-paused] .hero-title,
+html[data-glow-paused] .page-title,
+html[data-glow-paused] .section-title {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-glow="on"] body::before,
+  html[data-glow="on"] .navbar::before,
+  html[data-glow="on"] .hero-title,
+  html[data-glow="on"] .page-title,
+  html[data-glow="on"] .section-title {
+    animation: none !important;
+  }
+}
+
+@media print {
+  html[data-glow="on"] body::before,
+  html[data-glow="on"] .navbar::before {
+    display: none !important;
+  }
+}
