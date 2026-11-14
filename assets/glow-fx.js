@@ -15,6 +15,10 @@
   /* 1) Never override the v8.4 Fix legacy fallback. */
   if (r.getAttribute('data-compat') === 'legacy') return;
 
+  /* 1b) Android mobile uses the reduced rendering budget (v8.7): skip the
+         GPU-heavy light layer entirely; mobile-perf.css handles the visuals. */
+  if (r.getAttribute('data-perf') === 'mobile') return;
+
   function mq(query) {
     try { return !!(w.matchMedia && w.matchMedia(query).matches); }
     catch (e) { return false; }

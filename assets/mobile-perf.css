@@ -1,0 +1,157 @@
+/*!
+ * mobile-perf.css — Android mobile rendering budget (v8.7)
+ *
+ * Every rule is gated behind html[data-perf="mobile"], set by mobile-perf.js.
+ * Desktop / iOS / Android TV see no difference.
+ *
+ * Targets the real frame-time costs on Android GPUs:
+ *   - large-area blur filters and mix-blend-mode layers
+ *   - backdrop-filter on fixed navbars (repaints on every scroll)
+ *   - infinite transform/opacity animations on full-viewport decorations
+ *   - reveal transitions with filter:blur(6px)
+ *   - unnecessary will-change compositing layers
+ * Content visibility is never delegated to JavaScript on these devices.
+ */
+
+/* 1. Remove GPU-expensive decoration layers entirely. These are created by
+      aesthetic.js / glow-fx.css and are purely cosmetic. */
+html[data-perf="mobile"] .fx-aurora,
+html[data-perf="mobile"] .fx-grain,
+html[data-perf="mobile"] .fx-hero-orb,
+html[data-perf="mobile"] .fx-progress,
+html[data-perf="mobile"] .fx-cursor,
+html[data-perf="mobile"] .fx-cursor-dot,
+html[data-perf="mobile"] .fx-sweep,
+html[data-perf="mobile"] .fx-ripple,
+html[data-perf="mobile"] .fx-flash,
+html[data-perf="mobile"] .fx-nav-pill,
+html[data-perf="mobile"] .fx-load-dots,
+html[data-perf="mobile"] .fx-load-halo,
+html[data-perf="mobile"] .fx-load-ring,
+html[data-perf="mobile"] .fx-load-ring-2,
+html[data-perf="mobile"] .hero-particles,
+html[data-perf="mobile"] body::before,
+html[data-perf="mobile"] .navbar::before {
+  display: none !important;
+}
+
+/* 2. Stop infinite animations. Entrance animations are also removed so the
+      first screen paints immediately; static opacity fallbacks keep text
+      visible (see .hero-title{opacity:1} added in v8.6). */
+html[data-perf="mobile"] .hero-eyebrow,
+html[data-perf="mobile"] .hero-subtitle,
+html[data-perf="mobile"] .hero-title,
+html[data-perf="mobile"] .scroll-hint,
+html[data-perf="mobile"] .page-title,
+html[data-perf="mobile"] .section-title,
+html[data-perf="mobile"] .hero-caret,
+html[data-perf="mobile"] .section-head::before {
+  animation: none !important;
+}
+html[data-perf="mobile"] .hero-eyebrow,
+html[data-perf="mobile"] .hero-subtitle,
+html[data-perf="mobile"] .hero-title,
+html[data-perf="mobile"] .scroll-hint {
+  opacity: 1 !important;
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
+/* 3. Content-first: reveal elements must not depend on a successful
+      IntersectionObserver / classList run, and must never animate blur. */
+html[data-perf="mobile"] [data-reveal],
+html[data-perf="mobile"] .section-head {
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-transform: none !important;
+  transform: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* 4. Fixed navbars with backdrop-filter force a full-viewport blur on every
+      scroll frame. Use an opaque background instead. */
+html[data-perf="mobile"] .navbar,
+html[data-perf="mobile"] .theme-ctl {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: #fff !important;
+}
+html[data-perf="mobile"][data-theme="dark"] .navbar {
+  background: #1c1923 !important;
+}
+html[data-perf="mobile"][data-theme="dark"] .theme-ctl {
+  background: #241f2c !important;
+}
+
+/* 5. Drop shadows, hover transforms and text-gradient filters. Touch devices
+      have no hover state, so these only cost paint without adding value. */
+html[data-perf="mobile"] .card,
+html[data-perf="mobile"] .dl-card,
+html[data-perf="mobile"] .hub-card,
+html[data-perf="mobile"] .project,
+html[data-perf="mobile"] .post,
+html[data-perf="mobile"] .contact,
+html[data-perf="mobile"] .to-top {
+  box-shadow: none !important;
+}
+html[data-perf="mobile"] .card:hover,
+html[data-perf="mobile"] .dl-card:hover,
+html[data-perf="mobile"] .hub-card:hover,
+html[data-perf="mobile"] .project:hover,
+html[data-perf="mobile"] .post:hover {
+  -webkit-transform: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  top: auto;
+}
+html[data-perf="mobile"] .hero-title,
+html[data-perf="mobile"] .page-title {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* 6. Release compositing hints. On constrained GPUs, many will-change layers
+      consume memory and can make scrolling slower, not faster. */
+html[data-perf="mobile"] .fx-aurora i,
+html[data-perf="mobile"] .fx-hero-orb,
+html[data-perf="mobile"] [data-reveal],
+html[data-perf="mobile"] .hero-inner,
+html[data-perf="mobile"] .navbar {
+  will-change: auto !important;
+}
+
+/* 7. Low-tier devices: remove the remaining transitions and convert
+      background-clip:text headings to solid colour (no gradient repaint).
+      The loader is still removed by the page's own JS setTimeout, so
+      disabling its transition is safe. */
+html[data-perf="mobile"][data-perf-tier="low"] a,
+html[data-perf="mobile"][data-perf-tier="low"] button,
+html[data-perf="mobile"][data-perf-tier="low"] .card,
+html[data-perf="mobile"][data-perf-tier="low"] .dl-card,
+html[data-perf="mobile"][data-perf-tier="low"] #loader {
+  transition: none !important;
+}
+html[data-perf="mobile"][data-perf-tier="low"] .hero-title,
+html[data-perf="mobile"][data-perf-tier="low"] .page-title {
+  background: none !important;
+  -webkit-text-fill-color: #c62e6c !important;
+  color: #c62e6c !important;
+}
+html[data-perf="mobile"][data-perf-tier="low"][data-theme="dark"] .hero-title,
+html[data-perf="mobile"][data-perf-tier="low"][data-theme="dark"] .page-title {
+  -webkit-text-fill-color: #ff9ac4 !important;
+  color: #ff9ac4 !important;
+}
+
+/* 8. Respect the system preference as a second layer of defence. */
+@media (prefers-reduced-motion: reduce) {
+  html[data-perf="mobile"] *,
+  html[data-perf="mobile"] *::before,
+  html[data-perf="mobile"] *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
