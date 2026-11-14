@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>函数棋2.0.1.0 - Function Chess</title>
+    <title>函数棋2.0.2.0 - Function Chess</title>
     <link rel="stylesheet" href="files/css/style.css">
     <link rel="stylesheet" href="files/css/shaihai-theme.css">
     <link rel="stylesheet" href="files/css/editor.css">
@@ -13,8 +13,47 @@
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
+<!-- v8.4 compat bootstrap:start -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<script>
+/* v8.4 兼容引导：ES5 语法，必须保持为 ES5。
+   - IE10 及以下 / 无 Canvas 2D：跳转静态降级页
+   - IE11 及旧内核：按需加载 polyfill（现代浏览器零开销）
+   - 打 data-legacy 标记供 CSS 关闭高开销装饰 */
+(function () {
+  var w = window, d = document, dm = d.documentMode;
+  var canvasOK = false;
+  try { canvasOK = !!(d.createElement('canvas').getContext); } catch (e) {}
+  if ((dm && dm < 11) || !canvasOK) {
+    location.replace('legacy.html' + location.search + location.hash);
+    return;
+  }
+  var EP = (w.Element && w.Element.prototype) ? w.Element.prototype : {};
+  var need = (
+    typeof w.Promise !== 'function' ||
+    typeof w.Map !== 'function' ||
+    typeof w.Symbol !== 'function' ||
+    typeof w.fetch !== 'function' ||
+    typeof Object.assign !== 'function' ||
+    typeof Object.entries !== 'function' ||
+    !Array.prototype.includes ||
+    !Array.prototype.flat ||
+    !String.prototype.padStart ||
+    !EP.remove ||
+    !(w.NodeList && w.NodeList.prototype && w.NodeList.prototype.forEach) ||
+    typeof w.CustomEvent !== 'function'
+  );
+  if (need) {
+    d.documentElement.setAttribute('data-legacy', '1');
+    /* 同步写入：保证 polyfill 一定早于所有 defer 游戏脚本执行 */
+    d.write('<script src="files/es5/polyfills.min.js"><\/script>');
+  }
+})();
+</script>
+<!-- v8.4 compat bootstrap:end -->
 </head>
 <body>
+    <noscript><div style="padding:16px;font:16px/1.6 sans-serif;color:#7a2038">函数棋需要启用 JavaScript 才能运行，请在浏览器设置中开启后刷新页面。</div></noscript>
     <!-- 启动界面（仅首次加载时显示） -->
     <div id="splash-screen">
         <div class="splash-content">
@@ -72,7 +111,7 @@
         </div>
 
         <button class="bgm-float-btn" id="bgm-open-btn" type="button" aria-label="背景音乐设置" title="背景音乐设置">
-            <img src="files/images/VolumeButton.png" alt="背景音乐设置" class="bgm-float-icon-img">
+            <img src="files/images/VolumeButton.png" alt="背景音乐设置" class="bgm-float-icon-img" decoding="async">
         </button>
     </header>
     
@@ -116,7 +155,7 @@
             <div class="summa-emoji-panel" id="summa-emoji-panel" style="display:none"></div>
             <!-- Summa 表情弹出浮层：收到对方表情 / 本地发出反馈（纯图片，无文字） -->
             <div class="summa-emoji-pop" id="summa-emoji-pop" style="display:none">
-                <img id="summa-emoji-pop-img" alt="">
+                <img id="summa-emoji-pop-img" alt="" decoding="async" loading="lazy">
             </div>
         </section>
         
@@ -210,7 +249,7 @@
                         </svg>
                     </button>
                 </div>
-                <img class="start-page-title" src="files/images/MainTitle.png" alt="函数棋">
+                <img class="start-page-title" src="files/images/MainTitle.png" alt="函数棋" decoding="async">
                 <button class="start-page-btn" id="start-go-btn" type="button">开始游戏</button>
                 <a class="about-us-link" href="https://space.bilibili.com/3690976753223882" target="_blank" rel="noopener noreferrer">关于我们</a>
             </div>
@@ -228,10 +267,10 @@
                             <span>对战函数设置</span>
                         </button>
                         <button class="bgm-float-btn start-bgm-btn" id="start-bgm-open-btn" type="button" aria-label="背景音乐设置" title="背景音乐设置">
-                            <img src="files/images/VolumeButton.png" alt="背景音乐设置" class="bgm-float-icon-img">
+                            <img src="files/images/VolumeButton.png" alt="背景音乐设置" class="bgm-float-icon-img" decoding="async">
                         </button>
                         <button class="btn btn-secondary main-leaderboard-btn" id="leaderboard-open-btn" type="button" aria-label="在线排行榜" title="在线排行榜">
-                            <img class="leaderboard-open-icon" src="files/images/championship.png" alt="在线排行榜">
+                            <img class="leaderboard-open-icon" src="files/images/championship.png" alt="在线排行榜" decoding="async" loading="lazy">
                             <span>排行榜</span>
                         </button>
                     </div>
@@ -595,7 +634,7 @@
     <!-- Summa训练选择弹窗 -->
     <div class="modal" id="summa-train-dialog" style="display: none;">
         <div class="modal-content summa-dialog-content">
-            <img class="summa-dialog-icon" src="files/Summa形象处理/summa_image/happy.png" alt="Summa 图标">
+            <img class="summa-dialog-icon" src="files/Summa形象处理/summa_image/happy.png" alt="Summa 图标" decoding="async" loading="lazy">
             <h2 class="summa-dialog-title" id="summa-dialog-title">唤醒 Summa</h2>
             <p class="summa-dialog-message" id="summa-dialog-message"></p>
             
@@ -1223,44 +1262,44 @@
       </button>
     </div>
 
-        <script src="files/js/CompatManager.js" defer></script>
-    <script src="files/vendor/katex/katex.min.js" defer></script>
-    <script src="files/js/GridSystem.js" defer></script>
-    <script src="files/js/CollisionDetector.js" defer></script>
-    <script src="files/js/ComplexMath.js" defer></script>
-    <script src="files/js/FunctionParser.js" defer></script>
+        <script src="files/es5/js/CompatManager.js" defer></script>
+    <script src="files/es5/vendor/katex/katex.min.js" defer></script>
+    <script src="files/es5/js/GridSystem.js" defer></script>
+    <script src="files/es5/js/CollisionDetector.js" defer></script>
+    <script src="files/es5/js/ComplexMath.js" defer></script>
+    <script src="files/es5/js/FunctionParser.js" defer></script>
     <!-- MathLatex：表达式 → LaTeX 转换器（运行时依赖 FunctionParser） -->
-    <script src="files/js/MathLatex.js" defer></script>
+    <script src="files/es5/js/MathLatex.js" defer></script>
     <!-- geogebra-lite 核心引擎（采样+裁剪） -->
-    <script src="files/geogebra-lite/plot/Gap.js" defer></script>
-    <script src="files/geogebra-lite/plot/PathPlotter.js" defer></script>
-    <script src="files/geogebra-lite/plot/CurveSegmentInfo.js" defer></script>
-    <script src="files/geogebra-lite/plot/SegmentParams.js" defer></script>
-    <script src="files/geogebra-lite/plot/CurvePlotterStackItem.js" defer></script>
-    <script src="files/geogebra-lite/plot/CurvePlotterStack.js" defer></script>
-    <script src="files/geogebra-lite/plot/CurvePlotterUtils.js" defer></script>
-    <script src="files/geogebra-lite/plot/TupleNeighbours.js" defer></script>
-    <script src="files/geogebra-lite/plot/LabelPositionCalculator.js" defer></script>
-    <script src="files/geogebra-lite/plot/GeneralPathClippedForCurvePlotter.js" defer></script>
-    <script src="files/geogebra-lite/plot/CurveSegmentPlotter.js" defer></script>
-    <script src="files/geogebra-lite/plot/CurvePlotter.js" defer></script>
-    <script src="files/js/FunctionRenderer.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/Gap.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/PathPlotter.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/CurveSegmentInfo.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/SegmentParams.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/CurvePlotterStackItem.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/CurvePlotterStack.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/CurvePlotterUtils.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/TupleNeighbours.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/LabelPositionCalculator.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/GeneralPathClippedForCurvePlotter.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/CurveSegmentPlotter.js" defer></script>
+    <script src="files/es5/geogebra-lite/plot/CurvePlotter.js" defer></script>
+    <script src="files/es5/js/FunctionRenderer.js" defer></script>
     <!-- 全局音频管理器和角色管理器 -->
-    <script src="files/js/AudioManager.js" defer></script>
+    <script src="files/es5/js/AudioManager.js" defer></script>
     <!-- SummaAnimator 必须在 SummaCharacter 之前加载 -->
-    <script src="files/Summa形象处理/SummaAnimator.js" defer></script>
-    <script src="files/Summa形象处理/SummaCharacter.js" defer></script>
+    <script src="files/es5/Summa形象处理/SummaAnimator.js" defer></script>
+    <script src="files/es5/Summa形象处理/SummaCharacter.js" defer></script>
     
     <!-- Ai子模块（按依赖顺序加载） -->
-    <script src="files/js/ai/AIFunctionBuilderSingle.js" defer></script>
-    <script src="files/js/ai/AIFunctionBuilderMulti.js" defer></script>
-    <script src="files/js/ai/AIFunctionBuilder.js" defer></script>
-    <script src="files/js/ai/AITargetSelector.js" defer></script>
-    <script src="files/js/ai/AIConstraintManager.js" defer></script>
-    <script src="files/js/ai/AILearningSystem.js" defer></script>
-    <script src="files/js/ai/AIExpressionHandler.js" defer></script>
-    <script src="files/js/ai/AIPersistence.js" defer></script>
-    <script src="files/js/AIController.js" defer></script>
+    <script src="files/es5/js/ai/AIFunctionBuilderSingle.js" defer></script>
+    <script src="files/es5/js/ai/AIFunctionBuilderMulti.js" defer></script>
+    <script src="files/es5/js/ai/AIFunctionBuilder.js" defer></script>
+    <script src="files/es5/js/ai/AITargetSelector.js" defer></script>
+    <script src="files/es5/js/ai/AIConstraintManager.js" defer></script>
+    <script src="files/es5/js/ai/AILearningSystem.js" defer></script>
+    <script src="files/es5/js/ai/AIExpressionHandler.js" defer></script>
+    <script src="files/es5/js/ai/AIPersistence.js" defer></script>
+    <script src="files/es5/js/AIController.js" defer></script>
     <!-- 联机信令服务器配置（必须在 P2PController.js 之前） -->
     <script>
         window.P2P_SIGNALING = {
@@ -1272,212 +1311,205 @@
         };
     </script>
     <!-- 核心控制器 -->
-    <script src="files/js/P2PController.js" defer></script>
+    <script src="files/es5/js/P2PController.js" defer></script>
     <!-- 匹配大厅控制器（依赖 P2PController.signaling 构建 WebSocket 地址） -->
-    <script src="files/js/MatchLobby.js" defer></script>
+    <script src="files/es5/js/MatchLobby.js" defer></script>
     <!-- 竞速对战多人房间控制器（2-4 人星型拓扑，独立于 1v1 的 P2PController，依赖 PeerJS） -->
-    <script src="files/js/RaceRoomController.js" defer></script>
-    <script src="files/js/GameController.js" defer></script>
-    <script src="files/js/campaignLevels.js" defer></script>
-    <script src="files/js/RaceMode/RaceModeManager.js" defer></script>
-    <script src="files/js/RaceMode/RaceModeController.js" defer></script>
-    <script src="files/js/UIController.js" defer></script>
+    <script src="files/es5/js/RaceRoomController.js" defer></script>
+    <script src="files/es5/js/GameController.js" defer></script>
+    <script src="files/es5/js/campaignLevels.js" defer></script>
+    <script src="files/es5/js/RaceMode/RaceModeManager.js" defer></script>
+    <script src="files/es5/js/RaceMode/RaceModeController.js" defer></script>
+    <script src="files/es5/js/UIController.js" defer></script>
     <!-- UIController 方法已拆分到以下模块（运行时挂回 UIController.prototype），须在 UIController.js 之后、实例化之前加载 -->
-    <script src="files/js/ui/UIModals.js" defer></script>
-    <script src="files/js/ui/UIStart.js" defer></script>
-    <script src="files/js/ui/UIInput.js" defer></script>
-    <script src="files/js/ui/UICanvas.js" defer></script>
-    <script src="files/js/ui/UIPhase.js" defer></script>
-    <script src="files/js/ui/UICampaign.js" defer></script>
-    <script src="files/js/ui/UICampaignImport.js" defer></script>
-    <script src="files/js/ui/UIRace.js" defer></script>
+    <script src="files/es5/js/ui/UIModals.js" defer></script>
+    <script src="files/es5/js/ui/UIStart.js" defer></script>
+    <script src="files/es5/js/ui/UIInput.js" defer></script>
+    <script src="files/es5/js/ui/UICanvas.js" defer></script>
+    <script src="files/es5/js/ui/UIPhase.js" defer></script>
+    <script src="files/es5/js/ui/UICampaign.js" defer></script>
+    <script src="files/es5/js/ui/UICampaignImport.js" defer></script>
+    <script src="files/es5/js/ui/UIRace.js" defer></script>
     <!-- 竞速对战 UI（批次11 拆分：原 UIRaceBattle.js 3054 行 → 9 个连续切片，全部挂载 UIController.prototype）
          UIRaceBattleBase 必须最先加载（含 RACE_BATTLE_DIFFICULTIES / RACE_BATTLE_STAMINA 顶层 const） -->
-    <script src="files/js/ui/racebattle/UIRaceBattleBase.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleRoom.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattlePanel.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleResult.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleResume.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleMatch.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattlePlay.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleView.js" defer></script>
-    <script src="files/js/ui/racebattle/UIRaceBattleLobby.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleBase.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleRoom.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattlePanel.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleResult.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleResume.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleMatch.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattlePlay.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleView.js" defer></script>
+    <script src="files/es5/js/ui/racebattle/UIRaceBattleLobby.js" defer></script>
     <!-- P2P 联机 UI（批次11 拆分：原 UIP2P.js 1777 行/64 方法 → 9 个连续切片，全部挂载 UIController.prototype，无加载期依赖，按职责分组） -->
-    <script src="files/js/ui/uip2p/UIP2PRoom.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PSelectors.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PEmoji.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PDisconnect.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PSpectate.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PVSIntro.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PSync.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PHealth.js" defer></script>
-    <script src="files/js/ui/uip2p/UIP2PResume.js" defer></script>
-    <script src="files/js/ui/UILobby.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PRoom.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PSelectors.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PEmoji.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PDisconnect.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PSpectate.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PVSIntro.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PSync.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PHealth.js" defer></script>
+    <script src="files/es5/js/ui/uip2p/UIP2PResume.js" defer></script>
+    <script src="files/es5/js/ui/UILobby.js" defer></script>
     <!-- 排行榜：身份 + 数据服务 + UI（UILeaderboard 依赖 UIController 原型） -->
-    <script src="files/js/PlayerProfile.js" defer></script>
+    <script src="files/es5/js/PlayerProfile.js" defer></script>
     <!-- 排行榜防作弊：签名工具（须在 LeaderboardService 之前加载） -->
-    <script src="files/js/VerifyCrypto.js" defer></script>
-    <script src="files/js/LeaderboardService.js" defer></script>
-    <script src="files/js/ui/UILeaderboard.js" defer></script>
-    <script src="files/js/ui/UISpectator.js" defer></script>
-    <script src="files/js/GameVersion.js" defer></script>
-    <script src="files/js/ui/UINotice.js" defer></script>
+    <script src="files/es5/js/VerifyCrypto.js" defer></script>
+    <script src="files/es5/js/LeaderboardService.js" defer></script>
+    <script src="files/es5/js/ui/UILeaderboard.js" defer></script>
+    <script src="files/es5/js/ui/UISpectator.js" defer></script>
+    <script src="files/es5/js/GameVersion.js" defer></script>
+    <script src="files/es5/js/ui/UINotice.js" defer></script>
     <!-- 核心对战 UI（批次11 拆分：原 UICore.js 2327 行/53 方法 → 8 个连续切片，全部挂载 UIController.prototype，无加载期依赖，按职责分组） -->
-    <script src="files/js/ui/uicore/UICoreInit.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreGameEvents.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreEvents.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreTestFunc.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreAI.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreP2PSync.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreBattle.js" defer></script>
-    <script src="files/js/ui/uicore/UICoreMisc.js" defer></script>
-<script src="files/js/ui/UIEditor.js" defer></script>
-<script src="files/js/ui/UIFloatKeypad.js" defer></script>
-    <script src="files/js/SummaTrainer.js" defer></script>
-    <script src="files/js/ui/uicore/UILobbyWatch.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreInit.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreGameEvents.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreEvents.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreTestFunc.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreAI.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreP2PSync.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreBattle.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UICoreMisc.js" defer></script>
+<script src="files/es5/js/ui/UIEditor.js" defer></script>
+<script src="files/es5/js/ui/UIFloatKeypad.js" defer></script>
+    <script src="files/es5/js/SummaTrainer.js" defer></script>
+    <script src="files/es5/js/ui/uicore/UILobbyWatch.js" defer></script>
     
-    <script>
-        // 初始化游戏
-        document.addEventListener('DOMContentLoaded', () => {
-            // 创建核心组件
-            const gridSystem = new GridSystem('game-canvas');
-            const gameController = new GameController();
-
-            // 创建UI控制器
-            const uiController = new UIController(gridSystem, gameController);
-            uiController.raceModeManager = new RaceModeManager();
-            uiController.raceModeController = new RaceModeController(gridSystem);
-            uiController.p2pController = null;
-            uiController._lobby = new MatchLobbyController();
-            // 排行榜服务（复用 lobby WebSocket 通道）+ 排行榜 UI 初始化
-            uiController._leaderboardService = new LeaderboardService(uiController._lobby);
-            // 防作弊上报结果提示（核验失败 / 限流 / 用时异常）
-            uiController._leaderboardService.onSubmitResult = (res) => {
-                if (!res || res.ok) return;
-                const sm = typeof uiController.showMessage === 'function' ? uiController.showMessage.bind(uiController) : null;
-                if (!sm) return;
-                if (res.code === 'verify_failed') {
-                    const map = {
-                        not_pass: '表达式复算未命中或命中禁区',
-                        expr_mismatch: '表达式与签名不一致（若为旧版本通关记录，请重新通关该关）',
-                        length_mismatch: '长度与服务器 token 复算不符（若为旧版本通关记录，请重新通关该关）',
-                        value_mismatch: 'LR∑ 值与关卡长度不符（可能因旧关卡缺表达式，重新通关即可同步）',
-                        missing_levels: '缺少逐关表达式（请重新通关后同步）',
-                        missing_expr: '该关缺少表达式记录（老版本关卡），请重新通关一次以补齐',
-                        level_not_open: '存在未开放关卡'
-                    };
-                    const reason = map[res.reason] || (res.reason || '未知原因');
-                    const where = (res.level !== undefined && res.level !== null && res.level !== '') ? `（第 ${res.level} 关）` : '';
-                    sm(`成绩核验未通过${where}：${reason}`, 'error');
-                } else if (res.code === 'rate_limited') {
-                    sm('提交太频繁，请稍后再试', 'error');
-                } else if (res.code === 'too_fast') {
-                    sm('用时异常过快，成绩未记录', 'error');
-                }
-            };
-            uiController.initLeaderboard();
-
-            // 创建Summa训练器
-            const summaTrainer = new SummaTrainer(gameController, gridSystem);
-
-            // 将训练器暴露到全局，方便控制台调用
-            window.summaTrainer = summaTrainer;
-            window.gameController = gameController;
-            window.uiController = uiController;
-
-            // ── 全局匹配大厅速览浮窗：常驻探针（任意界面可见，可拖动/折叠/隐藏）──
-            if (typeof uiController._initLobbyWatch === 'function') {
-                uiController._initLobbyWatch();
-            }
-
-            // ── 启动界面：点击 / ESC / 回车 / 空格 均可进入主界面 ──
-            const splash = document.getElementById('splash-screen');
-            if (splash) {
-                uiController.showSplash();   // 绑定「点击 + 键盘」进入监听
-                // 启动后检测访客大退未结束的排位对局，弹窗询问是否恢复（对战/竞速分别检测）
-                uiController._checkP2PResume();
-                uiController._checkRaceBattleResume();
-            } else {
-                uiController.showModal(document.getElementById('start-modal'));
-                // 无 splash 场景：直接进入主界面后拉取通知 + 检查版本
-                uiController.checkNotice();
-                uiController.checkVersion();
-            }
-
-            // ── 服务器通知/版本：绑定弹窗「知道了」按钮；checkNotice/checkVersion 在进入主界面后触发 ──
-            uiController.initNotice();
-
-            console.log('函数棋游戏已加载完成！');
-            console.log('游戏模块:', {
-                gridSystem: !!gridSystem,
-                gameController: !!gameController,
-                uiController: !!uiController,
-                summaTrainer: !!summaTrainer
-            });
-
-            console.log('\n=== Summa训练器已就绪 ===');
-            console.log('使用方法：');
-            console.log('1. 开始训练: summaTrainer.startTraining({totalGames: 1000, difficulty: "hard"})');
-            console.log('2. 停止训练: summaTrainer.stopTraining()');
-            console.log('3. 查看统计: summaTrainer.getTrainingStats()');
-            console.log('4. 加载数据: summaTrainer.loadTrainingData()');
-            console.log('========================\n');
-        });
+    <script data-hsq="init">
+document.addEventListener('DOMContentLoaded', function () {
+  var gridSystem = new GridSystem('game-canvas');
+  var gameController = new GameController();
+  var uiController = new UIController(gridSystem, gameController);
+  uiController.raceModeManager = new RaceModeManager();
+  uiController.raceModeController = new RaceModeController(gridSystem);
+  uiController.p2pController = null;
+  uiController._lobby = new MatchLobbyController();
+  uiController._leaderboardService = new LeaderboardService(uiController._lobby);
+  uiController._leaderboardService.onSubmitResult = function (res) {
+    if (!res || res.ok) return;
+    var sm = typeof uiController.showMessage === 'function' ? uiController.showMessage.bind(uiController) : null;
+    if (!sm) return;
+    if (res.code === 'verify_failed') {
+      var map = {
+        not_pass: '表达式复算未命中或命中禁区',
+        expr_mismatch: '表达式与签名不一致（若为旧版本通关记录，请重新通关该关）',
+        length_mismatch: '长度与服务器 token 复算不符（若为旧版本通关记录，请重新通关该关）',
+        value_mismatch: 'LR∑ 值与关卡长度不符（可能因旧关卡缺表达式，重新通关即可同步）',
+        missing_levels: '缺少逐关表达式（请重新通关后同步）',
+        missing_expr: '该关缺少表达式记录（老版本关卡），请重新通关一次以补齐',
+        level_not_open: '存在未开放关卡'
+      };
+      var reason = map[res.reason] || res.reason || '未知原因';
+      var where = res.level !== undefined && res.level !== null && res.level !== '' ? "\uFF08\u7B2C ".concat(res.level, " \u5173\uFF09") : '';
+      sm("\u6210\u7EE9\u6838\u9A8C\u672A\u901A\u8FC7".concat(where, "\uFF1A").concat(reason), 'error');
+    } else if (res.code === 'rate_limited') {
+      sm('提交太频繁，请稍后再试', 'error');
+    } else if (res.code === 'too_fast') {
+      sm('用时异常过快，成绩未记录', 'error');
+    }
+  };
+  uiController.initLeaderboard();
+  var summaTrainer = new SummaTrainer(gameController, gridSystem);
+  window.summaTrainer = summaTrainer;
+  window.gameController = gameController;
+  window.uiController = uiController;
+  if (typeof uiController._initLobbyWatch === 'function') {
+    uiController._initLobbyWatch();
+  }
+  var splash = document.getElementById('splash-screen');
+  if (splash) {
+    uiController.showSplash();
+    uiController._checkP2PResume();
+    uiController._checkRaceBattleResume();
+  } else {
+    uiController.showModal(document.getElementById('start-modal'));
+    uiController.checkNotice();
+    uiController.checkVersion();
+  }
+  uiController.initNotice();
+  console.log('函数棋游戏已加载完成！');
+  console.log('游戏模块:', {
+    gridSystem: !!gridSystem,
+    gameController: !!gameController,
+    uiController: !!uiController,
+    summaTrainer: !!summaTrainer
+  });
+  console.log('\n=== Summa训练器已就绪 ===');
+  console.log('使用方法：');
+  console.log('1. 开始训练: summaTrainer.startTraining({totalGames: 1000, difficulty: "hard"})');
+  console.log('2. 停止训练: summaTrainer.stopTraining()');
+  console.log('3. 查看统计: summaTrainer.getTrainingStats()');
+  console.log('4. 加载数据: summaTrainer.loadTrainingData()');
+  console.log('========================\n');
+});
     </script>
 
     <!-- <<< 按钮交互增强：涟漪 + 磁性吸附 + 光晕跟随 + 箭头注入 >>> -->
-    <script>
-        (function initButtonEnhancements() {
-            var btns = document.querySelectorAll('.btn, .btn-exit, .mode-btn, .btn-small, .summa-dialog-option-btn, .summa-dialog-skip-btn, .summa-dialog-exit-btn, .campaign-difficulty-grid .btn, .campaign-level-cell, .summa-dialog-input-buttons .btn');
+    <script data-hsq="buttons">
+/* v8.4：ES5 重写，移除 NodeList.forEach / Element.remove / 自定义属性
+   setProperty 的硬依赖；轻量/老设备跳过涟漪与磁性效果以省渲染开销。 */
+(function () {
+  var sel = '.btn, .btn-exit, .mode-btn, .btn-small, .summa-dialog-option-btn, ' +
+            '.summa-dialog-skip-btn, .summa-dialog-exit-btn, ' +
+            '.campaign-difficulty-grid .btn, .campaign-level-cell, ' +
+            '.summa-dialog-input-buttons .btn';
+  var btns = document.querySelectorAll(sel);
+  var light = document.documentElement.getAttribute('data-legacy') === '1';
+  var reduced = false;
+  try {
+    reduced = !!(window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  } catch (e) {}
+  var skipFx = light || reduced;
+  var i, el, arrow;
 
-            // ── 箭头注入 ──
-            btns.forEach(function(el) {
-                if (el.hasAttribute('data-arrow') && !el.querySelector('.btn-arrow')) {
-                    var arrow = document.createElement('span');
-                    arrow.className = 'btn-arrow';
-                    arrow.textContent = '\u2192';
-                    el.appendChild(arrow);
-                }
-            });
+  for (i = 0; i < btns.length; i++) {
+    el = btns[i];
+    if (el.hasAttribute('data-arrow') && !el.querySelector('.btn-arrow')) {
+      arrow = document.createElement('span');
+      arrow.className = 'btn-arrow';
+      arrow.appendChild(document.createTextNode('\u2192'));
+      el.appendChild(arrow);
+    }
+  }
 
-            btns.forEach(function(el) {
-                // ── 涟漪 ──
-                el.addEventListener('click', function(e) {
-                    var rect = el.getBoundingClientRect();
-                    var ripple = document.createElement('span');
-                    ripple.className = 'ripple';
-                    var size = Math.max(rect.width, rect.height);
-                    ripple.style.width = ripple.style.height = size + 'px';
-                    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-                    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-                    el.appendChild(ripple);
-                    setTimeout(function() { ripple.remove(); }, 650);
-                });
+  function bind(el) {
+    el.addEventListener('click', function (e) {
+      if (skipFx) return;
+      var rect = el.getBoundingClientRect();
+      var ripple = document.createElement('span');
+      var size = Math.max(rect.width, rect.height);
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      el.appendChild(ripple);
+      setTimeout(function () {
+        if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+      }, 650);
+    });
+    el.addEventListener('mousemove', function (e) {
+      if (skipFx || this.disabled) return;
+      var r = this.getBoundingClientRect();
+      try {
+        this.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+        this.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+        this.style.setProperty('--mx', ((e.clientX - r.left - r.width / 2) / r.width * 6).toFixed(1) + 'px');
+        this.style.setProperty('--my', ((e.clientY - r.top - r.height / 2) / r.height * 6).toFixed(1) + 'px');
+      } catch (err) {}
+    });
+    el.addEventListener('mouseleave', function () {
+      try {
+        this.style.removeProperty('--gx');
+        this.style.removeProperty('--gy');
+        this.style.removeProperty('--mx');
+        this.style.removeProperty('--my');
+      } catch (err) {}
+    });
+  }
 
-                // ── 磁性吸附 + 光晕跟随（仅桌面，有鼠标时） ──
-                el.addEventListener('mousemove', function(e) {
-                    if (this.disabled) return;
-                    var rect = this.getBoundingClientRect();
-                    // 光晕坐标（百分比）
-                    var gx = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-                    var gy = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-                    this.style.setProperty('--gx', gx + '%');
-                    this.style.setProperty('--gy', gy + '%');
-                    // 磁性偏移
-                    var mx = ((e.clientX - rect.left - rect.width / 2) / rect.width  * 6).toFixed(1);
-                    var my = ((e.clientY - rect.top  - rect.height / 2) / rect.height * 6).toFixed(1);
-                    this.style.setProperty('--mx', mx + 'px');
-                    this.style.setProperty('--my', my + 'px');
-                    // 不覆盖 CSS hover 的 translateY(-3px)，用 transform 叠加
-                });
-                el.addEventListener('mouseleave', function() {
-                    this.style.removeProperty('--gx');
-                    this.style.removeProperty('--gy');
-                    this.style.removeProperty('--mx');
-                    this.style.removeProperty('--my');
-                });
-            });
-        })();
+  for (i = 0; i < btns.length; i++) bind(btns[i]);
+})();
     </script>
 </body>
 </html>

@@ -47,9 +47,10 @@ class AudioManager {
         this._preloadAllSounds();
         this._initBgmPlayer();
 
-        // 页面加载 1 秒后主动开始播放（绑定交互回退作为兜底）
+        // v8.4 性能优化：BGM 单曲 3~7 MB。取消「加载 1 秒后主动播放」，
+        // 改为首次用户手势触发，避免首屏无谓下载数 MB 音频（现代浏览器
+        // 的 autoplay 策略本来也会拦截无手势播放）。
         this._bindBgmUnlock();
-        setTimeout(() => this.startBgm(), 1000);
         
         // 尝试初始化 Web Audio API（用于合成音效）
         this._audioCtx = null;
@@ -77,7 +78,8 @@ class AudioManager {
         for (const [key, filename] of Object.entries(this.sounds)) {
             const audio = new Audio();
             audio.src = this.localBaseUrl + filename;
-            audio.preload = 'auto';
+            // v8.4: 不预取音效体，首次播放时再按需拉取（旧设备省流量/省内存）
+            audio.preload = 'none';
             this._audioPool[key] = audio;
         }
         
@@ -91,7 +93,7 @@ class AudioManager {
 
         if (!this._bgmAudio) {
             this._bgmAudio = new Audio();
-            this._bgmAudio.preload = 'auto';
+            this._bgmAudio.preload = 'none';
             this._bgmAudio.loop = false;
             this._bgmAudio.volume = this.masterVolume * this.bgmVolume;
             this._bgmAudio.addEventListener('ended', () => this._playNextBgm());
@@ -112,8 +114,13 @@ class AudioManager {
             try {
                 const snd = this._audioPool[key].cloneNode(true);
                 snd.volume = this._sfxGain(volume);
-                snd.play().catch(() => {});
-                snd.onended = () => snd.remove();
+                // v8.4: IE11 的 HTMLMediaElement.play() 返回 undefined，
+                // 直接 .catch() 会抛 TypeError，故显式判定后使用。
+                const p = snd.play();
+                if (p && typeof p.catch === 'function') p.catch(() => {});
+                snd.onended = function () {
+                    if (snd.parentNode) snd.parentNode.removeChild(snd);
+                };
             } catch (e) {
                 console.warn('[Audio] 播放异常:', e);
             }
@@ -155,9 +162,12 @@ class AudioManager {
         this._currentBgmIndex = nextIndex;
         this._bgmAudio.src = this.bgmBaseUrl + this._bgmPlaylist[nextIndex];
         this._bgmAudio.volume = this.masterVolume * this.bgmVolume;
-        this._bgmAudio.play().catch(() => {
-            // 用户未交互前可能被浏览器拦截，后续交互时会自动恢复
-        });
+        const p = this._bgmAudio.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(() => {
+                // 用户未交互前可能被浏览器拦截，后续交互时会自动恢复
+            });
+        }
     }
 
     _bindBgmUnlock() {
@@ -182,7 +192,8 @@ class AudioManager {
 
         // 尝试 resume AudioContext（部分浏览器要求 context 被 resume 后才允许 HTMLAudioElement play）
         if (this._audioCtx && this._audioCtx.state === 'suspended') {
-            this._audioCtx.resume().catch(() => {});
+            const rp = this._audioCtx.resume();
+            if (rp && typeof rp.catch === 'function') rp.catch(() => {});
         }
 
         if (!this._bgmAudio) this._initBgmPlayer();

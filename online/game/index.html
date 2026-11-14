@@ -2,7 +2,17 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+/* v8.4：老内核不支持 CSS 变量 / CSS.supports，打标记供下方样式降级 */
+(function () {
+  var w = window, d = document;
+  if (!w.CSS || typeof w.CSS.supports !== 'function') {
+    d.documentElement.setAttribute('data-legacy', '1');
+  }
+})();
+</script>
 <meta name="description" content="MeowRC 在线游戏板块 —— 把数学、创意与对战装进浏览器，在线即玩。">
 <meta name="theme-color" content="#f5a0b8" id="metaTheme">
 <title>游戏板块 · MeowRC Online</title>
@@ -93,6 +103,27 @@
     .theme-ctl{top:auto;bottom:16px;right:16px}
     .theme-ctl button{padding:8px 10px;font-size:12px}
   }
+
+  /* v8.4 老浏览器降级：CSS 变量不可用时 var() 整条声明失效，
+     尤其 h1 的 background-clip:text + color:transparent 会导致标题不可见。
+     以 data-legacy 更高优先级覆盖，现代浏览器不受影响。 */
+  html[data-legacy="1"] body{background:#fdf6f9;color:#2b2b33;
+    font-family:Arial,"Microsoft YaHei",sans-serif}
+  html[data-legacy="1"] .grid{display:block}
+  html[data-legacy="1"] .card{background:#fff;border:1px solid #ffe1ef;
+    box-shadow:none;margin-bottom:18px}
+  html[data-legacy="1"] .card:hover{transform:none;box-shadow:none}
+  html[data-legacy="1"] h1{background:none;color:#e02c72}
+  html[data-legacy="1"] .sub,
+  html[data-legacy="1"] .card p,
+  html[data-legacy="1"] .note{color:#6b6b76}
+  html[data-legacy="1"] .thumb{background:#ffe1ef}
+  html[data-legacy="1"] .tag,
+  html[data-legacy="1"] .badge{background:#ffe1ef;color:#c62e6c}
+  html[data-legacy="1"] .btn-primary{background:#ff1f7a;color:#fff}
+  html[data-legacy="1"] .btn-ghost{background:#fff;color:#c62e6c;border:1px solid #ffe1ef}
+  html[data-legacy="1"] .theme-ctl{background:#fff;border:1px solid #ffe1ef;box-shadow:none}
+  html[data-legacy="1"] .back{color:#c62e6c;background:#fff;border:1px solid #ffe1ef}
 </style>
 </head>
 <body>

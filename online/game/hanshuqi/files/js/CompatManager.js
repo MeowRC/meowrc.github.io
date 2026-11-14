@@ -74,13 +74,33 @@
 
     /* 6) 动态脚本加载（供需要时才拉取的依赖使用） */
     Compat.loadScript = function (src) {
-      return new Promise(function (resolve, reject) {
-        var s = doc.createElement('script');
-        s.src = src; s.async = true;
-        s.onload = function () { resolve(src); };
-        s.onerror = function () { reject(new Error('script load failed: ' + src)); };
-        doc.head.appendChild(s);
-      });
+      /* v8.4: 不依赖原生 Promise —— IE11 无 Promise，polyfill 也可能迟到。
+         返回最小 thenable，正确处理「脚本先加载完、后挂 .then」的时序。 */
+      var state = 0;                 // 0=pending 1=ok 2=fail
+      var value = null, onOk = null, onFail = null;
+      function fire() {
+        if (state === 1 && onOk) onOk(value);
+        else if (state === 2 && onFail) onFail(value);
+      }
+      var s = doc.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = function () { state = 1; value = src; fire(); };
+      s.onerror = function () {
+        state = 2; value = new Error('script load failed: ' + src); fire();
+      };
+      (doc.head || doc.body).appendChild(s);
+      return {
+        then: function (a, b) {
+          onOk = a || null; onFail = b || null;
+          if (state) fire();
+          return this;
+        },
+        catch: function (b) {
+          onFail = b || null;
+          if (state === 2) fire();
+          return this;
+        }
+      };
     };
 
     /* 7) 页面可见性：隐藏时暂停 BGM，恢复时（若已手势解锁）继续 */
@@ -107,8 +127,10 @@
       if (!doc) return;
       var el = doc.documentElement;
       if (!el) return;
-      el.dataset.compat = Compat.lite ? 'lite' : 'full';
-      if (Compat.reducedMotion) el.dataset.reducedMotion = '1';
+      /* v8.4: 用 setAttribute 而非 dataset —— dataset 在 IE10 缺失，
+         且属性写入可直接被 [data-compat="lite"] 等 CSS 选择器命中。 */
+      el.setAttribute('data-compat', Compat.lite ? 'lite' : 'full');
+      if (Compat.reducedMotion) el.setAttribute('data-reduced-motion', '1');
     }
     if (doc) {
       if (doc.readyState === 'loading') {

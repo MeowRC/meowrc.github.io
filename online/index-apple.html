@@ -131,8 +131,8 @@
   var themeBtn = $('#themeToggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
       var meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.content = next === 'dark' ? '#14121a' : '#fdfbfc';
       try {
@@ -209,15 +209,15 @@
       ticking = true;
       raf(function () {
         var y = window.scrollY;
-        if (navbar) navbar.classList.toggle('scrolled', y > 10);
-        if (toTop) toTop.classList.toggle('show', y > 500);
+        if (navbar) { if (y > 10) navbar.classList.add('scrolled'); else navbar.classList.remove('scrolled'); }
+        if (toTop) { if (y > 500) toTop.classList.add('show'); else toTop.classList.remove('show'); }
         ticking = false;
       });
-    }, { passive: true });
+    }, false);
 
     if (toTop) {
       toTop.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+        window.scrollTo(0, 0);
       });
     }
   }
@@ -249,7 +249,7 @@
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape' || e.key === 'Esc') close();
     });
   }
 

@@ -6435,3 +6435,41 @@ html[data-compat="lite"] * {
   text-shadow: none !important;
   transition-duration: 0.06ms !important;
 }
+
+/* ============================================================
+   v8.4 渲染效率优化：轻量模式下进一步关闭模糊、滤镜、无限动画
+   与大面积渐变，减少合成层与重绘开销（老设备 GPU 通常极弱）。
+   仅作用于 [data-compat="lite"]，正常设备视觉完全不变。
+   ============================================================ */
+html[data-compat="lite"] *,
+html[data-compat="lite"] *::before,
+html[data-compat="lite"] *::after {
+  filter: none !important;
+  -webkit-filter: none !important;
+  animation: none !important;
+  will-change: auto !important;
+  transform-style: flat !important;
+}
+html[data-compat="lite"] #splash-screen,
+html[data-compat="lite"] .modal-backdrop,
+html[data-compat="lite"] .fx-aurora,
+html[data-compat="lite"] .fx-grain {
+  background-image: none !important;
+}
+html[data-compat="lite"] .ripple,
+html[data-compat="lite"] .btn-arrow {
+  display: none !important;
+}
+
+/* 老浏览器（由入口探测脚本打 data-legacy="1"）同样禁用高频装饰 */
+html[data-legacy="1"] *,
+html[data-legacy="1"] *::before,
+html[data-legacy="1"] *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+  transition: none !important;
+}

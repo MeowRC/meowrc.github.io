@@ -1,0 +1,11 @@
+{
+  "files": 86,
+  "srcBytes": 2497314,
+  "outBytes": 1221742,
+  "vendors": 1,
+  "failures": [],
+  "polyfillBytes": 280472,
+  "scriptTags": 86,
+  "savedJsBytes": 1275572,
+  "savedJsPercent": 51.1
+}
