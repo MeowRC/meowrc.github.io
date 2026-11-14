@@ -2,6 +2,23 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
+<script>
+/* v8.4 Fix — old-engine capability probe (ES3 only, must sit AFTER <meta charset>).
+   Marks <html data-compat="legacy">; the CSS fallback then shows all content
+   and the enhancement scripts are skipped. Modern engines are untouched. */
+(function () {
+  var w = window, d = document, r = d.documentElement, legacy = false;
+  try {
+    legacy = !('classList' in r) ||
+             typeof Array.prototype.forEach !== 'function' ||
+             !w.addEventListener ||
+             !('querySelector' in d) ||
+             !(w.CSS && typeof w.CSS.supports === 'function') ||
+             !('IntersectionObserver' in w);
+  } catch (e) { legacy = true; }
+  if (legacy && r.setAttribute) r.setAttribute('data-compat', 'legacy');
+})();
+</script>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>
@@ -167,6 +184,10 @@
 
 <script>
 (function(){
+  /* v8.4 Fix: old engines are handled by ../assets/online-compat.js.
+     Skip all enhancement code so missing APIs cannot abort the page. */
+  if (document.documentElement.getAttribute('data-compat') === 'legacy') return;
+
   var KEY='game-theme-mode';
   var root=document.documentElement;
   var meta=document.getElementById('metaTheme');
@@ -226,5 +247,6 @@
   }catch(e){}
 })();
 </script>
+<script src="../../assets/online-compat.js"></script>
 </body>
 </html>

@@ -1,4 +1,21 @@
 <!DOCTYPE html> <html lang="zh-CN" data-theme="light"> <head> <meta charset="UTF-8" />
+<script>
+/* v8.4 Fix — old-engine capability probe (ES3 only, must sit AFTER <meta charset>).
+   Marks <html data-compat="legacy">; the CSS fallback then shows all content
+   and the enhancement scripts are skipped. Modern engines are untouched. */
+(function () {
+  var w = window, d = document, r = d.documentElement, legacy = false;
+  try {
+    legacy = !('classList' in r) ||
+             typeof Array.prototype.forEach !== 'function' ||
+             !w.addEventListener ||
+             !('querySelector' in d) ||
+             !(w.CSS && typeof w.CSS.supports === 'function') ||
+             !('IntersectionObserver' in w);
+  } catch (e) { legacy = true; }
+  if (legacy && r.setAttribute) r.setAttribute('data-compat', 'legacy');
+})();
+</script>
 
 <script>
 (function () {
@@ -123,6 +140,10 @@
 <script>
 (function () {
   'use strict';
+  /* v8.4 Fix: old engines are handled by ../assets/online-compat.js.
+     Skip all enhancement code so missing APIs cannot abort the page. */
+  if (document.documentElement.getAttribute('data-compat') === 'legacy') return;
+
 
   var reduced = false;
   try {
@@ -275,4 +296,5 @@
 </script>
 
 <script src="../../assets/aesthetic.js" defer></script>
+<script src="../../assets/online-compat.js"></script>
 </body> </html>
