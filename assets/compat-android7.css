@@ -1,0 +1,76 @@
+/*!
+ * compat-android7.css — capability fallbacks for Android 7 / Chrome 51~56
+ * and equivalent WebView engines.
+ *
+ * Everything is gated behind @supports NOT, so browsers that implement the
+ * feature are completely unaffected. No JavaScript, no UA sniffing.
+ *
+ * Android 7 baseline (Chrome 51~56) supports: flexbox, CSS custom properties,
+ * transforms, matchMedia, IntersectionObserver, passive listeners, SVG.
+ * It does NOT support: clamp(), backdrop-filter, CSS Grid, flex `gap`,
+ * the `inset` shorthand, or the individual `translate` property.
+ */
+
+/* 1. clamp() — Chrome 79+. Without a fallback the whole font-size
+      declaration is dropped and headings inherit a much smaller size. */
+@supports not (font-size: clamp(1rem, 2vw, 3rem)) {
+  .hero-title    { font-size: 3rem; }
+  .hero-subtitle { font-size: 2.5rem; }
+  .hero-eyebrow  { font-size: .95rem; }
+  .page-title    { font-size: 2.2rem; }
+  .section-title { font-size: 1.5rem; }
+}
+
+/* 2. backdrop-filter — Chrome 76+. A semi-transparent navbar without the
+      blur lets page content bleed through, which hurts text contrast. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navbar { background: #fff !important; }
+  [data-theme="dark"] .navbar { background: #1c1923 !important; }
+  .theme-ctl { background: #fff !important; }
+  [data-theme="dark"] .theme-ctl { background: #241f2c !important; }
+}
+
+/* 3. CSS Grid — Chrome 57+. Without it grid containers collapse to inline
+      flow; fall back to a simple vertical stack that stays readable. */
+@supports not (display: grid) {
+  .hub-grid, .projects, .post-list, .downloads, .grid { display: block; }
+  .hub-card, .project, .post, .dl-card, .card {
+    display: block;
+    width: auto;
+    max-width: none;
+    margin: 0 0 16px;
+  }
+  .hub-icon, .hub-name, .hub-desc, .hub-go { display: block; margin-bottom: 8px; }
+  .btns { display: block; }
+  .btn { display: inline-block; margin: 4px 8px 4px 0; }
+  .nav-links, .navbar-inner { display: block; }
+  .nav-links li { display: inline-block; }
+  .dl-card--wide, .dl-card--music { width: auto; }
+}
+
+/* 4. `inset` shorthand — Chrome 87+. Decorative absolute layers would lose
+      their geometry and collapse to auto-positioned boxes. */
+@supports not (inset: 0) {
+  .hero::after, .page-hero::after, .fx-grain {
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+  .fx-aurora {
+    top: -18vmax; left: -18vmax; right: -18vmax; bottom: -18vmax;
+  }
+}
+
+/* 5. Flex/grid `gap` — Chrome 84+ for flexbox. Only applied on engines that
+      also lack Grid, so modern browsers keep their exact spacing. */
+@supports not (display: grid) {
+  .navbar-inner > * + * { margin-left: 12px; }
+  .dl-head, .btns, .dl-info, .tags, .contact-socials { margin-top: 10px; }
+  .tag, .dl-tag, .hub-icon { margin-right: 6px; }
+}
+
+/* 6. On these engines `background-clip:text` works, but a sweep animation
+      that pushes the gradient past 100% can leave -webkit-text-fill-color:
+      transparent text invisible. Pin the gradient in place as a safety net. */
+@supports not (display: grid) {
+  .hero-title, .page-title { background-position: 0% 50% !important; }
+  .page-enter .hero-title { animation-name: heroUp !important; }
+}

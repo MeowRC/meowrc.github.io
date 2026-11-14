@@ -121,10 +121,9 @@ html[data-glow="on"] .back:hover {
 }
 
 /* -------------------------------------------------------------- typography */
-html[data-glow="on"] .hero-title {
-  animation: glowSweep 9s linear infinite;
-}
-
+/* NOTE: never set `animation` on .hero-title here. The entrance animation
+   (heroUp, in index*.css) is what lifts the title from opacity:0; an
+   animation shorthand here would override it and hide "MeowRc" forever. */
 html[data-glow="on"] .page-title,
 html[data-glow="on"] .section-title {
   animation: glowPulse 5.5s ease-in-out infinite;
@@ -146,11 +145,6 @@ html[data-glow="on"] .section-title {
   100% { background-position: -200% 0; }
 }
 
-@keyframes glowSweep {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
-}
-
 @keyframes glowPulse {
   0%, 100% { text-shadow: 0 0 0 rgba(var(--glow-pink), 0); }
   50%      { text-shadow: 0 0 22px rgba(var(--glow-pink), .34); }
@@ -159,7 +153,6 @@ html[data-glow="on"] .section-title {
 /* ------------------------------------------------- pauses and degradation */
 html[data-glow-paused] body::before,
 html[data-glow-paused] .navbar::before,
-html[data-glow-paused] .hero-title,
 html[data-glow-paused] .page-title,
 html[data-glow-paused] .section-title {
   animation-play-state: paused !important;
@@ -168,7 +161,6 @@ html[data-glow-paused] .section-title {
 @media (prefers-reduced-motion: reduce) {
   html[data-glow="on"] body::before,
   html[data-glow="on"] .navbar::before,
-  html[data-glow="on"] .hero-title,
   html[data-glow="on"] .page-title,
   html[data-glow="on"] .section-title {
     animation: none !important;

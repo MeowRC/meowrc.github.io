@@ -141,10 +141,34 @@
   html[data-legacy="1"] .btn-ghost{background:#fff;color:#c62e6c;border:1px solid #ffe1ef}
   html[data-legacy="1"] .theme-ctl{background:#fff;border:1px solid #ffe1ef;box-shadow:none}
   html[data-legacy="1"] .back{color:#c62e6c;background:#fff;border:1px solid #ffe1ef}
+
+  /* v8.6: compact site navigation so the game board is never an orphan page */
+  .game-topnav{position:relative;z-index:2;display:flex;align-items:center;
+    gap:20px;max-width:960px;margin:0 auto 18px;padding:0 4px;flex-wrap:wrap}
+  .game-topnav .nav-brand{font-size:1.1rem}
+  .game-topnav-links{display:flex;align-items:center;gap:10px}
+  .game-topnav-links a{font-size:.86rem;font-weight:600;color:#c62e6c;
+    text-decoration:none;padding:6px 12px;border:1px solid #ffe1ef;
+    border-radius:999px;background:#fff}
+  .game-topnav-links a:hover{background:#fff0f6}
+  @media (max-width:520px){.game-topnav{gap:10px}
+    .game-topnav-links a{padding:5px 9px;font-size:.8rem}}
+  html[data-legacy="1"] .game-topnav-links a{background:#fff;color:#c62e6c;border-color:#ffe1ef}
 </style>
 <link rel="stylesheet" href="../../assets/glow-fx.css">
+<link rel="stylesheet" href="../../assets/compat-android7.css">
 </head>
 <body>
+
+
+<nav class="game-topnav" aria-label="站点导航">
+  <a class="nav-brand" href="../../index.html"><em>MeowRc</em> Blog</a>
+  <span class="game-topnav-links">
+    <a href="../../index.html#projects">项目</a>
+    <a href="/online/">在线</a>
+    <a href="/online/game/">游戏</a>
+  </span>
+</nav>
 
 <div class="theme-ctl" role="group" aria-label="明暗主题">
   <button type="button" data-mode="auto" aria-pressed="true" title="跟随时间自动切换">自动</button>
@@ -161,7 +185,7 @@
 
   <main class="grid">
     <article class="card">
-      <div class="thumb">??</div>
+      <div class="thumb" aria-hidden="true"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#c62e6c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 11v3M4.5 12.5h3M15 10.5h.01M18 13h.01"/></svg></div>
       <h2>函数棋</h2>
       <p>把函数画在坐标系上，用函数图像进行攻防对战的创意策略游戏。支持单机闯关、本地双人、在线对战与 AI 对局。</p>
       <div class="tags">
