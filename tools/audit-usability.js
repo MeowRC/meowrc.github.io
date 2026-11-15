@@ -41,7 +41,7 @@ function exists(rel) { return fs.existsSync(path.join(ROOT, rel)); }
 function norm(p) { return p.replace(/\\/g, '/').replace(/^\/+/, ''); }
 
 /* ------------------------------------------------------------- per page */
-console.log('[1/4] Per-page usability audit');
+console.log('[1/5] Per-page usability audit');
 
 PAGES.forEach(function (rel) {
   var s = read(rel);
@@ -161,7 +161,7 @@ PAGES.forEach(function (rel) {
 console.log('  - ' + PAGES.length + ' site pages audited');
 
 /* --------------------------------------------------------- redirect pages */
-console.log('[2/4] Redirect pages');
+console.log('[2/5] Redirect pages');
 REDIRECT_PAGES.forEach(function (rel) {
   var s = read(rel);
   ok(/location\.replace|http-equiv="refresh"/.test(s), rel, 'no redirect mechanism');
@@ -170,7 +170,7 @@ REDIRECT_PAGES.forEach(function (rel) {
 console.log('  - ' + REDIRECT_PAGES.length + ' redirect pages audited');
 
 /* --------------------------------------------------------------- global */
-console.log('[3/4] Cross-cutting checks');
+console.log('[3/5] Cross-cutting checks');
 
 ['index.html', 'index-apple.html', 'index-ie.html', 'index-legacy.html',
  'online/index.html', 'online/index-apple.html', 'online/index-ie.html',
@@ -208,7 +208,7 @@ ok(glow.split('{').length === glow.split('}').length, 'assets/glow-fx.css', 'unb
 console.log('  - cross-cutting checks done');
 
 /* --------------------------------------------- Android 7 compatibility */
-console.log('[4/4] Android 7 / Chrome 51+ compatibility');
+console.log('[4/5] Android 7 / Chrome 51+ compatibility');
 var a7 = read('assets/compat-android7.css');
 [
   ['@supports not (font-size: clamp', 'clamp() fallback'],
@@ -255,6 +255,47 @@ if (fnMatch) {
      'index.html', 'isModern() still requires Chrome 104+ translate property');
 }
 console.log('  - CSS fallbacks + capability simulation done');
+
+/* --------------------------------------------- contact + hover stability */
+console.log('[5/5] Contact section and hover stability');
+var HOME_VARIANTS = ['index.html', 'index-apple.html', 'index-ie.html', 'index-legacy.html'];
+HOME_VARIANTS.forEach(function (rel) {
+  var s = read(rel);
+  ok((s.match(/class="contact-row"/g) || []).length === 1,
+     rel + ': expected exactly 1 contact row after removing QQ/所在地');
+  ok(s.indexOf('contact-label">QQ<') === -1, rel + ': QQ row still present');
+  ok(s.indexOf('contact-label">所在地<') === -1, rel + ': 所在地 row still present');
+  ok((s.match(/class="social-link"/g) || []).length === 3,
+     rel + ': expected 3 social links (GitHub/Bilibili/AcFun)');
+});
+['index.css', 'index-apple.css', 'index-ie.css', 'index-legacy.css'].forEach(function (f) {
+  var s = read('assets/' + f);
+  ok(/\.contact-row\+\.contact-row/.test(s),
+     'assets/' + f + ': missing adjacent-row separator (prevents a double line)');
+  ok(s.indexOf('.contact-row:last-of-type') === -1,
+     'assets/' + f + ': stale :last-of-type rule (never matched, socials is last div)');
+  ok(s.indexOf('.social-link:active{transform:none}') !== -1,
+     'assets/' + f + ': missing :active transform override for polish.css');
+  var hovers = s.match(/\.social-link:hover\{[^}]*\}/g) || [];
+  ok(hovers.length > 0, 'assets/' + f + ': no .social-link:hover rule found');
+  hovers.forEach(function (rule) {
+    ok(!/transform\s*:/.test(rule) && !/top\s*:\s*-/.test(rule),
+       'assets/' + f + ': hover rule still shifts geometry -> ' + rule.slice(0, 70));
+  });
+  var bases = s.match(/\.social-link\{[^}]*\}/g) || [];
+  ok(bases.length > 0, 'assets/' + f + ': no .social-link base rule found');
+  bases.forEach(function (rule) {
+    ok(!/\btransition:[^}]*\b(top|transform)\b/.test(rule),
+       'assets/' + f + ': .social-link transition still animates geometry -> ' +
+       rule.slice(0, 70));
+  });
+});
+var aestheticSrc = read('assets/aesthetic.js');
+ok(aestheticSrc.indexOf('$$(".social-link, .dl-btn").forEach') === -1,
+   'assets/aesthetic.js: magnet spring still bound to .social-link');
+ok(aestheticSrc.indexOf('$$(".dl-btn").forEach(function(e){e.setAttribute("data-fx-magnet"') !== -1,
+   'assets/aesthetic.js: magnet should remain active for .dl-btn');
+console.log('  - 4 variants, 4 stylesheets, 1 enhancement script verified');
 
 /* ---------------------------------------------------------------- report */
 console.log('');
