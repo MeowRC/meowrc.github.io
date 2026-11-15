@@ -47,4 +47,31 @@
   } catch (e) {
     /* getComputedStyle/env unavailable: keep the basic iOS marker only. */
   }
+
+  /* ---- rendering tier -------------------------------------------------
+     iOS exposes neither deviceMemory nor a trustworthy hardwareConcurrency
+     (Safari reports a fixed low value), so the physical pixel area of the
+     panel is used as the capability proxy:
+
+       iPad / iPadOS (any panel)              -> full  (large, always recent)
+       iPhone with >= 2.9M physical pixels    -> full  (iPhone 12 and later)
+       other iPhones (8 / SE2 / SE3 / X / XS
+       / XR / 11 / 12 mini)                   -> lite
+
+     "iPhone 9" was never released: Apple went from iPhone 8 straight to
+     iPhone X. "iPhone 9 and later" is therefore handled as "iPhone X and
+     later", which this split covers together with the older iPhone 8/SE. */
+  var sw = (w.screen && w.screen.width) || w.innerWidth || 0;
+  var sh = (w.screen && w.screen.height) || w.innerHeight || 0;
+  var dpr = w.devicePixelRatio || 1;
+  var physics = sw * sh * dpr * dpr;
+  var iPad = /iPad/i.test(ua) ||
+             (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1 &&
+              Math.min(sw, sh) >= 744);
+  var reduced = false;
+  try { reduced = !!(w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  catch (e2) {}
+
+  var lite = reduced || (!iPad && physics > 0 && physics < 2900000);
+  r.setAttribute('data-ios-tier', lite ? 'lite' : 'full');
 })(window, document);

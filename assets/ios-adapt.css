@@ -95,3 +95,58 @@ html[data-ios="1"][data-ios-notch="1"] .fx-grain {
 html[data-ios="1"][data-ios-notch="1"] .fx-aurora i {
   will-change: auto;
 }
+
+/* 9. Lite tier (v9): iPhones whose panel is small or several generations old.
+      The full-screen shader-like layers and every continuous animation are
+      removed; layout, gradients, cards and navigation stay untouched.
+      Content visibility is never delegated to the enhancement script here,
+      because aesthetic.js short-circuits on this marker. */
+html[data-ios="1"][data-ios-tier="lite"] .fx-aurora,
+html[data-ios="1"][data-ios-tier="lite"] .fx-hero-orb,
+html[data-ios="1"][data-ios-tier="lite"] .fx-progress,
+html[data-ios="1"][data-ios-tier="lite"] .fx-grain,
+html[data-ios="1"][data-ios-tier="lite"] .fx-sweep,
+html[data-ios="1"][data-ios-tier="lite"] .fx-cursor,
+html[data-ios="1"][data-ios-tier="lite"] .fx-cursor-dot,
+html[data-ios="1"][data-ios-tier="lite"] .fx-nav-pill,
+html[data-ios="1"][data-ios-tier="lite"] .hero-particles {
+  display: none !important;
+}
+html[data-ios="1"][data-ios-tier="lite"] .hero-title,
+html[data-ios="1"][data-ios-tier="lite"] .page-title,
+html[data-ios="1"][data-ios-tier="lite"] .section-title,
+html[data-ios="1"][data-ios-tier="lite"] .hero-caret,
+html[data-ios="1"][data-ios-tier="lite"] .scroll-hint {
+  animation: none !important;
+}
+/* Content-first: reveal elements must stay visible without the enhancement
+   layer, and must never animate blur. */
+html[data-ios="1"][data-ios-tier="lite"] [data-reveal],
+html[data-ios="1"][data-ios-tier="lite"] .section-head {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  -webkit-transform: none !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+html[data-ios="1"][data-ios-tier="lite"] .hero-eyebrow,
+html[data-ios="1"][data-ios-tier="lite"] .hero-subtitle,
+html[data-ios="1"][data-ios-tier="lite"] .hero-title,
+html[data-ios="1"][data-ios-tier="lite"] .scroll-hint {
+  opacity: 1 !important;
+}
+html[data-ios="1"][data-ios-tier="lite"] .hero-title,
+html[data-ios="1"][data-ios-tier="lite"] .page-title {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+/* Release compositing hints so the GPU keeps fewer offscreen layers. */
+html[data-ios="1"][data-ios-tier="lite"] [data-reveal],
+html[data-ios="1"][data-ios-tier="lite"] .hero-inner,
+html[data-ios="1"][data-ios-tier="lite"] .navbar,
+html[data-ios="1"][data-ios-tier="lite"] .fx-aurora i {
+  will-change: auto !important;
+}

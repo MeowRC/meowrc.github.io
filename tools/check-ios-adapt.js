@@ -107,7 +107,19 @@ ok(ungated.length === 0, 'ios-adapt.css: ungated rules -> ' + ungated.slice(0, 3
 ].forEach(function (token) {
   ok(clean.indexOf(token) !== -1, 'ios-adapt.css: missing ' + token);
 });
-console.log('  - ' + selectors.length + ' CSS blocks, 0 ungated, 6 safe-area features verified');
+ok(clean.indexOf('data-ios-tier="lite"') !== -1,
+   'ios-adapt.css: missing lite-tier rendering budget');
+var liteBlock = clean.slice(clean.indexOf('data-ios-tier="lite"'));
+ok(/\.fx-aurora[\s\S]{0,1200}display:\s*none\s*!important/.test(liteBlock),
+   'ios-adapt.css: lite tier must drop the full-screen aurora layer');
+ok(/\[data-reveal\][\s\S]{0,400}opacity:\s*1\s*!important/.test(liteBlock),
+   'ios-adapt.css: lite tier must keep reveal content visible without JS');
+ok(js.indexOf('data-ios-tier') !== -1 &&
+   js.indexOf('devicePixelRatio') !== -1,
+   'ios-adapt.js: missing tier split');
+ok(/data-ios-tier"\)\s*===\s*"lite"/.test(read('assets/aesthetic.js')),
+   'aesthetic.js: missing iOS lite-tier short-circuit');
+console.log('  - ' + selectors.length + ' CSS blocks, 0 ungated, 6 safe-area + lite-tier verified');
 
 /* ---------------------------------------------------------------- redirect */
 console.log('[2/4] ppt/1 redirect');
@@ -150,6 +162,11 @@ function env(cfg) {
       platform: cfg.platform || '',
       maxTouchPoints: cfg.touch || 0
     },
+    screen: { width: cfg.sw || 0, height: cfg.sh || 0 },
+    devicePixelRatio: cfg.dpr === undefined ? 1 : cfg.dpr,
+    matchMedia: function (q) {
+      return { matches: q.indexOf('prefers-reduced-motion') !== -1 && cfg.reduced === true };
+    },
     document: {
       documentElement: root,
       createElement: function () { return { style: { cssText: '' } }; }
@@ -167,14 +184,26 @@ function env(cfg) {
 }
 
 var PROFILES = [
-  { label: 'iPhone X / 14 Pro (top 47, bottom 34)', ua: IPHONE_X, top: 47, bottom: 34, ios: true, notch: true },
-  { label: 'iPhone X landscape (top 0, bottom 21)', ua: IPHONE_X, top: 0, bottom: 21, ios: true, notch: true },
-  { label: 'iPhone 8 (top 20, bottom 0)', ua: IPHONE_X, top: 20, bottom: 0, ios: true, notch: false },
-  { label: 'iPad Pro iPadOS desktop-UA (top 24, bottom 20)', ua: IPADOS, platform: 'MacIntel', touch: 5, top: 24, bottom: 20, ios: true, notch: true },
-  { label: 'iOS without env() support', ua: IPHONE_X, noEnv: true, ios: true, notch: false },
-  { label: 'Android phone', ua: ANDROID, top: 24, bottom: 0, ios: false, notch: false },
-  { label: 'Windows desktop', ua: DESKTOP, top: 0, bottom: 0, ios: false, notch: false },
-  { label: 'macOS desktop (MacIntel, no touch)', ua: MAC, platform: 'MacIntel', touch: 0, top: 0, bottom: 0, ios: false, notch: false }
+  /* iPhone 8 / SE2 / SE3: 750x1334@2 = 1.00M */
+  { label: 'iPhone 8 (375x667@2, no notch)', ua: IPHONE_X, sw: 375, sh: 667, dpr: 2, top: 20, bottom: 0, ios: true, notch: false, tier: 'lite' },
+  /* iPhone X / XS: 1125x2436 = 2.74M */
+  { label: 'iPhone X (375x812@3)', ua: IPHONE_X, sw: 375, sh: 812, dpr: 3, top: 44, bottom: 34, ios: true, notch: true, tier: 'lite' },
+  /* iPhone XR / 11: 828x1792 = 1.48M */
+  { label: 'iPhone 11 (414x896@2)', ua: IPHONE_X, sw: 414, sh: 896, dpr: 2, top: 44, bottom: 34, ios: true, notch: true, tier: 'lite' },
+  /* iPhone X landscape */
+  { label: 'iPhone X landscape (top 0, bottom 21)', ua: IPHONE_X, sw: 812, sh: 375, dpr: 3, top: 0, bottom: 21, ios: true, notch: true, tier: 'lite' },
+  /* iPhone 13: 1170x2532 = 2.96M */
+  { label: 'iPhone 13 (390x844@3)', ua: IPHONE_X, sw: 390, sh: 844, dpr: 3, top: 47, bottom: 34, ios: true, notch: true, tier: 'full' },
+  /* iPhone 15 Pro Max: 1290x2796 = 3.61M */
+  { label: 'iPhone 15 Pro Max (430x932@3)', ua: IPHONE_X, sw: 430, sh: 932, dpr: 3, top: 59, bottom: 34, ios: true, notch: true, tier: 'full' },
+  /* iPad Pro 12.9: 2048x2732 = 5.60M */
+  { label: 'iPad Pro (1024x1366@2)', ua: IPHONE_X.replace('iPhone', 'iPad'), sw: 1024, sh: 1366, dpr: 2, top: 24, bottom: 20, ios: true, notch: true, tier: 'full' },
+  { label: 'iPadOS desktop-UA (1366x1024@2)', ua: IPADOS, platform: 'MacIntel', touch: 5, sw: 1366, sh: 1024, dpr: 2, top: 24, bottom: 20, ios: true, notch: true, tier: 'full' },
+  { label: 'iPhone 13 + prefers-reduced-motion', ua: IPHONE_X, sw: 390, sh: 844, dpr: 3, top: 47, bottom: 34, reduced: true, ios: true, notch: true, tier: 'lite' },
+  { label: 'iOS without env() support', ua: IPHONE_X, sw: 375, sh: 812, dpr: 3, noEnv: true, ios: true, notch: false, tier: 'lite' },
+  { label: 'Android phone', ua: ANDROID, sw: 390, sh: 844, dpr: 3, top: 24, bottom: 0, ios: false, notch: false, tier: null },
+  { label: 'Windows desktop', ua: DESKTOP, sw: 1920, sh: 1080, dpr: 1, top: 0, bottom: 0, ios: false, notch: false, tier: null },
+  { label: 'macOS desktop (MacIntel, no touch)', ua: MAC, platform: 'MacIntel', touch: 0, sw: 1440, sh: 900, dpr: 2, top: 0, bottom: 0, ios: false, notch: false, tier: null }
 ];
 
 PROFILES.forEach(function (p) {
@@ -182,9 +211,12 @@ PROFILES.forEach(function (p) {
   vm.runInNewContext(js, e.sandbox, { filename: 'ios-adapt.js' });
   var isIOS = e.attrs['data-ios'] === '1';
   var notch = e.attrs['data-ios-notch'] === '1';
+  var tier = e.attrs['data-ios-tier'] || null;
   ok(isIOS === p.ios, p.label + ': expected iOS=' + p.ios + ', got ' + isIOS);
   ok(notch === p.notch, p.label + ': expected notch=' + p.notch + ', got ' + notch);
-  console.log('  - ' + (isIOS ? (notch ? 'NOTCH' : 'IOS  ') : 'NONE ') + '  ' + p.label);
+  ok(tier === p.tier, p.label + ': expected tier=' + p.tier + ', got ' + tier);
+  console.log('  - ' + (isIOS ? (p.tier === 'lite' ? 'LITE ' : 'FULL ') : 'NONE ') +
+              (notch ? 'notch' : '     ') + '  ' + p.label);
 });
 
 /* -------------------------------------------------------------- regression */
