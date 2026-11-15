@@ -1,0 +1,97 @@
+/*!
+ * ios-adapt.css — safe-area layout for iOS, iPhone X and later (v8.8)
+ *
+ * Every rule is gated behind html[data-ios="1"], set by ios-adapt.js.
+ * env() values include 0px fallbacks, so engines without safe-area support
+ * keep the original geometry. Non-iOS devices are completely untouched.
+ *
+ * Why this file exists: index-apple.css already covers the root iOS variant,
+ * but the seven /online/ pages share online-base.css, which has no safe-area
+ * rules, and their viewport lacked viewport-fit=cover. On iPhone X and later
+ * the fixed navbar was overlapped by the status bar / notch and the floating
+ * buttons sat under the Home Indicator.
+ */
+
+/* 1. Fixed navbar: extend under the status bar without covering content.
+      constant() covers iOS 11.0~11.2; env() covers 11.2+ and later. */
+html[data-ios="1"] .navbar {
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(var(--nav-h, 64px) + constant(safe-area-inset-top));
+  height: calc(var(--nav-h, 64px) + env(safe-area-inset-top, 0px));
+}
+html[data-ios="1"] .navbar-inner {
+  padding-left: calc(24px + env(safe-area-inset-left, 0px));
+  padding-right: calc(24px + env(safe-area-inset-right, 0px));
+}
+
+/* 2. Collapsed mobile menu sits below the taller navbar. */
+html[data-ios="1"] .nav-links {
+  top: calc(var(--nav-h, 64px) + env(safe-area-inset-top, 0px));
+  padding-left: calc(16px + env(safe-area-inset-left, 0px));
+  padding-right: calc(16px + env(safe-area-inset-right, 0px));
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 3. Hero content clears the taller fixed navbar. */
+html[data-ios="1"] .page-hero {
+  padding-top: calc(136px + env(safe-area-inset-top, 0px));
+  padding-left: calc(24px + env(safe-area-inset-left, 0px));
+  padding-right: calc(24px + env(safe-area-inset-right, 0px));
+}
+html[data-ios="1"] .hero-inner {
+  padding-top: calc(120px + env(safe-area-inset-top, 0px));
+  padding-left: calc(var(--gutter, 24px) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--gutter, 24px) + env(safe-area-inset-right, 0px));
+}
+
+/* 4. Main content / footer: landscape notch on the sides, Home Indicator at
+      the bottom. Individual longhand properties preserve existing padding-top. */
+html[data-ios="1"] .main {
+  padding-left: calc(24px + env(safe-area-inset-left, 0px));
+  padding-right: calc(24px + env(safe-area-inset-right, 0px));
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+html[data-ios="1"] .footer {
+  padding-left: calc(24px + env(safe-area-inset-left, 0px));
+  padding-right: calc(24px + env(safe-area-inset-right, 0px));
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 5. Floating controls must clear the Home Indicator. */
+html[data-ios="1"] .to-top {
+  right: calc(22px + env(safe-area-inset-right, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+}
+html[data-ios="1"] .theme-ctl {
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
+}
+
+/* 6. Game board page (its own layout, no navbar). */
+html[data-ios="1"] .game-topnav {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: calc(4px + env(safe-area-inset-left, 0px));
+  padding-right: calc(4px + env(safe-area-inset-right, 0px));
+}
+html[data-ios="1"] .wrap {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 7. iPhone X and later: dynamic viewport height avoids the URL-bar jump.
+      Unsupported engines ignore the declaration and keep 92svh / 92vh. */
+html[data-ios="1"][data-ios-notch="1"] .hero {
+  min-height: 92dvh;
+}
+
+/* 8. Full-screen devices: drop the full-viewport noise layer (feTurbulence
+      + mix-blend-mode). This is the single most expensive decoration on iOS;
+      all other effects are kept so the visual identity stays intact. */
+html[data-ios="1"][data-ios-notch="1"] .fx-grain {
+  display: none !important;
+}
+html[data-ios="1"][data-ios-notch="1"] .fx-aurora i {
+  will-change: auto;
+}
