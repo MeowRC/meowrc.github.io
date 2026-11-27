@@ -1,24 +1,36 @@
 /*!
- * compat-android7.css — capability fallbacks for Android 7 / Chrome 51~56
- * and equivalent WebView engines.
+ * compat-android7.css — capability fallbacks for legacy engines
  *
- * Everything is gated behind @supports NOT, so browsers that implement the
- * feature are completely unaffected. No JavaScript, no UA sniffing.
+ * Covers Android 7 / Chrome 51~56 WebView, EdgeHTML 18 ("Edge 2019"),
+ * Chrome 57~83 and equivalent engines.
  *
- * Android 7 baseline (Chrome 51~56) supports: flexbox, CSS custom properties,
- * transforms, matchMedia, IntersectionObserver, passive listeners, SVG.
- * It does NOT support: clamp(), backdrop-filter, CSS Grid, flex `gap`,
- * the `inset` shorthand, or the individual `translate` property.
+ * Everything is gated behind either @supports NOT or a marker set by
+ * compat-detect.js, so capable browsers are completely unaffected.
+ * No UA sniffing in CSS.
+ *
+ * Key correction in v10: the previous release bundled flex `gap` and gradient
+ * text fixes inside `@supports not (display:grid)`. EdgeHTML 18 and Chrome
+ * 57~83 DO support Grid, so those fixes never applied even though they lack
+ * flex gap, `inset`, `clamp()` and `min()` — producing the reported layout
+ * errors. Each fallback is now gated on its own capability.
  */
 
-/* 1. clamp() — Chrome 79+. Without a fallback the whole font-size
-      declaration is dropped and headings inherit a much smaller size. */
+/* 1. clamp() — Chrome 79+/EdgeHTML never. A dropped font-size declaration
+      makes headings fall back to an inherited, much smaller size. */
 @supports not (font-size: clamp(1rem, 2vw, 3rem)) {
+  .loader-logo  { font-size: 2.2rem; }
   .hero-title    { font-size: 3rem; }
   .hero-subtitle { font-size: 2.5rem; }
   .hero-eyebrow  { font-size: .95rem; }
   .page-title    { font-size: 2.2rem; }
   .section-title { font-size: 1.5rem; }
+}
+
+/* 1b. min()/max() — Chrome 79+/EdgeHTML never. A dropped width declaration
+       collapses the loader bar and the footer ornament. */
+@supports not (width: min(1px, 2px)) {
+  .loader-bar     { width: 220px; max-width: 60vw; }
+  .footer::before { width: 82%; max-width: 460px; }
 }
 
 /* 2. backdrop-filter — Chrome 76+. A semi-transparent navbar without the
@@ -30,8 +42,8 @@
   [data-theme="dark"] .theme-ctl { background: #241f2c !important; }
 }
 
-/* 3. CSS Grid — Chrome 57+. Without it grid containers collapse to inline
-      flow; fall back to a simple vertical stack that stays readable. */
+/* 3. CSS Grid — Chrome 57-/EdgeHTML 15-. Grid containers collapse to inline
+      flow; fall back to a readable vertical stack. */
 @supports not (display: grid) {
   .hub-grid, .projects, .post-list, .downloads, .grid { display: block; }
   .hub-card, .project, .post, .dl-card, .card {
@@ -48,28 +60,67 @@
   .dl-card--wide, .dl-card--music { width: auto; }
 }
 
-/* 4. `inset` shorthand — Chrome 87+. Decorative absolute layers would lose
-      their geometry and collapse to auto-positioned boxes. */
+/* 4. `inset` shorthand — Chrome 87+/EdgeHTML never. The homepage navbar uses
+      `inset:0 0 auto`, hero layers and #loader use `inset:0`; without these
+      declarations the fixed navbar loses its position entirely and the
+      decorative layers collapse to auto-positioned boxes. */
 @supports not (inset: 0) {
-  .hero::after, .page-hero::after, .fx-grain {
+  #loader, .loader-bar>i::after, .hero::before, .hero::after,
+  .hero-particles, .page-hero::before, .page-hero::after,
+  .fx-grain, .fx-spot, .fx-sweep, .fx-progress::after {
     top: 0; left: 0; right: 0; bottom: 0;
   }
-  .fx-aurora {
-    top: -18vmax; left: -18vmax; right: -18vmax; bottom: -18vmax;
+  .navbar { top: 0; left: 0; right: 0; bottom: auto; }
+  .fx-aurora { top: -18vmax; left: -18vmax; right: -18vmax; bottom: -18vmax; }
+  .to-top::after { top: -5px; left: -5px; right: -5px; bottom: -5px; }
+}
+
+/* 5. Flex `gap` — Chrome 84+/EdgeHTML never. `@supports` cannot detect this
+      reliably (grid `gap` returns true on those engines), so compat-detect.js
+      measures a real flex row and sets data-no-flex-gap. Unlike the previous
+      release this block applies to EVERY legacy engine, including ones that
+      support CSS Grid. Row containers get horizontal spacing, column
+      containers get vertical spacing. */
+html[data-no-flex-gap] .navbar-inner > * + *,
+html[data-no-flex-gap] .nav-links > * + *,
+html[data-no-flex-gap] .nav-actions > * + *,
+html[data-no-flex-gap] .tags > * + *,
+html[data-no-flex-gap] .contact-row > * + *,
+html[data-no-flex-gap] .contact-socials > * + *,
+html[data-no-flex-gap] .dl-head > * + *,
+html[data-no-flex-gap] .dl-title-wrap > * + *,
+html[data-no-flex-gap] .dl-info > * + *,
+html[data-no-flex-gap] .dl-links > * + *,
+html[data-no-flex-gap] .dl-expand-head > * + *,
+html[data-no-flex-gap] .dl-version-row > * + *,
+html[data-no-flex-gap] .hub-go > * + *,
+html[data-no-flex-gap] .online-back > * + *,
+html[data-no-flex-gap] .fx-load-dots > * + *,
+html[data-no-flex-gap] .btns > * + * {
+  margin-left: 10px;
+}
+html[data-no-flex-gap] .hub-card > * + *,
+html[data-no-flex-gap] .post-list > * + *,
+html[data-no-flex-gap] .projects > * + *,
+html[data-no-flex-gap] .hub-grid > * + *,
+html[data-no-flex-gap] .downloads > * + * {
+  margin-top: 14px;
+}
+
+/* 6. Gradient-clipped headings. On engines without background-clip:text the
+      -webkit-text-fill-color:transparent declaration hides the text entirely.
+      A solid-colour fallback keeps the title visible. */
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .loader-logo em, .hero-title, .page-title {
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    color: var(--accent-strong);
   }
 }
 
-/* 5. Flex/grid `gap` — Chrome 84+ for flexbox. Only applied on engines that
-      also lack Grid, so modern browsers keep their exact spacing. */
-@supports not (display: grid) {
-  .navbar-inner > * + * { margin-left: 12px; }
-  .dl-head, .btns, .dl-info, .tags, .contact-socials { margin-top: 10px; }
-  .tag, .dl-tag, .hub-icon { margin-right: 6px; }
-}
-
-/* 6. On these engines `background-clip:text` works, but a sweep animation
-      that pushes the gradient past 100% can leave -webkit-text-fill-color:
-      transparent text invisible. Pin the gradient in place as a safety net. */
+/* 7. On engines WITH background-clip:text but without Grid, a sweep animation
+      that pushes the gradient past 100% can leave transparent text invisible.
+      Kept as its own rule so Grid-capable legacy engines are not affected. */
 @supports not (display: grid) {
   .hero-title, .page-title { background-position: 0% 50% !important; }
   .page-enter .hero-title { animation-name: heroUp !important; }
