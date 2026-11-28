@@ -1,0 +1,3604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#04070a">
+<meta name="description" content="一棵真实的圣诞树：针叶、暖灯、飘雪与景深。挂上照片、写下祝福，用手势隔空操控。">
+<title>Merry Christmas · 星尘圣诞树</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Great+Vibes&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #04070a;
+        --gold: #ffd98a;
+        --gold-deep: #c9a15e;
+        --ice: #dcecff;
+        --muted: rgba(214, 230, 250, 0.55);
+        --line: rgba(255, 255, 255, 0.12);
+        --glass: rgba(8, 18, 28, 0.42);
+        --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: var(--bg);
+        color: #eaf2ff;
+        font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        touch-action: none;
+        overscroll-behavior: none;
+    }
+
+    #canvas-container { position: fixed; inset: 0; z-index: 1; }
+    #canvas-container canvas { display: block; }
+
+    /* ---------------- Loader ---------------- */
+    #loader {
+        position: fixed; inset: 0; z-index: 120;
+        display: grid; place-content: center; justify-items: center; gap: 22px;
+        background: radial-gradient(ellipse at 50% 45%, #0a1220 0%, #04070a 70%);
+        transition: opacity 0.9s var(--ease), visibility 0.9s;
+    }
+    #loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+    .spinner {
+        width: 40px; height: 40px; border-radius: 50%;
+        border: 1px solid rgba(255, 217, 138, 0.18);
+        border-top-color: var(--gold);
+        animation: spin 1.05s linear infinite;
+    }
+    .loader-text {
+        font-size: 10px; letter-spacing: 0.44em; text-transform: uppercase;
+        color: rgba(226, 238, 255, 0.6);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---------------- UI layer ---------------- */
+    #ui-layer {
+        position: fixed; inset: 0; z-index: 10;
+        pointer-events: none;
+    }
+    #ui-layer > * { transition: opacity 0.55s var(--ease), transform 0.55s var(--ease); }
+    #ui-layer.hidden .brand, #ui-layer.hidden .controls, #ui-layer.hidden #status-indicator,
+    #ui-layer.hidden #dock, #ui-layer.hidden #filmstrip { opacity: 0; pointer-events: none; }
+    #ui-layer.hidden .brand { transform: translateY(-10px); }
+    #ui-layer.hidden .controls { transform: translateY(10px); }
+    #ui-layer.hidden #dock { transform: translate(-50%, 14px); }
+
+    .brand {
+        position: absolute;
+        top: clamp(24px, 5vh, 60px);
+        left: clamp(20px, 4vw, 64px);
+        max-width: min(52vw, 620px);
+    }
+    .eyebrow {
+        margin: 0 0 16px;
+        font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase;
+        color: rgba(255, 217, 138, 0.72);
+        white-space: nowrap;
+    }
+    h1 {
+        margin: 0;
+        font-family: 'Cinzel Decorative', Georgia, 'Times New Roman', serif;
+        font-weight: 400;
+        font-size: clamp(32px, 5.2vw, 72px);
+        line-height: 0.98;
+        letter-spacing: 0.03em;
+        background: linear-gradient(175deg, #ffffff 6%, #ffe8bd 46%, #c9a15e 100%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent; color: transparent;
+        filter: drop-shadow(0 0 34px rgba(255, 196, 102, 0.28));
+    }
+    .tagline {
+        margin: 18px 0 0;
+        font-size: clamp(11px, 1.05vw, 13px);
+        letter-spacing: 0.3em;
+        color: var(--muted);
+        font-weight: 300;
+    }
+
+    #status-indicator {
+        position: absolute;
+        top: clamp(24px, 5vh, 54px);
+        right: clamp(20px, 4vw, 56px);
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 17px 9px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--glass);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: #dbe9ff; white-space: nowrap;
+        pointer-events: none;
+    }
+    #status-indicator .dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--gold);
+        box-shadow: 0 0 12px 2px rgba(255, 200, 120, 0.85);
+        animation: blink 2.8s ease-in-out infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    /* ---------------- 上传区 ---------------- */
+    .controls {
+        position: absolute;
+        right: clamp(20px, 4vw, 56px);
+        bottom: clamp(92px, 13vh, 136px);
+        display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+        text-align: right;
+        pointer-events: none;
+    }
+    .actions { display: flex; align-items: center; gap: 10px; pointer-events: auto; flex-wrap: wrap; justify-content: flex-end; }
+
+    .upload-btn, .ghost-btn {
+        font-family: inherit;
+        font-size: 11.5px; letter-spacing: 0.16em;
+        border-radius: 999px;
+        padding: 13px 24px;
+        cursor: pointer;
+        transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease),
+                    background 0.35s var(--ease), border-color 0.35s var(--ease), color 0.35s var(--ease);
+        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+        white-space: nowrap;
+        user-select: none;
+        min-height: 44px;
+    }
+    .upload-btn {
+        color: #ffeccd;
+        border: 1px solid rgba(255, 217, 138, 0.42);
+        background: linear-gradient(160deg, rgba(255, 217, 138, 0.2), rgba(201, 161, 94, 0.06));
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 6px 26px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        font-weight: 400;
+    }
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(160deg, rgba(255, 217, 138, 0.34), rgba(201, 161, 94, 0.12));
+        box-shadow: 0 10px 34px rgba(255, 190, 110, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .ghost-btn {
+        color: rgba(220, 236, 255, 0.82);
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.045);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .ghost-btn:hover { color: #fff; border-color: rgba(255, 255, 255, 0.32); transform: translateY(-2px); }
+    .ghost-btn[disabled] { opacity: 0.45; cursor: default; transform: none; }
+    .ghost-btn.on { border-color: rgba(255, 217, 138, 0.5); color: #ffe7bd; }
+
+    .count {
+        font-size: 10px; letter-spacing: 0.2em;
+        color: rgba(255, 224, 176, 0.72);
+        padding-left: 4px;
+    }
+    .count[hidden] { display: none; }
+
+    .hint-text {
+        margin: 0;
+        font-size: 10.5px;
+        letter-spacing: 0.13em;
+        line-height: 1.95;
+        color: var(--muted);
+        font-weight: 300;
+    }
+    .hint-text .k {
+        color: rgba(255, 236, 205, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 9.5px;
+    }
+    .legend { display: none; }
+    body.gestures .legend { display: block; }
+    body.gestures #webcam-wrapper { opacity: 0.8; }
+
+    /* ---------------- 底部模式坞 ---------------- */
+    #dock {
+        position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+        display: flex; align-items: center; gap: 2px;
+        padding: 6px;
+        border-radius: 26px;
+        border: 1px solid var(--line);
+        background: rgba(6, 14, 22, 0.66);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+        z-index: 30;
+        pointer-events: auto;
+        transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    .dock-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 15px;
+        border: 0; border-radius: 20px;
+        background: transparent;
+        color: rgba(214, 230, 250, 0.62);
+        font-family: inherit; font-size: 11px; letter-spacing: 0.1em;
+        cursor: pointer;
+        transition: color 0.3s var(--ease), background 0.3s var(--ease);
+        white-space: nowrap;
+        min-height: 42px;
+    }
+    .dock-btn svg { width: 16px; height: 16px; flex: none; }
+    .dock-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+    .dock-btn:focus-visible { outline: 2px solid rgba(255, 217, 138, 0.7); outline-offset: 2px; }
+    .dock-btn.active {
+        color: #ffe7bd;
+        background: linear-gradient(160deg, rgba(255, 217, 138, 0.22), rgba(201, 161, 94, 0.08));
+        box-shadow: inset 0 0 0 1px rgba(255, 217, 138, 0.22);
+    }
+    .dock-btn.icon-only { padding: 10px 12px; }
+    .dock-sep {
+        width: 1px; height: 20px; margin: 0 4px;
+        background: var(--line);
+    }
+
+    /* ---------------- 胶片条 ---------------- */
+    #filmstrip {
+        position: fixed; left: 50%; bottom: 94px; transform: translate(-50%, 8px);
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(6, 14, 22, 0.62);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        z-index: 25;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+        max-width: 94vw;
+    }
+    #filmstrip.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+    #strip-track { display: flex; gap: 7px; align-items: center; overflow-x: auto; scrollbar-width: none; }
+    #strip-track::-webkit-scrollbar { display: none; }
+    .thumb {
+        width: 46px; height: 46px; padding: 0; flex: none;
+        border-radius: 9px; overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.04);
+        cursor: pointer;
+        transition: border-color 0.25s, transform 0.25s, opacity 0.25s;
+        opacity: 0.62;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb:hover { opacity: 1; transform: translateY(-2px); }
+    .thumb.active { border-color: rgba(255, 217, 138, 0.85); opacity: 1; box-shadow: 0 0 16px rgba(255, 190, 110, 0.35); }
+    #strip-count {
+        font-size: 10px; letter-spacing: 0.16em; color: rgba(226, 238, 255, 0.62);
+        min-width: 34px; text-align: center;
+    }
+    .strip-arrow, #strip-close {
+        height: 32px; border-radius: 999px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border: 1px solid var(--line); background: transparent;
+        color: rgba(226, 238, 255, 0.72); cursor: pointer;
+        transition: color 0.25s, border-color 0.25s;
+        font-family: inherit; font-size: 10px; letter-spacing: 0.12em;
+    }
+    .strip-arrow { width: 32px; }
+    #strip-close { padding: 0 12px; }
+    .strip-arrow:hover, #strip-close:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+
+    /* ---------------- 弹层 ---------------- */
+    #scrim {
+        position: fixed; inset: 0; z-index: 65;
+        background: rgba(2, 5, 9, 0.58);
+        backdrop-filter: blur(3px);
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.35s var(--ease);
+    }
+    #scrim.show { opacity: 1; pointer-events: auto; }
+
+    .panel {
+        position: fixed; left: 50%; top: 50%; z-index: 70;
+        width: min(92vw, 430px);
+        max-height: 86vh; overflow-y: auto;
+        transform: translate(-50%, -46%);
+        padding: 26px 26px 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 217, 138, 0.22);
+        background: linear-gradient(170deg, rgba(14, 24, 36, 0.97), rgba(6, 12, 20, 0.97));
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+    }
+    .panel.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+    .panel-eyebrow {
+        margin: 0 0 8px;
+        font-size: 9.5px; letter-spacing: 0.4em; text-transform: uppercase;
+        color: rgba(255, 217, 138, 0.7);
+    }
+    .panel-title {
+        margin: 0 0 18px;
+        font-family: 'Cinzel Decorative', Georgia, serif;
+        font-size: 22px; font-weight: 400; letter-spacing: 0.02em;
+        color: #ffeecd;
+    }
+    .panel-text {
+        margin: 0 0 16px;
+        font-size: 12.5px; line-height: 1.9; letter-spacing: 0.03em;
+        color: rgba(222, 236, 255, 0.72);
+    }
+    .panel-hint {
+        margin: 0 0 18px;
+        font-size: 11px; line-height: 1.75; letter-spacing: 0.02em;
+        color: rgba(222, 236, 255, 0.48);
+    }
+    #wish-input {
+        width: 100%;
+        padding: 13px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        font-family: inherit; font-size: 14px; letter-spacing: 0.04em;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        min-height: 46px;
+    }
+    #wish-input:focus { border-color: rgba(255, 217, 138, 0.55); box-shadow: 0 0 0 3px rgba(255, 190, 110, 0.12); }
+    #wish-input::placeholder { color: rgba(214, 230, 250, 0.35); }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; }
+    .preset {
+        padding: 8px 13px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(226, 238, 255, 0.72);
+        font-family: inherit; font-size: 11px; letter-spacing: 0.06em;
+        cursor: pointer;
+        transition: all 0.25s;
+        min-height: 36px;
+    }
+    .preset:hover { color: #ffe7bd; border-color: rgba(255, 217, 138, 0.4); }
+    .panel-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+    .panel-actions .upload-btn, .panel-actions .ghost-btn { padding: 11px 20px; font-size: 11px; }
+
+    /* 新手引导 */
+    #guide {
+        position: fixed; inset: 0; z-index: 150;
+        display: grid; place-items: center;
+        background: radial-gradient(ellipse at 50% 40%, rgba(8, 16, 26, 0.86), rgba(3, 6, 10, 0.96));
+        backdrop-filter: blur(6px);
+        opacity: 0; visibility: hidden;
+        transition: opacity 0.6s var(--ease), visibility 0.6s;
+    }
+    #guide.open { opacity: 1; visibility: visible; }
+    .guide-card {
+        width: min(92vw, 460px);
+        padding: 32px 30px 26px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 217, 138, 0.2);
+        background: linear-gradient(170deg, rgba(14, 24, 36, 0.95), rgba(6, 12, 20, 0.98));
+        box-shadow: 0 50px 120px rgba(0, 0, 0, 0.65);
+        text-align: left;
+    }
+    .guide-steps { display: grid; gap: 16px; margin: 22px 0 26px; }
+    .guide-step { display: flex; gap: 14px; align-items: flex-start; }
+    .guide-num {
+        flex: none;
+        width: 26px; height: 26px; border-radius: 50%;
+        display: grid; place-content: center;
+        font-size: 11px; color: #ffe7bd;
+        border: 1px solid rgba(255, 217, 138, 0.35);
+        background: rgba(255, 190, 110, 0.08);
+    }
+    .guide-step h3 {
+        margin: 1px 0 5px;
+        font-size: 12.5px; font-weight: 500; letter-spacing: 0.08em;
+        color: #f2f7ff;
+    }
+    .guide-step p {
+        margin: 0;
+        font-size: 11.5px; line-height: 1.75; letter-spacing: 0.02em;
+        color: rgba(214, 230, 250, 0.6);
+    }
+    .guide-foot {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .link-btn {
+        background: none; border: 0; padding: 8px 4px;
+        color: rgba(214, 230, 250, 0.45);
+        font-family: inherit; font-size: 11px; letter-spacing: 0.08em;
+        cursor: pointer; text-decoration: underline; text-underline-offset: 4px;
+    }
+    .link-btn:hover { color: rgba(226, 238, 255, 0.85); }
+
+    /* ---------------- 情书面板 ---------------- */
+    #letter-panel {
+        width: min(92vw, 460px);
+        padding: 34px 34px 26px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 214, 224, 0.55);
+        background: radial-gradient(120% 80% at 50% 0%, #fffaf2 0%, #f8ebd8 55%, #f0dfc9 100%);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        color: #4a2c2c;
+        overflow-y: auto;
+    }
+    #letter-panel .panel-eyebrow { color: #b1726f; letter-spacing: 0.42em; }
+    #letter-panel .panel-title { color: #6d2f3c; margin-bottom: 16px; }
+    .letter-rule { width: 46px; height: 1px; background: rgba(140, 80, 70, 0.35); margin: 0 0 18px; }
+    .letter-body {
+        font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+        font-size: 17px; line-height: 2.05; letter-spacing: 0.01em;
+        color: #4a2c2c;
+        white-space: pre-line;
+        min-height: 128px;
+    }
+    .letter-body p { margin: 0 0 8px; }
+    .letter-cursor {
+        display: inline-block; width: 1px; height: 1em;
+        background: #8a3b52; vertical-align: -2px; margin-left: 2px;
+    }
+    #letter-sign {
+        margin: 16px 0 22px;
+        font-family: 'Great Vibes', cursive;
+        font-size: 27px; line-height: 1.4;
+        color: #8a3b52;
+        text-align: right;
+        opacity: 0;
+        transition: opacity 0.9s ease 0.15s;
+    }
+    #letter-panel.revealed #letter-sign { opacity: 1; }
+    #letter-panel .ghost-btn { color: #7a4a44; border-color: rgba(120, 70, 60, 0.25); background: rgba(255, 255, 255, 0.55); }
+    #letter-panel .ghost-btn:hover { color: #3f1f1f; border-color: rgba(120, 70, 60, 0.5); }
+
+    /* ---------------- Toast ---------------- */
+    #toast {
+        position: fixed; left: 50%; top: 92px;
+        transform: translate(-50%, -10px);
+        z-index: 160;
+        padding: 12px 22px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 217, 138, 0.24);
+        background: rgba(6, 14, 22, 0.88);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        color: #f3f7ff; font-size: 12px; letter-spacing: 0.04em; line-height: 1.6;
+        text-align: center;
+        max-width: min(88vw, 560px);
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+    }
+    #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* ---------------- Misc ---------------- */
+    #file-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+    #webcam-wrapper {
+        position: fixed; left: max(20px, env(safe-area-inset-left, 0px)); bottom: max(20px, env(safe-area-inset-bottom, 0px));
+        width: 168px; height: 126px;
+        border-radius: 12px; overflow: hidden;
+        border: 1px solid rgba(255, 217, 138, 0.35);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.4s var(--ease);
+    }
+    #webcam-wrapper video { display: none; }
+    #webcam-preview { width: 100%; height: 100%; display: block; transform: scaleX(-1); }
+
+    #debug-console {
+        position: fixed; left: 12px; bottom: 160px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.72);
+        border: 1px solid rgba(90, 255, 140, 0.2);
+        color: #7dffa9; font-family: ui-monospace, Consolas, monospace; font-size: 11px;
+        line-height: 1.6;
+        z-index: 200; pointer-events: none;
+        display: none;
+    }
+
+    body.dragover::after {
+        content: '松开，把回忆挂上枝头';
+        position: fixed; inset: 14px;
+        border: 1px dashed rgba(255, 217, 138, 0.5);
+        border-radius: 18px;
+        display: grid; place-content: center;
+        font-size: 13px; letter-spacing: 0.24em; color: #ffe7bd;
+        background: rgba(255, 190, 110, 0.05);
+        z-index: 90; pointer-events: none;
+    }
+
+    @media (max-width: 1000px) {
+        #status-indicator { top: clamp(20px, 4vh, 44px); font-size: 9.5px; padding: 7px 13px; }
+        .controls { right: 16px; left: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 104px); align-items: flex-start; text-align: left; }
+        .actions { justify-content: flex-start; }
+        .hint-text { font-size: 10px; letter-spacing: 0.08em; line-height: 1.8; }
+        #webcam-wrapper { display: none; }
+        #dock { flex-wrap: wrap; justify-content: center; width: calc(100% - 24px); max-width: 560px; border-radius: 24px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+        .dock-sep { display: none; }
+        .dock-btn { padding: 10px 12px; }
+        #filmstrip { bottom: calc(env(safe-area-inset-bottom, 0px) + 118px); }
+    }
+
+    @media (max-width: 760px) {
+        .brand { max-width: 74vw; top: 22px; left: 18px; }
+        .eyebrow { font-size: 9px; letter-spacing: 0.28em; }
+        .tagline { letter-spacing: 0.16em; margin-top: 12px; }
+        .dock-btn { font-size: 10px; padding: 9px 10px; gap: 6px; }
+        .dock-btn svg { width: 15px; height: 15px; }
+        .dock-btn.icon-only { padding: 9px 10px; }
+        .thumb { width: 40px; height: 40px; }
+        #strip-close { padding: 0 9px; font-size: 9px; }
+        #toast { top: 84px; font-size: 11.5px; }
+        .controls { bottom: calc(env(safe-area-inset-bottom, 0px) + 132px); }
+        .controls .hint-text { display: none; }
+        .brand { max-width: 82vw; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .spinner { animation-duration: 2.4s; }
+        #status-indicator .dot { animation: none; }
+        #ui-layer > * { transition: none; }
+    }
+</style>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+        "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/+esm"
+    }
+}
+</script>
+</head>
+<body>
+
+<div id="loader">
+    <div class="spinner"></div>
+    <div class="loader-text">Lighting the stardust</div>
+</div>
+
+<div id="canvas-container"></div>
+
+<div id="ui-layer">
+    <header class="brand">
+        <p class="eyebrow" id="eyebrow">Silent Night · 2025</p>
+        <h1>Merry<br>Christmas</h1>
+        <p class="tagline">把想说的话，藏进满树星光</p>
+    </header>
+
+    <div id="status-indicator">
+        <span class="dot"></span><span id="status-text">圣诞树</span>
+    </div>
+
+    <footer class="controls">
+        <div class="actions">
+            <label class="upload-btn" for="file-input">＋ 添加照片</label>
+            <input type="file" id="file-input" multiple accept="image/*">
+            <button class="ghost-btn" id="gesture-btn" type="button">开启手势</button>
+            <span class="count" id="photo-count" hidden></span>
+        </div>
+        <p class="hint-text">
+            <span class="k">拖拽</span> 旋转 · <span class="k">滚轮 / 双指</span> 缩放 ·
+            <span class="k">点照片</span> 放大 · <span class="k">H</span> 隐藏界面
+        </p>
+        <p class="hint-text legend">指向照片 · 比 V 看祝福 · 张开手掌散开 · 握拳归树 · 向下滑切换照片</p>
+    </footer>
+
+    <nav id="dock" aria-label="场景模式">
+        <button class="dock-btn active" data-mode="TREE" aria-pressed="true" title="看圣诞树">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 7 10h3l-4 5h4l-3 5h10l-3-5h4l-4-5h3z"/><path d="M12 20v2"/></svg>
+            <span>圣诞树</span>
+        </button>
+        <button class="dock-btn" data-mode="SCATTER" aria-pressed="false" title="让星尘散开">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></svg>
+            <span>散开</span>
+        </button>
+        <button class="dock-btn" data-mode="TEXT" aria-pressed="false" title="用粒子拼一句祝福">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>
+            <span>祝福</span>
+        </button>
+        <button class="dock-btn" data-mode="FOCUS" aria-pressed="false" title="看挂上的照片">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="m4.5 17 5-4.5 3.5 3 2.5-2 4 3.5"/></svg>
+            <span>回忆</span>
+        </button>
+        <button class="dock-btn" id="letter-btn" title="读一封信">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.3-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.7-7 9-7 9z"/></svg>
+            <span>情书</span>
+        </button>
+        <span class="dock-sep"></span>
+        <button class="dock-btn icon-only" id="sound-btn" title="音乐盒" aria-label="音乐盒">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>
+        </button>
+        <button class="dock-btn icon-only" id="save-btn" title="保存明信片" aria-label="保存明信片">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="m8 10 4 4 4-4"/><path d="M5 18h14"/></svg>
+        </button>
+        <button class="dock-btn icon-only" id="fs-btn" title="全屏" aria-label="全屏">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>
+        </button>
+    </nav>
+
+    <div id="filmstrip">
+        <button id="strip-close" type="button">返回</button>
+        <button class="strip-arrow" id="strip-prev" title="上一张" aria-label="上一张">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg>
+        </button>
+        <div id="strip-track"></div>
+        <span id="strip-count">0/0</span>
+        <button class="strip-arrow" id="strip-next" title="下一张" aria-label="下一张">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg>
+        </button>
+    </div>
+    <div id="webcam-wrapper">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="webcam-preview" width="168" height="126"></canvas>
+    </div>
+</div>
+
+<div class="panel" id="letter-panel" role="dialog" aria-modal="true" aria-labelledby="letter-title">
+    <p class="panel-eyebrow">A Letter</p>
+    <h2 class="panel-title" id="letter-title">写给你</h2>
+    <div class="letter-rule"></div>
+    <div class="letter-body" id="letter-body"></div>
+    <p id="letter-sign"></p>
+    <div class="panel-actions">
+        <button class="ghost-btn" id="letter-close" type="button">收好</button>
+    </div>
+</div>
+
+<div id="scrim"></div>
+
+<div class="panel" id="wish-panel" role="dialog" aria-modal="true" aria-labelledby="wish-title">
+    <p class="panel-eyebrow">Greeting</p>
+    <h2 class="panel-title" id="wish-title">点亮一句祝福</h2>
+    <p class="panel-text">输入一句话，粒子会把它拼出来。</p>
+    <input id="wish-input" type="text" maxlength="20" placeholder="例如：圣诞快乐 Anx" autocomplete="off">
+    <div class="presets">
+        <button class="preset" type="button">圣诞快乐</button>
+        <button class="preset" type="button">Merry Christmas</button>
+        <button class="preset" type="button">平安喜乐 万事顺遂</button>
+        <button class="preset" type="button">岁岁常相见</button>
+    </div>
+    <div class="panel-actions">
+        <button class="ghost-btn" id="wish-cancel" type="button">取消</button>
+        <button class="upload-btn" id="wish-apply" type="button">点亮祝福</button>
+    </div>
+</div>
+
+<div class="panel" id="camera-panel" role="dialog" aria-modal="true" aria-labelledby="camera-title">
+    <p class="panel-eyebrow">Gesture Mode</p>
+    <h2 class="panel-title" id="camera-title">用双手隔空操控</h2>
+    <p class="panel-text">
+        开启后会请求摄像头权限。画面<strong>只在本机识别</strong>，不会上传，也不会被录制。
+        如果不想开摄像头，鼠标操作完全一样。
+    </p>
+    <p class="panel-hint" id="camera-hint">首次开启需要下载约 8MB 的手势模型，只需一次。</p>
+    <div class="panel-actions">
+        <button class="ghost-btn" id="camera-cancel" type="button">不用了</button>
+        <button class="upload-btn" id="camera-allow" type="button">允许并开启</button>
+    </div>
+</div>
+
+<div id="guide">
+    <div class="guide-card">
+        <p class="panel-eyebrow">For You</p>
+        <h2 class="panel-title" style="margin-bottom:6px;">这棵树，是送给你的</h2>
+        <p class="panel-text" style="margin-bottom:0;">三十秒就能看懂。</p>
+
+        <div class="guide-steps">
+            <div class="guide-step">
+                <span class="guide-num">1</span>
+                <div>
+                    <h3>挂上你们的照片</h3>
+                    <p>点「添加照片」，或把图片直接拖进页面。它们会变成拍立得，绕着树飘。</p>
+                </div>
+            </div>
+            <div class="guide-step">
+                <span class="guide-num">2</span>
+                <div>
+                    <h3>换一种看它的方式</h3>
+                    <p>底部按钮：圣诞树 / 散开 / 祝福 / 照片。祝福可以改成你想说的话，由粒子拼出来。</p>
+                </div>
+            </div>
+            <div class="guide-step">
+                <span class="guide-num">3</span>
+                <div>
+                    <h3>还有一封信</h3>
+                    <p>点「情书」读一封信；点「音乐盒」有声音。想更酷可以开手势，不开也能用鼠标。</p>
+                </div>
+            </div>
+
+        <div class="guide-foot">
+            <button class="link-btn" id="guide-skip" type="button">以后再说</button>
+            <button class="upload-btn" id="guide-start" type="button">开始体验</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+
+<div id="debug-console">Initializing…</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ============================================================
+   0. 配置
+   ============================================================ */
+
+const TAU = Math.PI * 2;
+const MOBILE = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 820;
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PARAMS = new URLSearchParams(location.search);
+
+const CONFIG = {
+    greeting: (PARAMS.get('text') || '圣诞快乐 宝贝').slice(0, 20),
+
+    // 情书内容：改这里就能换成你自己想说的话
+    letter: {
+        title: '写给你',
+        lines: [
+            '今年的雪下得很慢，像是有话要说。',
+            '我把想说的都挂在这棵树上了——',
+            '每一颗星，都是一句没说出口的喜欢。',
+            '圣诞快乐。愿你被温柔包围，',
+            '也愿以后每一年的这个时候，',
+            '我都能站在你旁边。'
+        ],
+        signature: '—— 一直看着你的那个人'
+    },
+
+    quality: MOBILE
+        ? { tree: 12000, needles: 2800, snow: 800, dust: 300, stars: 700, ornaments: 64, lights: 120, bokeh: 45, petals: 55, hearts: 10 }
+        : { tree: 28000, needles: 7600, snow: 1500, dust: 650, stars: 1400, ornaments: 110, lights: 240, bokeh: 95, petals: 110, hearts: 16 },
+
+    tree: { height: 22, radius: 8.4, tiers: 9 },
+    camera: { fov: 42, rest: 46, min: 26, max: 90 },
+
+    palette: {
+        deepGreen: 0x04180c,
+        midGreen: 0x2f5c33,
+        emerald: 0x2f7a58,
+        blush: 0xffb6c9,
+        rose: 0xff7fa4,
+        gold: 0xffd18a,
+        ember: 0xffa46a
+    }
+};
+
+const STATE = {
+    mode: 'TREE',              // TREE | SCATTER | TEXT | FOCUS
+    focus: null,
+    photoIndex: 0,
+    zoom: CONFIG.camera.rest,
+    rotation: { x: 0, y: 0 },
+    pointer: { down: false, moved: 0, lastX: 0, lastY: 0, id: -1 },
+    pinch: { active: false, startDist: 0, startZoom: 0 },
+    hand: { detected: false, x: 0, y: 0 },
+    gesture: { current: null, start: 0, last: 0, hold: 520, cooldown: 1400 },
+    gestureReady: false,
+    uiHidden: false,
+    captureRequested: false
+};
+
+/* ============================================================
+   1. 工具
+   ============================================================ */
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const damp = (rate, dt) => 1 - Math.exp(-rate * dt);
+const lerpAngle = (from, to, t) => {
+    let d = (to - from) % TAU;
+    if (d > Math.PI) d -= TAU;
+    if (d < -Math.PI) d += TAU;
+    return from + d * t;
+};
+
+function log(msg) {
+    console.log(msg);
+    const el = document.getElementById('debug-console');
+    if (!el) return;
+    el.style.display = 'block';
+    el.innerText = msg;
+    clearTimeout(log._t);
+    log._t = setTimeout(() => {
+        if (el.innerText === msg) el.style.display = 'none';
+    }, 5000);
+}
+
+let toastTimer = 0;
+function toast(msg, ms = 3400) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+function updateStatus(text) {
+    const el = document.getElementById('status-text');
+    if (el) el.textContent = text;
+}
+
+/* ============================================================
+   2. 着色器
+   ============================================================ */
+
+const GradeShader = {
+    uniforms: {
+        tDiffuse: { value: null },
+        uTime: { value: 0 },
+        uExposure: { value: 1.05 },
+        uVignette: { value: 0.9 },
+        uGrain: { value: 0.018 }
+    },
+    vertexShader: `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform float uTime, uExposure, uVignette, uGrain;
+        varying vec2 vUv;
+
+        vec3 aces( vec3 x ) {
+            const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14;
+            return clamp( ( x * ( a * x + b ) ) / ( x * ( c * x + d ) + e ), 0.0, 1.0 );
+        }
+
+        vec3 toSRGB( vec3 c ) {
+            vec3 lo = c * 12.92;
+            vec3 hi = 1.055 * pow( max( c, vec3( 0.0 ) ), vec3( 0.41666 ) ) - 0.055;
+            return mix( lo, hi, step( vec3( 0.0031308 ), c ) );
+        }
+
+        void main() {
+            vec3 col = texture2D( tDiffuse, vUv ).rgb * uExposure;
+            col = aces( col );
+
+            float lum = dot( col, vec3( 0.2126, 0.7152, 0.0722 ) );
+            col *= mix( vec3( 0.88, 0.90, 1.02 ), vec3( 1.08, 0.98, 0.92 ), smoothstep( 0.03, 0.6, lum ) );
+            col += vec3( 0.012, 0.002, 0.008 ) * ( 1.0 - smoothstep( 0.0, 0.35, lum ) );
+
+            vec2 q = vUv - 0.5;
+            float vig = smoothstep( 0.86, 0.2, length( q ) );
+            col *= mix( 1.0, vig, uVignette );
+
+            float n = fract( sin( dot( vUv * 2048.0 + uTime * 9.0, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+            col += ( n - 0.5 ) * uGrain;
+
+            gl_FragColor = vec4( toSRGB( col ), 1.0 );
+        }
+    `
+};
+
+/* 深度感知的环绕散景（DOF），读取 RenderPass 的深度纹理 */
+const DofShader = {
+    uniforms: {
+        tDiffuse: { value: null },
+        tDepth: { value: null },
+        uTexel: { value: new THREE.Vector2(1 / 1440, 1 / 900) },
+        uNear: { value: 0.1 },
+        uFar: { value: 900 },
+        uFocus: { value: 46 },
+        uRange: { value: 34 },
+        uMaxBlur: { value: 3.2 }
+    },
+    vertexShader: `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform sampler2D tDepth;
+        uniform vec2 uTexel;
+        uniform float uNear, uFar, uFocus, uRange, uMaxBlur;
+        varying vec2 vUv;
+
+        float linearDepth( float d ) {
+            float z = d * 2.0 - 1.0;
+            return ( 2.0 * uNear * uFar ) / ( uFar + uNear - z * ( uFar - uNear ) );
+        }
+
+        void main() {
+            vec3 col = texture2D( tDiffuse, vUv ).rgb;
+            float z = linearDepth( texture2D( tDepth, vUv ).x );
+            float coc = clamp( abs( z - uFocus ) / uRange, 0.0, 1.0 );
+            coc *= coc;
+            float radius = coc * uMaxBlur;
+
+            if ( radius > 0.35 ) {
+                vec3 acc = vec3( 0.0 );
+                for ( int i = 0; i < 10; i++ ) {
+                    float fi = float( i );
+                    float ang = fi * 2.39996323;
+                    float rad = sqrt( ( fi + 0.5 ) / 10.0 );
+                    vec2 off = vec2( cos( ang ), sin( ang ) ) * rad * radius * uTexel * 2.0;
+                    acc += texture2D( tDiffuse, vUv + off ).rgb;
+                }
+                col = mix( col, acc * 0.1, smoothstep( 0.0, 1.0, coc ) );
+            }
+
+            gl_FragColor = vec4( col, 1.0 );
+        }
+    `
+};
+
+
+const POINT_VERT = `
+    attribute float aPhase;
+    uniform float uSize, uPixelRatio, uTime;
+    varying float vTwinkle;
+    void main() {
+        vec4 mv = modelViewMatrix * vec4( position, 1.0 );
+        float tw = 0.6 + 0.4 * sin( uTime * 1.7 + aPhase );
+        gl_PointSize = min( uSize * uPixelRatio * ( 90.0 / max( -mv.z, 1.0 ) ) * ( 0.85 + 0.35 * tw ), 26.0 );
+        gl_Position = projectionMatrix * mv;
+        vTwinkle = 0.4 + 0.6 * tw;
+    }
+`;
+
+const POINT_FRAG = `
+    uniform vec3 uColor;
+    uniform float uOpacity;
+    varying float vTwinkle;
+    void main() {
+        vec2 uv = gl_PointCoord - 0.5;
+        float a = pow( smoothstep( 0.5, 0.0, length( uv ) ), 1.55 );
+        if ( a < 0.004 ) discard;
+        gl_FragColor = vec4( uColor, a * uOpacity * vTwinkle );
+    }
+`;
+
+const VOLUME_VERT = `
+    attribute vec3 aColor;
+    attribute float aSize;
+    attribute float aPhase;
+    uniform float uTime, uPixelRatio, uSizeScale, uTwinkle;
+    varying vec3 vColor;
+    varying float vTwinkle;
+    void main() {
+        vec4 mv = modelViewMatrix * vec4( position, 1.0 );
+        float tw = 0.55 + 0.45 * sin( uTime * 2.1 + aPhase );
+        float steady = mix( 1.0, 0.82 + 0.38 * tw, uTwinkle );
+        gl_PointSize = min( aSize * uSizeScale * uPixelRatio * ( 150.0 / max( -mv.z, 1.0 ) ) * steady, 32.0 );
+        gl_Position = projectionMatrix * mv;
+        vColor = aColor;
+        vTwinkle = mix( 1.0, 0.35 + 0.65 * tw, uTwinkle );
+    }
+`;
+
+const VOLUME_FRAG = `
+    uniform float uAlpha;
+    varying vec3 vColor;
+    varying float vTwinkle;
+    void main() {
+        vec2 uv = gl_PointCoord - 0.5;
+        float a = pow( smoothstep( 0.5, 0.0, length( uv ) ), 1.9 );
+        if ( a < 0.004 ) discard;
+        gl_FragColor = vec4( vColor * ( 0.7 + 0.75 * vTwinkle ), a * vTwinkle * uAlpha );
+    }
+`;
+
+const SKY_VERT = `
+    varying vec3 vDir;
+    void main() {
+        vDir = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+`;
+
+const SKY_FRAG = `
+    varying vec3 vDir;
+    void main() {
+        float h = normalize( vDir ).y;
+        vec3 bottom = vec3( 0.010, 0.004, 0.014 );
+        vec3 horizon = vec3( 0.055, 0.018, 0.038 );
+        vec3 top = vec3( 0.010, 0.003, 0.018 );
+        vec3 col = mix( bottom, horizon, smoothstep( -0.5, 0.05, h ) );
+        col = mix( col, top, smoothstep( 0.0, 0.9, h ) );
+        gl_FragColor = vec4( col, 1.0 );
+    }
+`;
+
+/* 针叶材质：风摆 + 溶解（按实例随机延迟） */
+function injectNeedleMotion(material, uniforms) {
+    material.onBeforeCompile = (shader) => {
+        shader.uniforms.uTime = uniforms.uTime;
+        shader.uniforms.uDissolve = uniforms.uDissolve;
+
+        shader.vertexShader = `
+            uniform float uTime;
+            uniform float uDissolve;
+            attribute float aDelay;
+        ` + shader.vertexShader;
+
+        shader.vertexShader = shader.vertexShader.replace(
+            '#include <begin_vertex>',
+            `
+            #include <begin_vertex>
+            float sway = sin( uTime * 1.35 + instanceMatrix[3].x * 0.7 + instanceMatrix[3].z * 0.5 );
+            transformed.x += sway * 0.05 * position.y * position.y;
+
+            float dis = smoothstep( aDelay * 0.55, aDelay * 0.55 + 0.45, uDissolve );
+            transformed *= ( 1.0 - dis );
+            transformed.y += dis * 0.7;
+            `
+        );
+    };
+    material.customProgramCacheKey = () => 'needle-foliage';
+}
+
+/* ============================================================
+   3. 场景对象
+   ============================================================ */
+
+const clock = new THREE.Clock();
+const mainGroup = new THREE.Group();
+const photoGroup = new THREE.Group();
+const giftGroup = new THREE.Group();
+const orbiters = [];
+const moteMats = [];
+
+let scene, camera, renderer, composer, dofPass, bloomPass, gradePass;
+let volume, volumeUniforms;
+let foliage, foliageUniforms;
+let trunk;
+let stringLights;
+let snow, snowVel;
+let dustMotes;
+let topStar, groundGlow, contactShadow, groundMesh;
+let glowTexture;
+let photoPaperMat;
+let needleTexture;
+
+const volumeData = { posTree: null, posScatter: null, posText: null };
+const textLayout = { u: null, v: null };
+
+const focusCtx = { mesh: null, pos: new THREE.Vector3(), scale: 1 };
+const _worldPos = new THREE.Vector3();
+const _invGroup = new THREE.Matrix4();
+
+/* ============================================================
+   4. 初始化
+   ============================================================ */
+
+// 依据屏幕比例计算能完整装下整棵树的机位距离
+function updateFraming() {
+    const tan = Math.tan(THREE.MathUtils.degToRad(CONFIG.camera.fov * 0.5));
+    const byHeight = (CONFIG.tree.height + 15) / (2 * tan);
+    const byWidth = (CONFIG.tree.radius * 2 + 7) / (2 * tan * Math.max(camera.aspect, 0.3));
+    const need = Math.round(Math.max(byHeight, byWidth) * 1.02);
+
+    const delta = need - CONFIG.camera.rest;
+    CONFIG.camera.rest = need;
+    CONFIG.camera.max = Math.max(90, Math.round(need * 1.6));
+    STATE.zoom = clamp(STATE.zoom + delta, CONFIG.camera.min, CONFIG.camera.max);
+}
+
+function initThree() {
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0b0510, 0.009);
+
+    camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, window.innerWidth / window.innerHeight, 0.1, 900);
+    updateFraming();
+    camera.position.set(0, 2.4, CONFIG.camera.rest + 20);
+
+    renderer = new THREE.WebGLRenderer({
+        antialias: !MOBILE,
+        alpha: false,
+        powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, MOBILE ? 1.6 : 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    // 色调映射与 sRGB 由 GradePass 统一处理，避免二次映射
+    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    glowTexture = createGlowTexture(96);
+    needleTexture = createNeedleTexture();
+
+    photoPaperMat = new THREE.MeshStandardMaterial({
+        color: 0xfff6ea, metalness: 0.0, roughness: 0.62,
+        emissive: 0x2a1b16, emissiveIntensity: 0.35
+    });
+
+    scene.add(mainGroup);
+    mainGroup.add(photoGroup);
+    mainGroup.add(giftGroup);
+}
+
+function setupEnvironment() {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envScene = new RoomEnvironment();
+    scene.environment = pmrem.fromScene(envScene, 0.04).texture;
+    envScene.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) o.material.dispose();
+    });
+    pmrem.dispose();
+}
+
+function setupLights() {
+    scene.add(new THREE.AmbientLight(0x6b4a5e, 0.42));
+
+    const key = new THREE.DirectionalLight(0xffd3b4, 1.5);
+    key.position.set(24, 30, 20);
+    key.castShadow = true;
+    key.shadow.mapSize.set(MOBILE ? 1024 : 2048, MOBILE ? 1024 : 2048);
+    key.shadow.camera.left = -28;
+    key.shadow.camera.right = 28;
+    key.shadow.camera.top = 30;
+    key.shadow.camera.bottom = -26;
+    key.shadow.camera.near = 1;
+    key.shadow.camera.far = 110;
+    key.shadow.bias = -0.0006;
+    key.shadow.normalBias = 0.03;
+    key.target.position.set(0, -2, 0);
+    scene.add(key, key.target);
+
+    const fill = new THREE.DirectionalLight(0x9a86ff, 0.4);
+    fill.position.set(-26, 14, -20);
+    scene.add(fill);
+
+    // 树内部的暖光，让针叶有透光感
+    const inner = new THREE.PointLight(0xffb3c6, 15, 24, 2);
+    inner.position.set(0, 1, 0);
+    mainGroup.add(inner);
+
+    const rim = new THREE.SpotLight(0xff9ec7, 210, 120, 0.85, 0.95, 1.6);
+    rim.position.set(-30, 22, -30);
+    scene.add(rim);
+}
+
+function createSky() {
+    const sky = new THREE.Mesh(
+        new THREE.SphereGeometry(420, 32, 16),
+        new THREE.ShaderMaterial({
+            vertexShader: SKY_VERT,
+            fragmentShader: SKY_FRAG,
+            side: THREE.BackSide,
+            depthWrite: false,
+            fog: false
+        })
+    );
+    sky.renderOrder = -10;
+    scene.add(sky);
+}
+
+/* 自定义 DOF Pass：直接读取 RenderPass 的深度纹理 */
+class DofPass extends Pass {
+    constructor(camera) {
+        super();
+        this.camera = camera;
+        this.uniforms = THREE.UniformsUtils.clone(DofShader.uniforms);
+        this.material = new THREE.ShaderMaterial({
+            uniforms: this.uniforms,
+            vertexShader: DofShader.vertexShader,
+            fragmentShader: DofShader.fragmentShader,
+            depthTest: false,
+            depthWrite: false
+        });
+        this.fsQuad = new FullScreenQuad(this.material);
+    }
+    setSize(width, height) {
+        this.uniforms.uTexel.value.set(1 / width, 1 / height);
+    }
+    render(renderer, writeBuffer, readBuffer) {
+        this.uniforms.tDiffuse.value = readBuffer.texture;
+        this.uniforms.tDepth.value = readBuffer.depthTexture;
+        this.uniforms.uNear.value = this.camera.near;
+        this.uniforms.uFar.value = this.camera.far;
+        renderer.setRenderTarget(this.renderToScreen ? null : writeBuffer);
+        if (this.clear) renderer.clear();
+        this.fsQuad.render(renderer);
+    }
+}
+
+function setupPost() {
+    composer = new EffectComposer(renderer);
+    composer.setPixelRatio(renderer.getPixelRatio());
+    composer.setSize(window.innerWidth, window.innerHeight);
+
+    composer.addPass(new RenderPass(scene, camera));
+
+    const attachDepth = (rt) => {
+        rt.depthTexture = new THREE.DepthTexture(rt.width, rt.height);
+        rt.depthTexture.format = THREE.DepthFormat;
+        rt.depthTexture.type = THREE.UnsignedIntType;
+    };
+    attachDepth(composer.renderTarget1);
+    attachDepth(composer.renderTarget2);
+
+    dofPass = new DofPass(camera);
+    dofPass.enabled = !MOBILE;
+    dofPass.setSize(composer.renderTarget1.width, composer.renderTarget1.height);
+    composer.addPass(dofPass);
+
+    bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        0.5, 0.78, 1.05
+    );
+    composer.addPass(bloomPass);
+
+
+    gradePass = new ShaderPass(GradeShader);
+    composer.addPass(gradePass);
+}
+
+/* ============================================================
+   5. 程序化纹理
+   ============================================================ */
+
+// 四角星芒贴图，用于树顶的镜头光晕
+function createFlareTexture() {
+    const size = 256;
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    g.globalCompositeOperation = 'lighter';
+
+    const beam = (angle, len, width, alpha) => {
+        g.save();
+        g.translate(size / 2, size / 2);
+        g.rotate(angle);
+        const grd = g.createLinearGradient(0, 0, len, 0);
+        grd.addColorStop(0, `rgba(255, 246, 228, ${alpha})`);
+        grd.addColorStop(0.3, `rgba(255, 214, 170, ${alpha * 0.4})`);
+        grd.addColorStop(1, 'rgba(255, 190, 140, 0)');
+        g.fillStyle = grd;
+        g.beginPath();
+        g.moveTo(0, -width);
+        g.lineTo(len, 0);
+        g.lineTo(0, width);
+        g.closePath();
+        g.fill();
+        g.restore();
+    };
+
+    [0, Math.PI / 2, Math.PI, -Math.PI / 2].forEach(a => beam(a, 126, 3.4, 0.9));
+    [Math.PI / 4, -Math.PI / 4, Math.PI * 0.75, -Math.PI * 0.75].forEach(a => beam(a, 62, 2.2, 0.4));
+
+    const grd = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, 42);
+    grd.addColorStop(0, 'rgba(255, 250, 236, 1)');
+    grd.addColorStop(0.4, 'rgba(255, 216, 164, 0.5)');
+    grd.addColorStop(1, 'rgba(255, 190, 140, 0)');
+    g.fillStyle = grd;
+    g.beginPath();
+    g.arc(size / 2, size / 2, 42, 0, TAU);
+    g.fill();
+
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+}
+function createGlowTexture(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    const grd = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    grd.addColorStop(0.0, 'rgba(255,255,255,1)');
+    grd.addColorStop(0.24, 'rgba(255,244,220,0.55)');
+    grd.addColorStop(0.58, 'rgba(255,210,132,0.1)');
+    grd.addColorStop(1.0, 'rgba(255,190,110,0)');
+    g.fillStyle = grd;
+    g.fillRect(0, 0, size, size);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+}
+
+/* 一根冷杉枝：主枝 + 两侧针叶，透明底，用 alphaTest 裁切 */
+function createNeedleTexture() {
+    const w = 128, h = 256;
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, w, h);
+    g.lineCap = 'round';
+
+    g.strokeStyle = 'rgba(62,48,30,0.92)';
+    g.lineWidth = 3;
+    g.beginPath();
+    g.moveTo(w / 2, h - 2);
+    g.quadraticCurveTo(w / 2 + 2, h * 0.5, w / 2 - 1, 12);
+    g.stroke();
+
+    const needles = 52;
+    for (let i = 0; i < needles; i++) {
+        const t = i / needles;
+        const y = h - 14 - t * (h - 30);
+        const side = i % 2 === 0 ? 1 : -1;
+        const len = (26 + 40 * (1 - t)) * (0.7 + Math.random() * 0.55);
+        const droop = 0.5 + Math.random() * 0.4;
+        const tipX = w / 2 + side * len;
+        const tipY = y - len * droop;
+
+        g.strokeStyle = `hsla(${98 + Math.random() * 24}, ${32 + Math.random() * 20}%, ${22 + Math.random() * 22}%, ${0.7 + Math.random() * 0.3})`;
+        g.lineWidth = 1.3 + Math.random() * 1.3;
+        g.beginPath();
+        g.moveTo(w / 2 + side * 2, y);
+        g.quadraticCurveTo(w / 2 + side * len * 0.55, y - len * droop * 0.3, tipX, tipY);
+        g.stroke();
+    }
+
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    return t;
+}
+
+function createBarkTexture() {
+    const c = document.createElement('canvas');
+    c.width = 64;
+    c.height = 256;
+    const g = c.getContext('2d');
+    g.fillStyle = '#2a1d12';
+    g.fillRect(0, 0, 64, 256);
+    for (let i = 0; i < 180; i++) {
+        const x = Math.random() * 64;
+        const y = Math.random() * 256;
+        g.strokeStyle = `rgba(${18 + Math.random() * 42},${12 + Math.random() * 28},${6 + Math.random() * 16},${0.2 + Math.random() * 0.5})`;
+        g.lineWidth = 1 + Math.random() * 2;
+        g.beginPath();
+        g.moveTo(x, y);
+        g.lineTo(x + (Math.random() - 0.5) * 3, y + 12 + Math.random() * 42);
+        g.stroke();
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(2, 2);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+}
+
+function addPhases(geo, count) {
+    const ph = new Float32Array(count);
+    for (let i = 0; i < count; i++) ph[i] = Math.random() * TAU;
+    geo.setAttribute('aPhase', new THREE.BufferAttribute(ph, 1));
+}
+
+function makeMoteMaterial({ size, color, opacity }) {
+    const mat = new THREE.ShaderMaterial({
+        uniforms: {
+            uSize: { value: size },
+            uOpacity: { value: opacity },
+            uColor: { value: new THREE.Color(color) },
+            uPixelRatio: { value: renderer.getPixelRatio() },
+            uTime: { value: 0 }
+        },
+        vertexShader: POINT_VERT,
+        fragmentShader: POINT_FRAG,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false
+    });
+    moteMats.push(mat);
+    return mat;
+}
+
+/* ============================================================
+   6. 真实针叶树（InstancedMesh + 顶点着色器风摆 / 溶解）
+   ============================================================ */
+
+function createFoliage() {
+    const count = CONFIG.quality.needles;
+    const h = CONFIG.tree.height;
+    const R = CONFIG.tree.radius;
+    const TIERS = CONFIG.tree.tiers;
+
+    const geo = new THREE.PlaneGeometry(1, 1, 1, 1);
+    geo.translate(0, 0.5, 0);
+
+    const delays = new Float32Array(count);
+    for (let i = 0; i < count; i++) delays[i] = Math.random();
+    geo.setAttribute('aDelay', new THREE.InstancedBufferAttribute(delays, 1));
+
+    const mat = new THREE.MeshStandardMaterial({
+        map: needleTexture,
+        alphaTest: 0.42,
+        side: THREE.DoubleSide,
+        roughness: 0.86,
+        metalness: 0.0,
+        color: 0xe9f4e2,
+        emissive: 0x061206,
+        emissiveIntensity: 0.22,
+        envMapIntensity: 0.55
+    });
+    mat.shadowSide = THREE.DoubleSide;
+
+    foliageUniforms = {
+        uTime: { value: 0 },
+        uDissolve: { value: 0 }
+    };
+    injectNeedleMotion(mat, foliageUniforms);
+
+    foliage = new THREE.InstancedMesh(geo, mat, count);
+    foliage.frustumCulled = false;
+    foliage.castShadow = true;
+    foliage.receiveShadow = true;
+
+    const matrix = new THREE.Matrix4();
+    const basis = new THREE.Matrix4();
+    const pos = new THREE.Vector3();
+    const dir = new THREE.Vector3();
+    const normal = new THREE.Vector3();
+    const xAxis = new THREE.Vector3();
+    const zAxis = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
+    const twistQuat = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+
+    for (let i = 0; i < count; i++) {
+        const t = Math.pow(Math.random(), 1.04);
+        const tier = Math.min(TIERS - 1, Math.floor(t * TIERS));
+        const local = t * TIERS - tier;
+
+        // 每层下宽上窄，形成层次分明的裙摆剪影
+        const envelope = 0.74 + 0.26 * (1 - local);
+        const yBase = -h / 2 + t * h;
+        const rMax = R * (1 - t) * envelope;
+
+        const angle = Math.random() * TAU;
+        const attachR = rMax * (0.28 + Math.random() * 0.34);
+        const len = rMax * (0.42 + Math.random() * 0.3) + 0.5;
+        const width = len * (0.5 + Math.random() * 0.22);
+
+        // 枝条朝外并下垂
+        const droop = 0.45 + Math.random() * 0.45;
+        dir.set(Math.cos(angle), -droop, Math.sin(angle)).normalize();
+        normal.set(Math.cos(angle), 0.32, Math.sin(angle)).normalize();
+
+        xAxis.crossVectors(dir, normal).normalize();
+        zAxis.crossVectors(xAxis, dir).normalize();
+        basis.makeBasis(xAxis, dir, zAxis);
+        quat.setFromRotationMatrix(basis);
+
+        // 绕枝条轴随机翻转，避免针叶朝向一致
+        twistQuat.setFromAxisAngle(dir, (Math.random() - 0.5) * 0.9);
+        quat.premultiply(twistQuat);
+
+        pos.set(
+            Math.cos(angle) * attachR,
+            yBase + (Math.random() - 0.5) * 0.7 - attachR * 0.05,
+            Math.sin(angle) * attachR
+        );
+        scale.set(width, len, 1);
+
+        matrix.compose(pos, quat, scale);
+        foliage.setMatrixAt(i, matrix);
+    }
+    foliage.instanceMatrix.needsUpdate = true;
+
+    mainGroup.add(foliage);
+
+    // 树干
+    trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.3, 0.62, 5.2, 10, 1),
+        new THREE.MeshStandardMaterial({
+            map: createBarkTexture(),
+            roughness: 0.92,
+            metalness: 0.0,
+            color: 0x8c6b45
+        })
+    );
+    trunk.position.y = -h / 2 + 2.6;
+    trunk.castShadow = true;
+    trunk.receiveShadow = true;
+    mainGroup.add(trunk);
+}
+
+function createStringLights() {
+    const count = CONFIG.quality.lights;
+    const h = CONFIG.tree.height;
+    const R = CONFIG.tree.radius;
+
+    const geo = new THREE.SphereGeometry(0.1, 8, 6);
+    const mat = new THREE.MeshStandardMaterial({
+        color: 0xffdca8,
+        emissive: 0xffa445,
+        emissiveIntensity: 2.0,
+        roughness: 0.35,
+        metalness: 0.0
+    });
+
+    stringLights = new THREE.InstancedMesh(geo, mat, count);
+    stringLights.frustumCulled = false;
+    stringLights.castShadow = false;
+
+    const matrix = new THREE.Matrix4();
+    const quat = new THREE.Quaternion();
+    const pos = new THREE.Vector3();
+    const scale = new THREE.Vector3(1, 1, 1);
+
+    for (let i = 0; i < count; i++) {
+        const t = i / count;
+        const y = -h / 2 + t * h * 0.94 + 0.6;
+        const r = R * (1 - t * 0.97) * 1.0;
+        const a = t * TAU * 7.5;
+
+        pos.set(Math.cos(a) * r, y + Math.sin(a * 3) * 0.12, Math.sin(a) * r);
+        matrix.compose(pos, quat, scale);
+        stringLights.setMatrixAt(i, matrix);
+    }
+    stringLights.instanceMatrix.needsUpdate = true;
+    mainGroup.add(stringLights);
+
+    // 两盏真实点光源，让灯带真的照亮附近针叶
+    const lightA = new THREE.PointLight(0xffb060, 16, 15, 2);
+    lightA.position.set(0, -3, 0);
+    mainGroup.add(lightA);
+
+    const lightB = new THREE.PointLight(0xffc07a, 12, 13, 2);
+    lightB.position.set(0, 5, 0);
+    mainGroup.add(lightB);
+}
+
+/* ============================================================
+   7. 树内星尘（可变形为文字 / 散开）
+   ============================================================ */
+
+function buildTextLayout(text) {
+    const canvas = document.createElement('canvas');
+    const font = '700 200px "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif';
+
+    let ctx = canvas.getContext('2d');
+    ctx.font = font;
+    const width = Math.ceil(ctx.measureText(text).width) + 120;
+    const height = 320;
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.font = font;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, width / 2, height / 2);
+
+    const data = ctx.getImageData(0, 0, width, height).data;
+    const step = MOBILE ? 4 : 3;
+    const u = [];
+    const v = [];
+    for (let y = 0; y < height; y += step) {
+        for (let x = 0; x < width; x += step) {
+            if (data[(y * width + x) * 4] > 140) {
+                u.push((x - width / 2) / width);
+                v.push(-(y - height / 2) / width);
+            }
+        }
+    }
+    // 打乱顺序：粒子数多于/少于采样点时，密度都均匀
+    for (let i = u.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tu = u[i]; u[i] = u[j]; u[j] = tu;
+        const tv = v[i]; v[i] = v[j]; v[j] = tv;
+    }
+    textLayout.u = u;
+    textLayout.v = v;
+    return u.length;
+}
+
+function layoutText() {
+    const arr = volumeData.posText;
+    if (!arr) return;
+    const n = textLayout.u.length;
+    if (!n) return;
+
+    const count = CONFIG.quality.tree;
+    const dist = CONFIG.camera.rest;
+    const visH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(CONFIG.camera.fov * 0.5));
+    const visW = visH * camera.aspect;
+    const targetW = Math.min(visW * 0.8, visH * 1.45);
+
+    for (let i = 0; i < count; i++) {
+        const k = i % n;
+        arr[i * 3] = textLayout.u[k] * targetW + (Math.random() - 0.5) * 0.02;
+        arr[i * 3 + 1] = textLayout.v[k] * targetW - 1.4 + (Math.random() - 0.5) * 0.02;
+        arr[i * 3 + 2] = (Math.random() - 0.5) * 0.26;
+    }
+}
+
+function createVolume() {
+    const count = CONFIG.quality.tree;
+    const h = CONFIG.tree.height;
+    const R = CONFIG.tree.radius;
+
+    const colDeep = new THREE.Color(CONFIG.palette.deepGreen);
+    const colMid = new THREE.Color(CONFIG.palette.midGreen);
+    const colEmerald = new THREE.Color(CONFIG.palette.emerald);
+    const colBlush = new THREE.Color(CONFIG.palette.blush);
+    const colGold = new THREE.Color(CONFIG.palette.gold);
+    const colEmber = new THREE.Color(CONFIG.palette.ember);
+
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    const phases = new Float32Array(count);
+
+    volumeData.posTree = new Float32Array(count * 3);
+    volumeData.posScatter = new Float32Array(count * 3);
+    volumeData.posText = new Float32Array(count * 3);
+
+    const tmp = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        const isSpark = Math.random() < 0.09;
+
+        let x, y, z, tipness;
+
+        if (isSpark) {
+            const t = Math.random();
+            const r = R * (1 - t) * (0.85 + Math.random() * 0.2);
+            const a = Math.random() * TAU;
+            x = Math.cos(a) * r;
+            y = -h / 2 + t * h;
+            z = Math.sin(a) * r;
+            tipness = 1;
+        } else {
+            const t = Math.pow(Math.random(), 1.05);
+            const rMax = R * (1 - t) * 0.94;
+            const branches = Math.max(3, Math.round(12 * (1 - t)));
+            const a = (Math.floor(Math.random() * branches) / branches) * TAU + t * TAU * 3.1;
+            tipness = Math.pow(Math.random(), 0.55);
+            const r = rMax * tipness;
+            x = Math.cos(a) * r;
+            y = -h / 2 + t * h;
+            z = Math.sin(a) * r;
+        }
+
+        volumeData.posTree[i3] = x;
+        volumeData.posTree[i3 + 1] = y;
+        volumeData.posTree[i3 + 2] = z;
+
+        const sr = 12 + Math.random() * 24;
+        const sa = Math.random() * TAU;
+        const sb = Math.acos(2 * Math.random() - 1);
+        volumeData.posScatter[i3] = sr * Math.sin(sb) * Math.cos(sa);
+        volumeData.posScatter[i3 + 1] = sr * Math.sin(sb) * Math.sin(sa) * 0.75;
+        volumeData.posScatter[i3 + 2] = sr * Math.cos(sb);
+
+        positions[i3] = x;
+        positions[i3 + 1] = y;
+        positions[i3 + 2] = z;
+
+        if (isSpark) {
+            tmp.copy(Math.random() < 0.5 ? colGold : colEmber);
+            sizes[i] = 1.2 + Math.random() * 0.9;
+        } else if (tipness > 0.84) {
+            tmp.copy(Math.random() < 0.45 ? colGold : colBlush);
+            sizes[i] = 0.85 + Math.random() * 0.6;
+        } else {
+            tmp.lerpColors(colDeep, Math.random() < 0.35 ? colEmerald : colMid, Math.random() * 0.7);
+            sizes[i] = 0.42 + Math.random() * 0.4;
+        }
+
+        colors[i3] = tmp.r;
+        colors[i3 + 1] = tmp.g;
+        colors[i3 + 2] = tmp.b;
+        phases[i] = Math.random() * TAU;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    const posAttr = new THREE.BufferAttribute(positions, 3);
+    posAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('position', posAttr);
+    geo.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+
+    volumeUniforms = {
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() },
+        uSizeScale: { value: 0.9 },
+        uTwinkle: { value: 1 },
+        uAlpha: { value: 0.1 }
+    };
+
+    volume = new THREE.Points(geo, new THREE.ShaderMaterial({
+        uniforms: volumeUniforms,
+        vertexShader: VOLUME_VERT,
+        fragmentShader: VOLUME_FRAG,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false
+    }));
+    volume.frustumCulled = false;
+    mainGroup.add(volume);
+
+    buildTextLayout(CONFIG.greeting);
+    layoutText();
+}
+
+function updateVolume(dt) {
+    if (!volume) return;
+    const arr = volume.geometry.attributes.position.array;
+    const count = CONFIG.quality.tree;
+
+    let targetArr = volumeData.posTree;
+    let speed = 2.2;
+
+    if (STATE.mode === 'SCATTER' || STATE.mode === 'FOCUS') targetArr = volumeData.posScatter;
+    else if (STATE.mode === 'TEXT') { targetArr = volumeData.posText; speed = 2.6; }
+
+    const k = damp(speed, dt);
+    for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        arr[i3] += (targetArr[i3] - arr[i3]) * k;
+        arr[i3 + 1] += (targetArr[i3 + 1] - arr[i3 + 1]) * k;
+        arr[i3 + 2] += (targetArr[i3 + 2] - arr[i3 + 2]) * k;
+    }
+    volume.geometry.attributes.position.needsUpdate = true;
+
+    if (STATE.mode === 'TREE') {
+        volume.rotation.y += (REDUCED_MOTION ? 0.03 : 0.07) * dt;
+    } else if (STATE.mode === 'TEXT' || STATE.mode === 'FOCUS') {
+        volume.rotation.y = lerpAngle(volume.rotation.y, 0, damp(3, dt));
+    } else {
+        volume.rotation.y += 0.16 * dt;
+    }
+
+    const wantAlpha = STATE.mode === 'TREE' ? 0.1 : STATE.mode === 'FOCUS' ? 0.08 : 0.96;
+    const wantSize = STATE.mode === 'TREE' ? 0.9 : STATE.mode === 'TEXT' ? 0.85 : 1;
+    const wantTwinkle = STATE.mode === 'TEXT' ? 0.12 : 1;
+    volumeUniforms.uTwinkle.value += (wantTwinkle - volumeUniforms.uTwinkle.value) * damp(3, dt);
+    volumeUniforms.uAlpha.value += (wantAlpha - volumeUniforms.uAlpha.value) * damp(2.5, dt);
+    volumeUniforms.uSizeScale.value += (wantSize - volumeUniforms.uSizeScale.value) * damp(3, dt);
+}
+
+/* ============================================================
+   8. 挂饰 / 礼物 / 照片
+   ============================================================ */
+
+class Orbiter {
+    constructor(mesh, type) {
+        this.mesh = mesh;
+        this.type = type;
+        this.baseScale = mesh.scale.x;
+        this.scale = this.baseScale;
+
+        this.posScatter = new THREE.Vector3(
+            (Math.random() - 0.5) * 46,
+            (Math.random() - 0.5) * 34,
+            (Math.random() - 0.5) * 46
+        );
+
+        const h = CONFIG.tree.height;
+        const R = CONFIG.tree.radius;
+        const t = 0.08 + Math.pow(Math.random(), 0.7) * 0.84;
+        const a = Math.random() * TAU;
+        const r = R * (1 - t) * (0.86 + Math.random() * 0.16);
+        this.posTree = new THREE.Vector3(Math.cos(a) * r, -h / 2 + t * h, Math.sin(a) * r);
+
+        const spin = type === 'PHOTO' ? 0.25 : 1.6;
+        this.spin = new THREE.Vector3(
+            (Math.random() - 0.5) * spin,
+            (Math.random() - 0.5) * spin,
+            (Math.random() - 0.5) * spin
+        );
+
+        this.orbitAngle = Math.random() * TAU;
+        this.orbitRadius = R + 3 + Math.random() * 5;
+        this.orbitSpeed = 0.12 + Math.random() * 0.16;
+        this.orbitY = (Math.random() - 0.5) * 15;
+        this.orbitPhase = Math.random() * TAU;
+
+        this._orbitPos = new THREE.Vector3(
+            Math.cos(this.orbitAngle) * this.orbitRadius,
+            this.orbitY,
+            Math.sin(this.orbitAngle) * this.orbitRadius
+        );
+        this._tmpPos = new THREE.Vector3();
+
+        if (type === 'PHOTO') mesh.position.copy(this._orbitPos);
+        else mesh.position.copy(this.posTree);
+    }
+
+    update(dt, focus, cam) {
+        const m = this.mesh;
+        const mode = STATE.mode;
+        const k = damp(2.4, dt);
+
+        let wantScale = this.baseScale;
+        let kScale = 5;
+
+        if (mode === 'FOCUS') {
+            if (focus.mesh === m) {
+                m.position.lerp(focus.pos, damp(6, dt));
+                m.lookAt(cam.position);
+                wantScale = focus.scale;
+                kScale = 7;
+            } else {
+                m.position.lerp(this.posScatter, k);
+                wantScale = this.baseScale * 0.012;
+                kScale = 3;
+            }
+        } else if (mode === 'TREE') {
+            if (this.type === 'PHOTO') {
+                this.orbitAngle += this.orbitSpeed * dt;
+                this._tmpPos.set(
+                    Math.cos(this.orbitAngle) * this.orbitRadius,
+                    this.orbitY + Math.sin(this.orbitAngle * 1.3 + this.orbitPhase) * 1.1,
+                    Math.sin(this.orbitAngle) * this.orbitRadius
+                );
+                m.position.lerp(this._tmpPos, damp(1.8, dt));
+                m.lookAt(cam.position);
+            } else {
+                m.position.lerp(this.posTree, k);
+                m.rotation.y += 0.4 * dt;
+                m.rotation.x += (0 - m.rotation.x) * damp(1.5, dt);
+                m.rotation.z += (0 - m.rotation.z) * damp(1.5, dt);
+            }
+        } else if (mode === 'SCATTER') {
+            m.position.lerp(this.posScatter, k);
+            m.rotation.x += this.spin.x * dt;
+            m.rotation.y += this.spin.y * dt;
+            m.rotation.z += this.spin.z * dt;
+            wantScale = this.type === 'PHOTO' ? this.baseScale * 1.5 : this.baseScale;
+        } else {
+            m.position.lerp(this.posScatter, k);
+            wantScale = this.baseScale * 0.012;
+            kScale = 3;
+        }
+
+        this.scale += (wantScale - this.scale) * damp(kScale, dt);
+        m.scale.setScalar(Math.max(this.scale, 0.0002));
+    }
+}
+
+function createStarGeometry(innerRadius, outerRadius, thickness) {
+    const shape = new THREE.Shape();
+    const points = 5;
+    const step = Math.PI / points;
+    for (let i = 0; i < points * 2; i++) {
+        const r = i % 2 === 0 ? outerRadius : innerRadius;
+        const a = i * step;
+        const x = Math.sin(a) * r;
+        const y = Math.cos(a) * r;
+        if (i === 0) shape.moveTo(x, y);
+        else shape.lineTo(x, y);
+    }
+    shape.closePath();
+    const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: thickness,
+        bevelEnabled: true,
+        bevelThickness: 0.08,
+        bevelSize: 0.04,
+        bevelSegments: 2
+    });
+    geo.center();
+    return geo;
+}
+
+function createOrnaments() {
+    const sphereGeo = new THREE.SphereGeometry(0.5, 24, 16);
+    const starGeo = createStarGeometry(0.22, 0.48, 0.14);
+
+    const goldMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffd98a, metalness: 1.0, roughness: 0.15,
+        clearcoat: 1.0, clearcoatRoughness: 0.08,
+        envMapIntensity: 2.0
+    });
+    const pearlMat = new THREE.MeshPhysicalMaterial({
+        color: 0xfff7e6, metalness: 0.9, roughness: 0.06,
+        clearcoat: 1.0, envMapIntensity: 2.2
+    });
+    const redMat = new THREE.MeshPhysicalMaterial({
+        color: 0x8f1420, metalness: 0.3, roughness: 0.2,
+        clearcoat: 1.0, clearcoatRoughness: 0.1,
+        sheen: 0.6, sheenColor: 0xff9d9d,
+        emissive: 0x160202, emissiveIntensity: 0.5
+    });
+    const iceMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffcdd9, metalness: 0.5, roughness: 0.12,
+        clearcoat: 1.0, emissive: 0x0b1624, emissiveIntensity: 0.6,
+        envMapIntensity: 1.6
+    });
+
+    for (let i = 0; i < CONFIG.quality.ornaments; i++) {
+        const r = Math.random();
+        let mesh;
+        if (r < 0.3) mesh = new THREE.Mesh(starGeo, pearlMat);
+        else if (r < 0.6) mesh = new THREE.Mesh(sphereGeo, goldMat);
+        else if (r < 0.85) mesh = new THREE.Mesh(sphereGeo, redMat);
+        else mesh = new THREE.Mesh(sphereGeo, iceMat);
+
+        const s = 0.28 + Math.random() * 0.34;
+        mesh.scale.setScalar(s);
+        mesh.rotation.set(Math.random() * TAU, Math.random() * TAU, Math.random() * TAU);
+        mesh.castShadow = true;
+
+        mainGroup.add(mesh);
+        orbiters.push(new Orbiter(mesh, 'ORNAMENT'));
+    }
+
+    const starMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffe3a1, metalness: 1.0, roughness: 0.08,
+        clearcoat: 1.0,
+        emissive: 0xffb84d, emissiveIntensity: 2.2, envMapIntensity: 2.0
+    });
+    topStar = new THREE.Mesh(createStarGeometry(0.8, 1.7, 0.34), starMat);
+    topStar.position.set(0, CONFIG.tree.height / 2 + 1.2, 0);
+    mainGroup.add(topStar);
+
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: glowTexture, color: 0xffce82, transparent: true,
+        opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false
+    }));
+    halo.scale.setScalar(8);
+    halo.position.copy(topStar.position);
+    mainGroup.add(halo);
+
+    // 星芒：十字光晕，缓慢旋转
+    const flare = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: createFlareTexture(), color: 0xffe6bc, transparent: true,
+        opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, fog: false
+    }));
+    flare.scale.setScalar(20);
+    flare.position.copy(topStar.position);
+    mainGroup.add(flare);
+
+    topStar.userData.halo = halo;
+    topStar.userData.flare = flare;
+}
+
+function createGifts() {
+    const baseY = -CONFIG.tree.height / 2;
+    const mats = [
+        new THREE.MeshStandardMaterial({ color: 0x7d1220, roughness: 0.55, metalness: 0.05 }),
+        new THREE.MeshStandardMaterial({ color: 0x7d2237, roughness: 0.55, metalness: 0.05 }),
+        new THREE.MeshStandardMaterial({ color: 0xf0e0c8, roughness: 0.5, metalness: 0.06 }),
+        new THREE.MeshStandardMaterial({ color: 0x3a1f3f, roughness: 0.5, metalness: 0.1 })
+    ];
+    const ribbonMat = new THREE.MeshStandardMaterial({
+        color: 0xe8c887, metalness: 0.75, roughness: 0.25,
+        emissive: 0x120c02, emissiveIntensity: 1
+    });
+
+    for (let i = 0; i < 7; i++) {
+        const angle = (i / 7) * TAU + Math.random() * 0.5;
+        const radius = 8.2 + Math.random() * 4;
+
+        const w = 1.5 + Math.random() * 1.3;
+        const h = 1.1 + Math.random() * 1.0;
+        const d = 1.5 + Math.random() * 1.1;
+
+        const group = new THREE.Group();
+        const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats[i % mats.length]);
+        box.castShadow = true;
+        box.receiveShadow = true;
+        group.add(box);
+
+        const bandA = new THREE.Mesh(new THREE.BoxGeometry(w * 0.14, h * 1.02, d * 1.02), ribbonMat);
+        const bandB = new THREE.Mesh(new THREE.BoxGeometry(w * 1.02, h * 1.02, d * 0.14), ribbonMat);
+        group.add(bandA, bandB);
+
+        group.position.set(Math.cos(angle) * radius, baseY + h / 2, Math.sin(angle) * radius);
+        group.rotation.y = Math.random() * TAU;
+        giftGroup.add(group);
+    }
+}
+
+function createGround() {
+    const baseY = -CONFIG.tree.height / 2;
+
+    const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x150b14, roughness: 0.9, metalness: 0.03,
+        fog: false, transparent: true, opacity: 1, depthWrite: false
+    });
+    // 远处过渡到天边的雾色，消掉地平线硬边
+    groundMat.onBeforeCompile = (shader) => {
+        shader.vertexShader = shader.vertexShader
+            .replace('#include <common>', '#include <common>\nvarying vec3 vGroundPos;')
+            .replace('#include <project_vertex>', '#include <project_vertex>\nvGroundPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+        shader.fragmentShader = shader.fragmentShader
+            .replace('#include <common>', '#include <common>\nvarying vec3 vGroundPos;')
+            .replace('#include <opaque_fragment>', `
+                #include <opaque_fragment>
+                float gd = length(vGroundPos.xz);
+                gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.078, 0.028, 0.052), smoothstep(18.0, 150.0, gd) * 0.94);
+                gl_FragColor.a *= 1.0 - smoothstep(40.0, 110.0, gd);
+            `);
+    };
+    groundMat.customProgramCacheKey = () => 'ground-haze';
+
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(240, 64), groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = baseY - 0.05;
+    ground.receiveShadow = true;
+    groundMesh = ground;
+    mainGroup.add(ground);
+
+    // 接地阴影，让树"站"在雪地上
+    contactShadow = new THREE.Mesh(
+        new THREE.PlaneGeometry(34, 34),
+        new THREE.MeshBasicMaterial({
+            map: glowTexture,
+            color: 0x000000,
+            transparent: true,
+            opacity: 0.6,
+            depthWrite: false,
+            blending: THREE.NormalBlending
+        })
+    );
+    contactShadow.rotation.x = -Math.PI / 2;
+    contactShadow.position.y = baseY + 0.02;
+    mainGroup.add(contactShadow);
+
+    // 地面暖光池
+    groundGlow = new THREE.Mesh(
+        new THREE.PlaneGeometry(70, 70),
+        new THREE.MeshBasicMaterial({
+            map: glowTexture,
+            color: 0xffa6c2,
+            transparent: true,
+            opacity: 0.2,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            fog: false
+        })
+    );
+    groundGlow.rotation.x = -Math.PI / 2;
+    groundGlow.position.y = baseY + 0.04;
+    mainGroup.add(groundGlow);
+}
+
+function makeCaptionTexture() {
+    const c = document.createElement('canvas');
+    c.width = 512;
+    c.height = 128;
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height);
+    g.fillStyle = '#8a4a52';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.font = '58px "Great Vibes", "Segoe Script", cursive';
+    g.fillText('with love', c.width / 2, c.height / 2 + 4);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    return t;
+}
+
+function addPhoto(texture) {
+    const img = texture.image || { width: 1, height: 1 };
+    const aspect = (img.width || 1) / (img.height || 1);
+    const MAX = 1.4;
+    const PAD = 0.14;
+    const CAP = 0.4;
+
+    let w, h;
+    if (aspect >= 1) { w = MAX; h = MAX / aspect; }
+    else { h = MAX; w = MAX * aspect; }
+
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+    const group = new THREE.Group();
+
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: glowTexture, color: 0xffb3c6, transparent: true,
+        opacity: 0.36, blending: THREE.AdditiveBlending, depthWrite: false
+    }));
+    glow.scale.setScalar(Math.max(w, h) * 2.4);
+    glow.position.z = -0.08;
+    group.add(glow);
+
+    const frameW = w + PAD * 2;
+    const frameH = h + PAD * 2 + CAP;
+
+    // 拍立得相纸
+    const frame = new THREE.Mesh(new THREE.PlaneGeometry(frameW, frameH), photoPaperMat);
+    frame.position.z = 0.006;
+    frame.castShadow = true;
+    group.add(frame);
+
+    const photo = new THREE.Mesh(
+        new THREE.PlaneGeometry(w, h),
+        new THREE.MeshBasicMaterial({ map: texture, toneMapped: false })
+    );
+    photo.position.set(0, CAP / 2, 0.02);
+    group.add(photo);
+
+    const caption = new THREE.Mesh(
+        new THREE.PlaneGeometry(frameW - 0.06, CAP),
+        new THREE.MeshBasicMaterial({
+            map: makeCaptionTexture(),
+            transparent: true,
+            depthWrite: false,
+            toneMapped: false
+        })
+    );
+    caption.position.set(0, -frameH / 2 + CAP / 2, 0.024);
+    group.add(caption);
+
+    group.userData.dims = { w: frameW, h: frameH };
+    group.userData.thumb = makeThumb(img);
+    group.userData.caption = caption;
+
+    photoGroup.add(group);
+    orbiters.push(new Orbiter(group, 'PHOTO'));
+
+    updatePhotoCount();
+    rebuildFilmstrip();
+}
+
+function makeThumb(image) {
+    const size = 96;
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    const iw = image.width || 1;
+    const ih = image.height || 1;
+    const scale = Math.max(size / iw, size / ih);
+    g.drawImage(image, (size - iw * scale) / 2, (size - ih * scale) / 2, iw * scale, ih * scale);
+    return c.toDataURL('image/jpeg', 0.72);
+}
+
+function updatePhotoCount() {
+    const el = document.getElementById('photo-count');
+    const n = photoGroup.children.length;
+    if (!n) { el.hidden = true; return; }
+    el.hidden = false;
+    el.textContent = `${n} 张照片`;
+}
+
+function rebuildFilmstrip() {
+    const track = document.getElementById('strip-track');
+    track.textContent = '';
+    photoGroup.children.forEach((g, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'thumb';
+        btn.type = 'button';
+        btn.title = `第 ${i + 1} 张`;
+        const img = document.createElement('img');
+        img.src = g.userData.thumb;
+        img.alt = '';
+        btn.appendChild(img);
+        btn.addEventListener('click', () => focusPhoto(i));
+        track.appendChild(btn);
+    });
+    updateFilmstrip();
+}
+
+function updateFilmstrip() {
+    const strip = document.getElementById('filmstrip');
+    const n = photoGroup.children.length;
+    const show = STATE.mode === 'FOCUS' && n > 0;
+    strip.classList.toggle('show', show);
+    if (!show) return;
+
+    document.querySelectorAll('#strip-track .thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === STATE.photoIndex);
+    });
+    document.getElementById('strip-count').textContent = `${STATE.photoIndex + 1}/${n}`;
+}
+
+function readFiles(fileList) {
+    const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+    if (!files.length) {
+        toast('这些文件里没有图片，换几张试试？');
+        return;
+    }
+    toast(`正在加载 ${files.length} 张照片…`, 1600);
+    let done = 0;
+    files.forEach(file => {
+        const url = URL.createObjectURL(file);
+        new THREE.TextureLoader().load(url, tex => {
+            addPhoto(tex);
+            URL.revokeObjectURL(url);
+            if (++done === files.length) {
+                toast(`已挂上 ${files.length} 张照片 · 点「回忆」放大查看`, 4200);
+            }
+        }, undefined, () => {
+            URL.revokeObjectURL(url);
+            if (++done === files.length) toast('有图片读取失败，可能是格式不支持');
+        });
+    });
+}
+
+/* ============================================================
+   9. 环境粒子
+   ============================================================ */
+
+function createStars() {
+    const n = CONFIG.quality.stars;
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+        const r = 140 + Math.random() * 180;
+        const a = Math.random() * TAU;
+        const b = Math.acos(2 * Math.random() - 1);
+        pos[i * 3] = r * Math.sin(b) * Math.cos(a);
+        pos[i * 3 + 1] = Math.abs(r * Math.sin(b) * Math.sin(a)) * 0.7 + 16;
+        pos[i * 3 + 2] = r * Math.cos(b);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    addPhases(geo, n);
+
+    const stars = new THREE.Points(geo, makeMoteMaterial({ size: 1.3, color: 0xdce9ff, opacity: 0.42 }));
+    stars.frustumCulled = false;
+    scene.add(stars);
+}
+
+function createAtmosphere() {
+    const cool = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: glowTexture, color: 0x2f6b8c, transparent: true,
+        opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, fog: false
+    }));
+    cool.scale.set(150, 105, 1);
+    cool.position.set(0, 18, -95);
+    scene.add(cool);
+
+    const warm = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: glowTexture, color: 0xff9d4a, transparent: true,
+        opacity: 0.2, blending: THREE.AdditiveBlending, depthWrite: false, fog: false
+    }));
+    warm.scale.set(120, 54, 1);
+    warm.position.set(0, -8, -70);
+    scene.add(warm);
+}
+
+function createDust() {
+    const n = CONFIG.quality.dust;
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+        const i3 = i * 3;
+        pos[i3] = (Math.random() - 0.5) * 50;
+        pos[i3 + 1] = (Math.random() - 0.5) * 36 + 2;
+        pos[i3 + 2] = (Math.random() - 0.5) * 50;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    addPhases(geo, n);
+
+    dustMotes = new THREE.Points(geo, makeMoteMaterial({ size: 1.2, color: 0xffe0ae, opacity: 0.35 }));
+    dustMotes.frustumCulled = false;
+    mainGroup.add(dustMotes);
+}
+
+function createSnow() {
+    const n = CONFIG.quality.snow;
+    const range = 90;
+    const pos = new Float32Array(n * 3);
+    snowVel = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+        const i3 = i * 3;
+        pos[i3] = (Math.random() - 0.5) * range;
+        pos[i3 + 1] = (Math.random() - 0.5) * range + 16;
+        pos[i3 + 2] = (Math.random() - 0.5) * range - 14;
+        snowVel[i3] = (Math.random() - 0.5) * 0.5;
+        snowVel[i3 + 1] = -(0.9 + Math.random() * 1.3);
+        snowVel[i3 + 2] = (Math.random() - 0.5) * 0.5;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    addPhases(geo, n);
+
+    snow = new THREE.Points(geo, makeMoteMaterial({ size: 1.15, color: 0xeaf4ff, opacity: 0.42 }));
+    snow.frustumCulled = false;
+    scene.add(snow);
+
+    // 地面积雪颗粒
+    const m = 520;
+    const ground = new Float32Array(m * 3);
+    for (let i = 0; i < m; i++) {
+        const a = Math.random() * TAU;
+        const r = Math.pow(Math.random(), 0.6) * 24;
+        ground[i * 3] = Math.cos(a) * r;
+        ground[i * 3 + 1] = -CONFIG.tree.height / 2 + Math.random() * 0.5;
+        ground[i * 3 + 2] = Math.sin(a) * r;
+    }
+    const gGeo = new THREE.BufferGeometry();
+    gGeo.setAttribute('position', new THREE.BufferAttribute(ground, 3));
+    addPhases(gGeo, m);
+    const mound = new THREE.Points(gGeo, makeMoteMaterial({ size: 1, color: 0xbfd8ff, opacity: 0.22 }));
+    mainGroup.add(mound);
+}
+
+function updateSnow(dt, t) {
+    if (!snow) return;
+    const pos = snow.geometry.attributes.position.array;
+    const n = CONFIG.quality.snow;
+    const range = 90;
+    for (let i = 0; i < n; i++) {
+        const i3 = i * 3;
+        pos[i3] += (snowVel[i3] + Math.sin(t * 0.35 + i) * 0.22) * dt;
+        pos[i3 + 1] += snowVel[i3 + 1] * dt;
+        pos[i3 + 2] += (snowVel[i3 + 2] + Math.cos(t * 0.28 + i * 0.7) * 0.22) * dt;
+        if (pos[i3 + 1] < -32) {
+            pos[i3 + 1] = 42 + Math.random() * 14;
+            pos[i3] = (Math.random() - 0.5) * range;
+            pos[i3 + 2] = (Math.random() - 0.5) * range;
+        }
+    }
+    snow.geometry.attributes.position.needsUpdate = true;
+}
+
+/* ============================================================
+   9.5 浪漫层：散景光斑 / 花瓣 / 上升的心
+   ============================================================ */
+
+let bokeh, bokehVel;
+let petals, petalState;
+const hearts = [];
+
+const _pMat4 = new THREE.Matrix4();
+const _pQuat = new THREE.Quaternion();
+const _pEuler = new THREE.Euler();
+const _pScale = new THREE.Vector3();
+const _pPos = new THREE.Vector3();
+
+function createBokeh() {
+    const n = CONFIG.quality.bokeh;
+    const pos = new Float32Array(n * 3);
+    const sizes = new Float32Array(n);
+    const colors = new Float32Array(n * 3);
+    const phases = new Float32Array(n);
+    bokehVel = new Float32Array(n * 3);
+
+    const pink = new THREE.Color(0xff9ec7);
+    const gold = new THREE.Color(0xffd9a3);
+    const lilac = new THREE.Color(0xc9a6ff);
+
+    for (let i = 0; i < n; i++) {
+        const i3 = i * 3;
+        const r = 12 + Math.random() * 32;
+        const a = Math.random() * TAU;
+        pos[i3] = Math.cos(a) * r;
+        pos[i3 + 1] = (Math.random() - 0.5) * 44 + 5;
+        pos[i3 + 2] = Math.sin(a) * r - 14;
+
+        sizes[i] = 1.1 + Math.random() * 3.6;
+
+        const roll = Math.random();
+        const c = roll < 0.5 ? pink : roll < 0.82 ? gold : lilac;
+        colors[i3] = c.r;
+        colors[i3 + 1] = c.g;
+        colors[i3 + 2] = c.b;
+        phases[i] = Math.random() * TAU;
+
+        bokehVel[i3] = (Math.random() - 0.5) * 0.12;
+        bokehVel[i3 + 1] = 0.06 + Math.random() * 0.2;
+        bokehVel[i3 + 2] = (Math.random() - 0.5) * 0.12;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+
+    const mat = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            uPixelRatio: { value: renderer.getPixelRatio() },
+            uSizeScale: { value: 1 },
+            uOpacity: { value: 0.5 }
+        },
+        vertexShader: `
+            attribute float aSize;
+            attribute vec3 aColor;
+            attribute float aPhase;
+            uniform float uTime, uPixelRatio, uSizeScale;
+            varying vec3 vColor;
+            varying float vAlpha;
+            void main() {
+                vec4 mv = modelViewMatrix * vec4( position, 1.0 );
+                gl_PointSize = min( aSize * uSizeScale * uPixelRatio * ( 240.0 / max( -mv.z, 1.0 ) ), 96.0 );
+                gl_Position = projectionMatrix * mv;
+                vColor = aColor;
+                vAlpha = 0.4 + 0.35 * sin( uTime * 0.55 + aPhase );
+            }
+        `,
+        fragmentShader: `
+            uniform float uOpacity;
+            varying vec3 vColor;
+            varying float vAlpha;
+            void main() {
+                vec2 p = gl_PointCoord * 2.0 - 1.0;
+                float d = length( p );
+                if ( d > 1.0 ) discard;
+                float body = smoothstep( 1.0, 0.55, d );
+                float rim = smoothstep( 0.98, 0.78, d ) * ( 1.0 - smoothstep( 0.8, 0.95, d ) );
+                float a = ( body * 0.32 + rim * 0.3 ) * ( 1.0 - smoothstep( 0.92, 1.0, d ) );
+                gl_FragColor = vec4( vColor, a * vAlpha * uOpacity );
+            }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false
+    });
+
+    bokeh = new THREE.Points(geo, mat);
+    bokeh.frustumCulled = false;
+    bokeh.renderOrder = 2;
+    scene.add(bokeh);
+    moteMats.push(mat);
+}
+
+function updateBokeh(dt, t) {
+    const pos = bokeh.geometry.attributes.position.array;
+    const n = CONFIG.quality.bokeh;
+    for (let i = 0; i < n; i++) {
+        const i3 = i * 3;
+        pos[i3] += (bokehVel[i3] + Math.sin(t * 0.25 + i) * 0.04) * dt;
+        pos[i3 + 1] += bokehVel[i3 + 1] * dt;
+        pos[i3 + 2] += bokehVel[i3 + 2] * dt;
+        if (pos[i3 + 1] > 30) pos[i3 + 1] = -20;
+    }
+    bokeh.geometry.attributes.position.needsUpdate = true;
+}
+
+function createPetals() {
+    const n = CONFIG.quality.petals;
+    petals = new THREE.InstancedMesh(
+        new THREE.PlaneGeometry(0.34, 0.3),
+        new THREE.MeshBasicMaterial({
+            map: createHeartTexture(),
+            color: 0xffaec4,
+            transparent: true,
+            opacity: 0.5,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            toneMapped: true
+        }),
+        n
+    );
+    petals.frustumCulled = false;
+    petals.renderOrder = 1;
+    scene.add(petals);
+
+    petalState = [];
+    const rand = (a, b) => a + Math.random() * (b - a);
+    for (let i = 0; i < n; i++) {
+        petalState.push({
+            x: rand(-32, 32),
+            y: rand(-14, 26),
+            z: rand(-26, 20),
+            rx: rand(0, TAU), ry: rand(0, TAU), rz: rand(0, TAU),
+            vx: rand(-0.16, 0.16), vy: -rand(0.22, 0.62), vz: rand(-0.16, 0.16),
+            sx: rand(-1.3, 1.3), sy: rand(-1.3, 1.3), sz: rand(-1.3, 1.3),
+            s: rand(0.7, 1.5)
+        });
+    }
+}
+
+function updatePetals(dt, t) {
+    for (let i = 0; i < petalState.length; i++) {
+        const p = petalState[i];
+        p.y += p.vy * dt;
+        p.x += (p.vx + Math.sin(t * 0.5 + i) * 0.12) * dt;
+        p.z += (p.vz + Math.cos(t * 0.4 + i) * 0.12) * dt;
+        p.rx += p.sx * dt;
+        p.ry += p.sy * dt;
+        p.rz += p.sz * dt;
+
+        if (p.y < -14) {
+            p.y = 22 + Math.random() * 8;
+            p.x = (Math.random() - 0.5) * 62;
+            p.z = (Math.random() - 0.5) * 46;
+        }
+
+        _pEuler.set(p.rx, p.ry, p.rz);
+        _pQuat.setFromEuler(_pEuler);
+        _pPos.set(p.x, p.y, p.z);
+        _pScale.setScalar(p.s);
+        _pMat4.compose(_pPos, _pQuat, _pScale);
+        petals.setMatrixAt(i, _pMat4);
+    }
+    petals.instanceMatrix.needsUpdate = true;
+}
+
+function createHeartTexture() {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d');
+    const grd = g.createRadialGradient(26, 24, 1, 32, 32, 34);
+    grd.addColorStop(0, 'rgba(255, 236, 240, 1)');
+    grd.addColorStop(0.5, 'rgba(255, 150, 180, 0.95)');
+    grd.addColorStop(1, 'rgba(255, 110, 150, 0)');
+    g.fillStyle = grd;
+    g.beginPath();
+    g.moveTo(32, 55);
+    g.bezierCurveTo(6, 36, 8, 12, 32, 22);
+    g.bezierCurveTo(56, 12, 58, 36, 32, 55);
+    g.fill();
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+}
+
+function createHearts() {
+    const tex = createHeartTexture();
+    for (let i = 0; i < CONFIG.quality.hearts; i++) {
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: tex,
+            color: 0xffb3c9,
+            transparent: true,
+            opacity: 0,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            fog: false
+        }));
+        const scale = 0.5 + Math.random() * 0.7;
+        sprite.scale.setScalar(scale);
+        sprite.position.set(
+            (Math.random() - 0.5) * 30,
+            -10 + Math.random() * 26,
+            (Math.random() - 0.5) * 18
+        );
+        sprite.userData = {
+            speed: 0.22 + Math.random() * 0.35,
+            phase: Math.random() * TAU,
+            scale,
+            opacity: 0.24 + Math.random() * 0.28
+        };
+        scene.add(sprite);
+        hearts.push(sprite);
+    }
+}
+
+function updateHearts(dt, t) {
+    for (const h of hearts) {
+        const d = h.userData;
+        h.position.y += d.speed * dt;
+        h.position.x += Math.sin(t * 0.45 + d.phase) * 0.03;
+        if (h.position.y > 24) h.position.y = -13;
+
+        const fade = clamp((h.position.y + 13) / 6, 0, 1) * clamp((24 - h.position.y) / 6, 0, 1);
+        h.material.opacity = d.opacity * fade * (0.55 + 0.45 * Math.sin(t * 0.8 + d.phase));
+        h.scale.setScalar(d.scale * (1 + 0.05 * Math.sin(t * 1.1 + d.phase)));
+    }
+}
+
+/* ============================================================
+   10. 模式 / 聚焦
+   ============================================================ */
+
+const STATUS_TEXT = {
+    TREE: '圣诞树',
+    SCATTER: '星尘散开',
+    TEXT: '圣诞祝福',
+    FOCUS: '照片'
+};
+
+function setMode(mode) {
+    if (mode === 'FOCUS' && photoGroup.children.length === 0) {
+        toast('还没有照片 · 先选几张吧');
+        document.getElementById('file-input').click();
+        return;
+    }
+    STATE.mode = mode;
+    if (mode !== 'FOCUS') STATE.focus = null;
+    updateStatus(STATUS_TEXT[mode] || mode);
+    updateDock();
+    updateFilmstrip();
+}
+
+function focusPhoto(index) {
+    const photos = photoGroup.children;
+    if (!photos.length) {
+        toast('还没有照片 · 先选几张吧');
+        document.getElementById('file-input').click();
+        return;
+    }
+    STATE.photoIndex = ((index % photos.length) + photos.length) % photos.length;
+    STATE.focus = photos[STATE.photoIndex];
+    STATE.mode = 'FOCUS';
+    updateStatus(`照片 ${STATE.photoIndex + 1}/${photos.length}`);
+    updateDock();
+    updateFilmstrip();
+}
+
+function nextPhoto(dir = 1) {
+    if (STATE.mode !== 'FOCUS' || !photoGroup.children.length) return;
+    focusPhoto(STATE.photoIndex + dir);
+}
+
+function updateDock() {
+    document.querySelectorAll('.dock-btn[data-mode]').forEach(btn => {
+        const active = btn.dataset.mode === STATE.mode;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+    });
+}
+
+function updateFocusLayout() {
+    focusCtx.mesh = STATE.focus;
+    if (STATE.mode !== 'FOCUS' || !STATE.focus) return;
+
+    const dist = 22;
+    const visH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(CONFIG.camera.fov * 0.5));
+    const visW = visH * camera.aspect;
+    const dims = STATE.focus.userData.dims || { w: 1.5, h: 1.5 };
+
+    focusCtx.scale = Math.min((visH * 0.6) / dims.h, (visW * 0.82) / dims.w);
+
+    _worldPos.set(0, 1.6, CONFIG.camera.rest - dist);
+    _invGroup.copy(mainGroup.matrixWorld).invert();
+    focusCtx.pos.copy(_worldPos).applyMatrix4(_invGroup);
+}
+
+/* ============================================================
+   11. 环境音（纯 WebAudio 合成）
+   ============================================================ */
+
+const Sound = {
+    ctx: null, master: null, on: false, step: 0, timer: 0, padNodes: [],
+    ensure() {
+        if (this.ctx) return true;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return false;
+        this.ctx = new AC();
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.0001;
+        this.master.connect(this.ctx.destination);
+        return true;
+    },
+    pad() {
+        const ctx = this.ctx;
+        [174.61, 261.63].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const gain = ctx.createGain();
+            gain.gain.value = 0.045;
+            const lfo = ctx.createOscillator();
+            lfo.frequency.value = 0.06 + i * 0.02;
+            const lfoGain = ctx.createGain();
+            lfoGain.gain.value = 0.018;
+            lfo.connect(lfoGain);
+            lfoGain.connect(gain.gain);
+            osc.connect(gain);
+            gain.connect(this.master);
+            osc.start();
+            lfo.start();
+            this.padNodes.push(osc, lfo);
+        });
+    },
+    note(freq, when, gainValue, dur) {
+        const ctx = this.ctx;
+        [[1, 1], [2.005, 0.42], [3.01, 0.16]].forEach(([mult, amp]) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq * mult;
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.0001, when);
+            g.gain.linearRampToValueAtTime(gainValue * amp, when + 0.008);
+            g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+            osc.connect(g);
+            g.connect(this.master);
+            osc.start(when);
+            osc.stop(when + dur + 0.05);
+        });
+    },
+    melodyStep() {
+        if (!this.on || !this.ctx) return;
+        const pattern = [698.46, 880.0, 1046.5, 1396.91, 1046.5, 880.0, 783.99, 698.46];
+        const now = this.ctx.currentTime;
+        this.note(pattern[this.step % pattern.length], now + 0.01, 0.07, 1.9);
+        if (this.step % 8 === 0) {
+            this.note(this.step % 16 === 0 ? 174.61 : 130.81, now + 0.01, 0.055, 3.4);
+        }
+        this.step++;
+        this.timer = setTimeout(() => this.melodyStep(), 560);
+    },
+    async toggle() {
+        if (!this.ensure()) {
+            toast('当前浏览器不支持音频');
+            return false;
+        }
+        const btn = document.getElementById('sound-btn');
+        if (!this.on) {
+            await this.ctx.resume();
+            if (!this.padNodes.length) this.pad();
+            this.on = true;
+            this.master.gain.cancelScheduledValues(this.ctx.currentTime);
+            this.master.gain.setValueAtTime(Math.max(this.master.gain.value, 0.0001), this.ctx.currentTime);
+            this.master.gain.linearRampToValueAtTime(0.13, this.ctx.currentTime + 1.6);
+            this.melodyStep();
+            btn.classList.add('active');
+            toast('音乐盒已开启');
+        } else {
+            this.on = false;
+            clearTimeout(this.timer);
+            this.master.gain.cancelScheduledValues(this.ctx.currentTime);
+            this.master.gain.setValueAtTime(this.master.gain.value, this.ctx.currentTime);
+            this.master.gain.linearRampToValueAtTime(0.0001, this.ctx.currentTime + 0.6);
+            btn.classList.remove('active');
+        }
+        return this.on;
+    }
+};
+
+/* ============================================================
+   12. 手势
+   ============================================================ */
+
+let handLandmarker = null;
+let video, webcamCanvas, webcamCtx;
+let lastVideoTime = -1;
+let swipeStartY = null;
+let swipeStartTime = 0;
+
+let modelPromise = null;
+
+function setGestureHint(text) {
+    const el = document.getElementById('camera-hint');
+    if (el) el.textContent = text;
+}
+
+function preloadMediaPipe() {
+    if (handLandmarker) return Promise.resolve(handLandmarker);
+    if (modelPromise) return modelPromise;
+
+    setGestureHint('正在下载手势模型（约 8MB，只需一次）…');
+    modelPromise = (async () => {
+        const { FilesetResolver, HandLandmarker } = await import('@mediapipe/tasks-vision');
+        const vision = await FilesetResolver.forVisionTasks(
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
+        );
+        const options = delegate => ({
+            baseOptions: {
+                modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+                delegate
+            },
+            runningMode: 'VIDEO',
+            numHands: 1
+        });
+        try {
+            return await HandLandmarker.createFromOptions(vision, options('GPU'));
+        } catch (err) {
+            console.warn('GPU delegate 不可用，回退到 CPU', err);
+            return HandLandmarker.createFromOptions(vision, options('CPU'));
+        }
+    })()
+        .then(lm => {
+            handLandmarker = lm;
+            setGestureHint('模型已就绪，点「允许并开启」开始');
+            return lm;
+        })
+        .catch(err => {
+            modelPromise = null;
+            setGestureHint('模型加载失败：' + (err.message || err) + '，可再点一次重试');
+            throw err;
+        });
+
+    return modelPromise;
+}
+
+async function enableGestures() {
+    const btn = document.getElementById('gesture-btn');
+    if (STATE.gestureReady) {
+        toast('手势已经开启啦');
+        return;
+    }
+    btn.disabled = true;
+    btn.textContent = '正在唤醒…';
+
+    try {
+        if (!navigator.mediaDevices?.getUserMedia) throw new Error('浏览器不支持摄像头');
+
+        video = document.getElementById('webcam');
+        webcamCanvas = document.getElementById('webcam-preview');
+        webcamCtx = webcamCanvas.getContext('2d');
+
+        setGestureHint('正在请求摄像头权限…');
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: 320, height: 240 }
+        });
+        video.srcObject = stream;
+        await video.play();
+
+        btn.textContent = '下载模型中…';
+        await preloadMediaPipe();
+
+        STATE.gestureReady = true;
+        btn.disabled = false;
+        btn.textContent = '手势已开启';
+        btn.classList.add('on');
+        document.body.classList.add('gestures');
+        setGestureHint('已开启 · 把手举到镜头前，停半秒再换手势');
+
+        predictLoop();
+        toast('手势已开启：指向照片 · 比 V 看祝福 · 张手散开 · 握拳归树', 5200);
+        log('MediaPipe ready');
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '开启手势';
+        console.warn(err);
+        toast('手势没开成：' + (err.message || err) + '。鼠标操作不受影响。', 5200);
+    }
+}
+
+async function predictLoop() {
+    if (!handLandmarker || !video) return;
+    requestAnimationFrame(predictLoop);
+
+    if (video.readyState < 2 || video.currentTime === lastVideoTime) return;
+    lastVideoTime = video.currentTime;
+
+    if (webcamCtx) webcamCtx.drawImage(video, 0, 0, webcamCanvas.width, webcamCanvas.height);
+
+    try {
+        processGestures(handLandmarker.detectForVideo(video, performance.now()));
+    } catch (e) {
+        // 偶发帧解码失败，忽略
+    }
+}
+
+const HAND_LINKS = [
+    [0, 1], [1, 2], [2, 3], [3, 4],
+    [0, 5], [5, 6], [6, 7], [7, 8],
+    [5, 9], [9, 10], [10, 11], [11, 12],
+    [9, 13], [13, 14], [14, 15], [15, 16],
+    [13, 17], [17, 18], [18, 19], [19, 20],
+    [0, 17]
+];
+
+function drawHand(lm) {
+    if (!webcamCtx) return;
+    const w = webcamCanvas.width;
+    const h = webcamCanvas.height;
+    webcamCtx.save();
+    webcamCtx.strokeStyle = 'rgba(255, 214, 138, 0.85)';
+    webcamCtx.fillStyle = 'rgba(255, 240, 214, 0.95)';
+    webcamCtx.lineWidth = 1.4;
+    for (const [a, b] of HAND_LINKS) {
+        webcamCtx.beginPath();
+        webcamCtx.moveTo(lm[a].x * w, lm[a].y * h);
+        webcamCtx.lineTo(lm[b].x * w, lm[b].y * h);
+        webcamCtx.stroke();
+    }
+    for (const p of lm) {
+        webcamCtx.beginPath();
+        webcamCtx.arc(p.x * w, p.y * h, 1.7, 0, TAU);
+        webcamCtx.fill();
+    }
+    webcamCtx.restore();
+}
+
+function processGestures(result) {
+    const lm = result?.landmarks?.[0];
+
+    if (!lm) {
+        STATE.hand.detected = false;
+        if (STATE.gesture.current !== null) {
+            STATE.gesture.current = null;
+            refreshStatus();
+        }
+        return;
+    }
+
+    STATE.hand.detected = true;
+    STATE.hand.x = (lm[9].x - 0.5) * 2;
+    STATE.hand.y = (lm[9].y - 0.5) * 2;
+    drawHand(lm);
+
+    const index = lm[8], middle = lm[12], ring = lm[16], pinky = lm[20], wrist = lm[0];
+    const indexUp = index.y < lm[6].y;
+    const middleUp = middle.y < lm[10].y;
+    const ringUp = ring.y < lm[14].y;
+    const pinkyUp = pinky.y < lm[18].y;
+
+    const avgDist = ([index, middle, ring, pinky]
+        .reduce((sum, t) => sum + Math.hypot(t.x - wrist.x, t.y - wrist.y), 0)) / 4;
+
+    let gesture = null;
+    if (indexUp && !middleUp && !ringUp) gesture = 'POINT';
+    else if (indexUp && middleUp && !ringUp) gesture = 'VICTORY';
+    else if (indexUp && middleUp && ringUp && pinkyUp) gesture = 'OPEN';
+    else if (avgDist > 0.35) gesture = 'OPEN';
+    else if (avgDist < 0.24 && !indexUp && !middleUp) gesture = 'FIST';
+
+    if (STATE.mode === 'FOCUS') detectSwipe(index);
+
+    const now = performance.now();
+    const g = STATE.gesture;
+
+    if (gesture && gesture === g.current) {
+        const held = now - g.start;
+
+        if (held > 180 && held < g.hold) {
+            updateStatus(`识别中 ${Math.min(99, Math.round((held / g.hold) * 100))}%`);
+        }
+
+        if (held > g.hold && now - g.last > g.cooldown) {
+            let fired = true;
+            if (gesture === 'POINT') focusPhoto(STATE.mode === 'FOCUS' ? STATE.photoIndex + 1 : STATE.photoIndex);
+            else if (gesture === 'VICTORY') setMode('TEXT');
+            else if (gesture === 'OPEN') setMode('SCATTER');
+            else if (gesture === 'FIST') setMode('TREE');
+            else fired = false;
+
+            if (fired) g.last = now;
+        }
+    } else {
+        g.current = gesture;
+        g.start = now;
+    }
+}
+
+function detectSwipe(fingerTip) {
+    const now = performance.now();
+    if (swipeStartY === null) {
+        swipeStartY = fingerTip.y;
+        swipeStartTime = now;
+        return;
+    }
+    if (now - swipeStartTime > 700) {
+        swipeStartY = fingerTip.y;
+        swipeStartTime = now;
+        return;
+    }
+    const deltaY = fingerTip.y - swipeStartY;
+    if (deltaY > 0.16) {
+        nextPhoto(1);
+        swipeStartY = null;
+    } else if (deltaY < -0.12) {
+        swipeStartY = fingerTip.y;
+        swipeStartTime = now;
+    }
+}
+
+/* ============================================================
+   13. 明信片导出
+   ============================================================ */
+
+function exportPostcard() {
+    const src = renderer.domElement;
+    const canvas = document.createElement('canvas');
+    canvas.width = src.width;
+    canvas.height = src.height;
+    const g = canvas.getContext('2d');
+    g.drawImage(src, 0, 0);
+
+    const s = canvas.width / 1440;
+
+    const grad = g.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
+    grad.addColorStop(0, 'rgba(2,5,9,0)');
+    grad.addColorStop(1, 'rgba(2,5,9,0.82)');
+    g.fillStyle = grad;
+    g.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+
+    g.textBaseline = 'alphabetic';
+    g.fillStyle = '#ffe8bd';
+    g.font = `${Math.round(54 * s)}px "Cinzel Decorative", Georgia, serif`;
+    g.fillText('Merry Christmas', 64 * s, canvas.height - 104 * s);
+
+    g.font = `${Math.round(15 * s)}px Montserrat, "PingFang SC", "Microsoft YaHei", sans-serif`;
+    g.fillStyle = 'rgba(222,236,255,0.75)';
+    g.fillText(CONFIG.greeting, 66 * s, canvas.height - 66 * s);
+
+    g.textAlign = 'right';
+    const date = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+    g.fillText(date, canvas.width - 64 * s, canvas.height - 66 * s);
+
+    canvas.toBlob(blob => {
+        if (!blob) { toast('导出失败，请重试'); return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `christmas-${Date.now()}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }, 'image/png');
+
+    toast('明信片已保存到下载文件夹');
+}
+
+/* ============================================================
+   14. 交互
+   ============================================================ */
+
+function setupEvents() {
+    const el = renderer.domElement;
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const activePointers = new Map();
+
+    const pinchDistance = () => {
+        const pts = [...activePointers.values()];
+        return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    };
+
+    el.addEventListener('pointerdown', e => {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (activePointers.size === 2) {
+            STATE.pinch.active = true;
+            STATE.pinch.startDist = pinchDistance();
+            STATE.pinch.startZoom = STATE.zoom;
+            STATE.pointer.down = false;
+            return;
+        }
+        STATE.pointer.down = true;
+        STATE.pointer.moved = 0;
+        STATE.pointer.lastX = e.clientX;
+        STATE.pointer.lastY = e.clientY;
+        el.setPointerCapture?.(e.pointerId);
+    });
+
+    el.addEventListener('pointermove', e => {
+        if (!activePointers.has(e.pointerId)) return;
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (STATE.pinch.active && activePointers.size === 2) {
+            const ratio = STATE.pinch.startDist / Math.max(1, pinchDistance());
+            STATE.zoom = clamp(STATE.pinch.startZoom * ratio, CONFIG.camera.min, CONFIG.camera.max);
+            return;
+        }
+        if (!STATE.pointer.down) return;
+
+        const dx = e.clientX - STATE.pointer.lastX;
+        const dy = e.clientY - STATE.pointer.lastY;
+        STATE.pointer.lastX = e.clientX;
+        STATE.pointer.lastY = e.clientY;
+        STATE.pointer.moved += Math.abs(dx) + Math.abs(dy);
+
+        STATE.rotation.y += dx * 0.005;
+        STATE.rotation.x = clamp(STATE.rotation.x + dy * 0.004, -0.6, 0.6);
+    });
+
+    const endPointer = e => {
+        activePointers.delete(e.pointerId);
+        if (activePointers.size < 2) STATE.pinch.active = false;
+        if (!STATE.pointer.down) return;
+        STATE.pointer.down = false;
+        if (STATE.pointer.moved < 8) pickPhoto(e, raycaster, pointer);
+    };
+    el.addEventListener('pointerup', endPointer);
+    el.addEventListener('pointercancel', e => {
+        activePointers.delete(e.pointerId);
+        STATE.pointer.down = false;
+        STATE.pinch.active = false;
+    });
+
+    el.addEventListener('wheel', e => {
+        e.preventDefault();
+        STATE.zoom = clamp(STATE.zoom + e.deltaY * 0.025, CONFIG.camera.min, CONFIG.camera.max);
+    }, { passive: false });
+
+    el.addEventListener('dblclick', () => {
+        STATE.zoom = CONFIG.camera.rest;
+        STATE.rotation.x = 0;
+    });
+
+    document.getElementById('file-input').addEventListener('change', e => {
+        readFiles(e.target.files);
+        e.target.value = '';
+    });
+
+    // 手势按钮 → 先解释权限，并预下载模型
+    const cameraPanel = document.getElementById('camera-panel');
+    const closeCamera = () => {
+        cameraPanel.classList.remove('open');
+        document.getElementById('scrim').classList.remove('show');
+    };
+    document.getElementById('gesture-btn').addEventListener('click', () => {
+        if (STATE.gestureReady) { toast('手势已经开启啦'); return; }
+        if (!navigator.mediaDevices?.getUserMedia) { toast('这个浏览器不支持摄像头'); return; }
+        cameraPanel.classList.add('open');
+        document.getElementById('scrim').classList.add('show');
+        preloadMediaPipe().catch(() => {});
+    });
+    document.getElementById('camera-cancel').addEventListener('click', closeCamera);
+    document.getElementById('camera-allow').addEventListener('click', () => {
+        closeCamera();
+        enableGestures();
+    });
+
+    document.querySelectorAll('.dock-btn[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const mode = btn.dataset.mode;
+            if (mode === 'FOCUS') focusPhoto(STATE.mode === 'FOCUS' ? STATE.photoIndex : 0);
+            else if (mode === 'TEXT' && STATE.mode === 'TEXT') openWish();
+            else setMode(mode);
+        });
+    });
+
+    document.getElementById('sound-btn').addEventListener('click', () => Sound.toggle());
+    document.getElementById('save-btn').addEventListener('click', () => {
+        STATE.captureRequested = true;
+    });
+    document.getElementById('fs-btn').addEventListener('click', () => {
+        if (document.fullscreenElement) document.exitFullscreen?.();
+        else document.documentElement.requestFullscreen?.().catch(() => toast('浏览器不允许全屏'));
+    });
+
+    document.getElementById('strip-prev').addEventListener('click', () => nextPhoto(-1));
+    document.getElementById('strip-next').addEventListener('click', () => nextPhoto(1));
+    document.getElementById('strip-close').addEventListener('click', () => setMode('TREE'));
+
+    // 情书
+    document.getElementById('letter-btn').addEventListener('click', openLetter);
+    document.getElementById('letter-close').addEventListener('click', closeLetter);
+    document.getElementById('letter-panel').addEventListener('click', e => e.stopPropagation());
+
+    // 祝福面板
+    const panel = document.getElementById('wish-panel');
+    const scrim = document.getElementById('scrim');
+    const input = document.getElementById('wish-input');
+
+    document.querySelectorAll('.preset').forEach(btn => {
+        btn.addEventListener('click', () => { input.value = btn.textContent; input.focus(); });
+    });
+    document.getElementById('wish-apply').addEventListener('click', () => applyGreeting(input.value));
+    document.getElementById('wish-cancel').addEventListener('click', () => closeWishPanel());
+    scrim.addEventListener('click', closeOverlays);
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') applyGreeting(input.value);
+        if (e.key === 'Escape') closeWishPanel();
+    });
+    panel.addEventListener('click', e => e.stopPropagation());
+    window.openWishPanel = openWish;
+
+    // 新手引导
+    const guide = document.getElementById('guide');
+    const guideStart = document.getElementById('guide-start');
+    const guideSkip = document.getElementById('guide-skip');
+    const dismissGuide = () => {
+        guide.classList.remove('open');
+        try { localStorage.setItem('xmas-guide-seen', '1'); } catch (e) { /* 隐私模式 */ }
+    };
+    guideStart.addEventListener('click', dismissGuide);
+    guideSkip.addEventListener('click', dismissGuide);
+
+    window.addEventListener('keydown', e => {
+        if (e.target === input) return;
+        const key = e.key.toLowerCase();
+        if (key === 'h') {
+            STATE.uiHidden = !STATE.uiHidden;
+            document.getElementById('ui-layer').classList.toggle('hidden', STATE.uiHidden);
+        } else if (key === 'd') {
+            const wrap = document.getElementById('webcam-wrapper');
+            const dbg = document.getElementById('debug-console');
+            wrap.style.opacity = wrap.style.opacity === '1' ? '0' : '1';
+            dbg.style.display = dbg.style.display === 'block' ? 'none' : 'block';
+            log('Debug mode');
+        } else if (key === 't') {
+            if (STATE.mode === 'TEXT') openWish();
+            else setMode('TEXT');
+        } else if (key === 's') {
+            setMode(STATE.mode === 'SCATTER' ? 'TREE' : 'SCATTER');
+        } else if (key === 'r' || key === 'escape') {
+            if (panel.classList.contains('open') || document.getElementById('letter-panel').classList.contains('open')) closeOverlays();
+            else if (cameraPanel.classList.contains('open')) closeCamera();
+            else setMode('TREE');
+        } else if (key === 'arrowright' || key === 'arrowdown') {
+            if (STATE.mode !== 'FOCUS') focusPhoto(STATE.photoIndex);
+            else nextPhoto(1);
+        } else if (key === 'arrowleft' || key === 'arrowup') {
+            if (STATE.mode === 'FOCUS') nextPhoto(-1);
+        } else if (key === 'e') {
+            openWish();
+        }
+    });
+
+    // 拖入图片
+    let dragDepth = 0;
+    window.addEventListener('dragenter', e => {
+        e.preventDefault();
+        dragDepth++;
+        document.body.classList.add('dragover');
+    });
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('dragleave', e => {
+        e.preventDefault();
+        if (--dragDepth <= 0) document.body.classList.remove('dragover');
+    });
+    window.addEventListener('drop', e => {
+        e.preventDefault();
+        dragDepth = 0;
+        document.body.classList.remove('dragover');
+        if (e.dataTransfer?.files?.length) readFiles(e.dataTransfer.files);
+    });
+
+    window.addEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) clock.getDelta();
+        if (Sound.on) {
+            if (document.hidden) clearTimeout(Sound.timer);
+            else Sound.melodyStep();
+        }
+    });
+}
+
+function refreshStatus() {
+    if (STATE.mode === 'FOCUS' && STATE.focus) {
+        updateStatus(`照片 ${STATE.photoIndex + 1}/${photoGroup.children.length}`);
+    } else {
+        updateStatus(STATUS_TEXT[STATE.mode] || '');
+    }
+}
+
+function openWish() {
+    const panel = document.getElementById('wish-panel');
+    const input = document.getElementById('wish-input');
+    input.value = CONFIG.greeting;
+    document.getElementById('scrim').classList.add('show');
+    panel.classList.add('open');
+    setTimeout(() => input.focus(), 120);
+}
+
+function closeOverlays() {
+    closeWishPanel();
+    closeLetter();
+    document.getElementById('camera-panel').classList.remove('open');
+}
+
+let letterTimer = 0;
+
+function openLetter() {
+    const panel = document.getElementById('letter-panel');
+    const body = document.getElementById('letter-body');
+    const sign = document.getElementById('letter-sign');
+
+    document.getElementById('letter-title').textContent = CONFIG.letter.title;
+    sign.textContent = CONFIG.letter.signature;
+    document.getElementById('scrim').classList.add('show');
+    panel.classList.add('open');
+    panel.classList.remove('revealed');
+    clearTimeout(letterTimer);
+    body.textContent = '';
+    panel.scrollTop = 0;
+
+    const text = CONFIG.letter.lines.join('\n');
+
+    if (REDUCED_MOTION) {
+        body.textContent = text;
+        panel.classList.add('revealed');
+        return;
+    }
+
+    const cursor = document.createElement('span');
+    cursor.className = 'letter-cursor';
+    body.appendChild(cursor);
+
+    let i = 0;
+    const type = () => {
+        if (i >= text.length) {
+            cursor.remove();
+            panel.classList.add('revealed');
+            return;
+        }
+        const ch = text[i++];
+        cursor.insertAdjacentText('beforebegin', ch);
+        panel.scrollTop = panel.scrollHeight;
+        letterTimer = setTimeout(type, ch === '\n' ? 420 : 26);
+    };
+    letterTimer = setTimeout(type, 520);
+}
+
+function closeLetter() {
+    clearTimeout(letterTimer);
+    document.getElementById('letter-panel').classList.remove('open');
+    document.getElementById('scrim').classList.remove('show');
+}
+function closeWishPanel() {
+    document.getElementById('scrim').classList.remove('show');
+    document.getElementById('wish-panel').classList.remove('open');
+}
+
+function applyGreeting(text) {
+    const value = (text || '').trim().slice(0, 20) || '圣诞快乐';
+    CONFIG.greeting = value;
+    buildTextLayout(value);
+    layoutText();
+    setMode('TEXT');
+    closeWishPanel();
+    toast('祝福已点亮');
+}
+
+function pickPhoto(e, raycaster, pointer) {
+    if (photoGroup.children.length) {
+        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(photoGroup.children, true);
+        if (hits.length) {
+            let obj = hits[0].object;
+            while (obj.parent && obj.parent !== photoGroup) obj = obj.parent;
+            const index = photoGroup.children.indexOf(obj);
+            if (index >= 0) focusPhoto(index);
+            return;
+        }
+    }
+    // 空白处点击：从照片视图退回圣诞树
+    if (STATE.mode === 'FOCUS') setMode('TREE');
+}
+
+let resizeTimer = 0;
+function onResize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    camera.aspect = w / h;
+    updateFraming();
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    composer.setSize(w, h);
+
+    syncPixelRatioUniforms();
+
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        layoutText();
+        updateFocusLayout();
+    }, 160);
+}
+
+function syncPixelRatioUniforms() {
+    const pr = renderer.getPixelRatio();
+    if (volumeUniforms) volumeUniforms.uPixelRatio.value = pr;
+    moteMats.forEach(m => { m.uniforms.uPixelRatio.value = pr; });
+    if (dofPass) dofPass.setSize(composer.renderTarget1.width, composer.renderTarget1.height);
+}
+
+/* ============================================================
+   15. 动画主循环
+   ============================================================ */
+
+function updateCamera(dt) {
+    camera.position.z += (STATE.zoom - camera.position.z) * damp(3.2, dt);
+    camera.position.y += (2.4 - camera.position.y) * damp(1.6, dt);
+    camera.lookAt(0, 1.2, 0);
+}
+
+function updateRotation(dt) {
+    const r = STATE.rotation;
+
+    if (STATE.mode === 'TREE') {
+        r.y += (REDUCED_MOTION ? 0.05 : 0.18) * dt;
+    } else if (STATE.mode === 'SCATTER' && STATE.hand.detected) {
+        r.y += (STATE.hand.x * Math.PI * 0.9 - r.y) * damp(3.5, dt);
+        r.x += (STATE.hand.y * Math.PI * 0.22 - r.x) * damp(3.5, dt);
+    } else if (STATE.mode === 'TEXT' || STATE.mode === 'FOCUS') {
+        r.y = lerpAngle(r.y, 0, damp(2.2, dt));
+        r.x += (0 - r.x) * damp(2.2, dt);
+    } else {
+        r.y += 0.1 * dt;
+    }
+}
+
+const BLOOM_TARGETS = {
+    TREE: [0.4, 1.2],
+    SCATTER: [0.6, 1.0],
+    TEXT: [0.34, 1.28],
+    FOCUS: [0.12, 1.5]
+};
+
+const EXPOSURE_TARGETS = { TREE: 0.98, SCATTER: 1.0, TEXT: 1.02, FOCUS: 1.15 };
+
+function updateGrade(dt) {
+    const [strength, threshold] = BLOOM_TARGETS[STATE.mode] || BLOOM_TARGETS.TREE;
+    bloomPass.strength += (strength - bloomPass.strength) * damp(2.5, dt);
+    bloomPass.threshold += (threshold - bloomPass.threshold) * damp(2.5, dt);
+
+    const exposure = EXPOSURE_TARGETS[STATE.mode] || 1.08;
+    gradePass.uniforms.uExposure.value += (exposure - gradePass.uniforms.uExposure.value) * damp(2.5, dt);
+}
+
+const perf = { acc: 0, frames: 0, downgraded: false };
+
+function trackPerformance(dt) {
+    perf.acc += dt;
+    perf.frames++;
+    if (perf.acc < 2.5 || perf.downgraded) return;
+
+    const fps = perf.frames / perf.acc;
+    perf.acc = 0;
+    perf.frames = 0;
+
+    if (fps < 42 && renderer.getPixelRatio() > 1) {
+        perf.downgraded = true;
+        renderer.setPixelRatio(1);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setPixelRatio(1);
+        composer.setSize(window.innerWidth, window.innerHeight);
+        syncPixelRatioUniforms();
+        toast('已自动降低分辨率，保证流畅', 2600);
+    }
+}
+
+function updateTreeLook(dt, t) {
+    const dissolveTarget = STATE.mode === 'TREE' ? 0 : 1;
+    foliageUniforms.uDissolve.value += (dissolveTarget - foliageUniforms.uDissolve.value) * damp(3.2, dt);
+    foliageUniforms.uTime.value = t;
+    foliage.castShadow = foliageUniforms.uDissolve.value < 0.08;
+
+    const solid = STATE.mode === 'TREE' ? 1 : 0;
+    const s = trunk.scale.x + (solid - trunk.scale.x) * damp(3.2, dt);
+    trunk.scale.setScalar(Math.max(s, 0.0001));
+    stringLights.scale.setScalar(Math.max(s, 0.0001));
+
+    const on = STATE.mode === 'TREE' || STATE.mode === 'SCATTER';
+    const starWant = on ? 1 + Math.sin(t * 1.6) * 0.03 : 0.0001;
+    const starScale = topStar.scale.x + (starWant - topStar.scale.x) * damp(3, dt);
+    topStar.scale.setScalar(Math.max(starScale, 0.0001));
+    topStar.lookAt(camera.position);
+    topStar.userData.halo.scale.setScalar(Math.max(starScale * 7, 0.0001));
+    topStar.userData.flare.scale.setScalar(Math.max(starScale * 14, 0.0001));
+    topStar.userData.flare.material.rotation += dt * 0.22;
+
+    giftGroup.scale.setScalar(THREE.MathUtils.lerp(
+        giftGroup.scale.x, on ? 1 : 0.0001, damp(3, dt)
+    ));
+
+    const glowOpacity = STATE.mode === 'FOCUS' ? 0.04 : STATE.mode === 'TEXT' ? 0.02 : 0.26;
+    groundGlow.material.opacity += (glowOpacity - groundGlow.material.opacity) * damp(2, dt);
+
+    const groundWant = STATE.mode === 'TEXT' ? 0 : 1;
+    groundMesh.material.opacity += (groundWant - groundMesh.material.opacity) * damp(2.2, dt);
+    groundMesh.visible = groundMesh.material.opacity > 0.01;
+    const shadowWant = STATE.mode === 'TEXT' ? 0 : 0.6;
+    contactShadow.material.opacity += (shadowWant - contactShadow.material.opacity) * damp(2.2, dt);
+}
+
+function updateLens(dt) {
+    if (!dofPass) return;
+    const enabled = !MOBILE && STATE.mode !== 'TEXT';
+    dofPass.enabled = enabled;
+    if (!enabled) return;
+    const focus = STATE.mode === 'FOCUS' ? 22 : camera.position.z;
+    dofPass.uniforms.uFocus.value += (focus - dofPass.uniforms.uFocus.value) * damp(3, dt);
+    dofPass.uniforms.uRange.value += ((STATE.mode === 'FOCUS' ? 12 : 34) - dofPass.uniforms.uRange.value) * damp(3, dt);
+    dofPass.uniforms.uMaxBlur.value += ((STATE.mode === 'FOCUS' ? 5.5 : 3.2) - dofPass.uniforms.uMaxBlur.value) * damp(3, dt);
+}
+
+
+function animate() {
+    requestAnimationFrame(animate);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
+
+    if (document.hidden) return;
+
+    updateCamera(dt);
+    updateRotation(dt);
+
+    mainGroup.rotation.x = STATE.rotation.x;
+    mainGroup.rotation.y = STATE.rotation.y;
+    mainGroup.updateMatrixWorld();
+
+    updateFocusLayout();
+    for (const o of orbiters) o.update(dt, focusCtx, camera);
+
+    updateVolume(dt);
+    updateTreeLook(dt, t);
+    updateSnow(dt, t);
+    updateBokeh(dt, t);
+    updatePetals(dt, t);
+    updateHearts(dt, t);
+    updateGrade(dt);
+    updateLens(dt);
+    trackPerformance(dt);
+
+    volumeUniforms.uTime.value = t;
+    for (const m of moteMats) m.uniforms.uTime.value = t;
+    gradePass.uniforms.uTime.value = t;
+
+    composer.render();
+
+    if (STATE.captureRequested) {
+        STATE.captureRequested = false;
+        exportPostcard();
+    }
+}
+
+/* ============================================================
+   16. 启动
+   ============================================================ */
+
+function updateEyebrow() {
+    const now = new Date();
+    const xmas = new Date(now.getFullYear(), 11, 25);
+    if (now > new Date(now.getFullYear(), 11, 26)) xmas.setFullYear(now.getFullYear() + 1);
+    const days = Math.ceil((xmas - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+    const label = days === 0 ? '今天' : days > 0 ? `D-${days}` : '已过节';
+    document.getElementById('eyebrow').textContent = `Silent Night · ${xmas.getFullYear()} · ${label}`;
+}
+
+function maybeShowGuide() {
+    let seen = false;
+    try { seen = localStorage.getItem('xmas-guide-seen') === '1'; } catch (e) { /* 隐私模式 */ }
+    if (!seen && PARAMS.get('demo') !== '1') {
+        setTimeout(() => document.getElementById('guide').classList.add('open'), 900);
+    }
+}
+
+function startDemo() {
+    document.getElementById('ui-layer').classList.add('hidden');
+    document.getElementById('guide').classList.remove('open');
+    const seq = ['TREE', 'SCATTER', 'TEXT', 'FOCUS'];
+    let i = 0;
+    setInterval(() => {
+        i = (i + 1) % seq.length;
+        const mode = seq[i];
+        if (mode === 'FOCUS') {
+            if (photoGroup.children.length) focusPhoto(STATE.photoIndex + 1);
+            else setMode('TREE');
+        } else {
+            setMode(mode);
+        }
+    }, 7000);
+}
+
+function init() {
+    initThree();
+    setupEnvironment();
+    setupLights();
+    createSky();
+    createStars();
+    createAtmosphere();
+    createGround();
+    createVolume();
+    createFoliage();
+    createStringLights();
+    createOrnaments();
+    createGifts();
+    createDust();
+    createSnow();
+    createBokeh();
+    createPetals();
+    createHearts();
+    setupPost();
+    setupEvents();
+
+    // 灯光从暗处慢慢亮起
+    foliageUniforms.uDissolve.value = 1;
+
+    // 手写字体就绪后重新绘制相纸上的字
+    if (document.fonts?.ready) {
+        document.fonts.ready.then(() => {
+            photoGroup.children.forEach(g => {
+                const cap = g.userData.caption;
+                if (!cap) return;
+                cap.material.map.dispose();
+                cap.material.map = makeCaptionTexture();
+                cap.material.needsUpdate = true;
+            });
+        });
+    }
+
+    updateEyebrow();
+    setMode('TREE');
+    animate();
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.getElementById('loader').classList.add('done');
+    }));
+
+    maybeShowGuide();
+    if (PARAMS.get('demo') === '1') startDemo();
+}
+
+try {
+    init();
+} catch (err) {
+    console.error(err);
+    const loader = document.getElementById('loader');
+    loader.classList.remove('done');
+    loader.innerHTML = `<div class="loader-text" style="max-width:70ch;line-height:2;text-align:center;padding:0 24px">
+        场景初始化失败：${err.message}<br>请用新版 Chrome / Edge / Safari 打开，并确认网络可访问 CDN
+    </div>`;
+}
+</script>
+</body>
+</html>
