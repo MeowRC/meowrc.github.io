@@ -66,13 +66,13 @@ PAGES.forEach(function (item) {
   ok(jsAt < headEnd, rel + ': ios-adapt.js must be in <head>');
   ok(cssAt > jsAt, rel + ': ios-adapt.css must follow the probe');
   ok(cssAt < headEnd, rel + ': ios-adapt.css must be in <head>');
-  /* loader-video.css is intentionally appended after ios-adapt.css so its
+  /* loader-media.css is intentionally appended after ios-adapt.css so its
      background override wins; no other stylesheet may follow ios-adapt.css. */
   var afterIos = head.slice(cssAt + cssTag.length);
   ok(afterIos.indexOf('<link rel="stylesheet"') === -1 ||
-     (afterIos.indexOf('loader-video.css') > -1 &&
+     (afterIos.indexOf('loader-media.css') > -1 &&
       afterIos.split('<link rel="stylesheet"').length === 2),
-     rel + ': only loader-video.css may follow ios-adapt.css');
+     rel + ': only loader-media.css may follow ios-adapt.css');
 });
 console.log('  - ' + PAGES.length + ' site pages wired in correct order');
 
