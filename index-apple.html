@@ -383,6 +383,32 @@
     }
   }
 
+
+  /* Wait for the loader video to finish once before leaving the loading
+     screen. DOM0 handlers are used for ES3/IE compatibility. Failure to load
+     or play exits immediately; a 10s safety net prevents a stuck loader if
+     `ended` never fires (e.g. background tab). */
+  function waitForLoaderVideo(done) {
+    var video = (loader && loader.querySelector)
+      ? loader.querySelector('video.loader-video') : null;
+    if (!video || typeof video.play !== 'function') { done(); return; }
+    var finished = false;
+    function finish() {
+      if (finished) return;
+      finished = true;
+      done();
+    }
+    video.onended = finish;
+    video.onerror = finish;
+    try {
+      var playing = video.play();
+      if (playing && typeof playing.catch === 'function') {
+        playing.catch(function () { finish(); });
+      }
+    } catch (e) { finish(); }
+    setTimeout(finish, 10000);
+  }
+
   function boot() {
     if (prefersReduced) {
       if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
@@ -397,7 +423,7 @@
 
     enterPage();
 
-    setTimeout(function () {
+    waitForLoaderVideo(function () {
       if (loader) loader.classList.add('slide-out');
 
       setTimeout(function () {
@@ -405,7 +431,7 @@
         initReveal();
         initTypewriter();
       }, 1200);
-    }, 3000);
+    });
 
     initScrollUI();
     initMobileMenu();
