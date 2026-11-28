@@ -24,6 +24,16 @@
   color: rgba(244, 238, 252, .9) !important;
 }
 
+/* aesthetic.js dynamically injects four decorative layers into #loader
+   (halo, two rings and a three-dot pulse). The GIF is now the only visual:
+   hide all four without touching the enhancement script. */
+#loader .fx-load-halo,
+#loader .fx-load-ring,
+#loader .fx-load-ring-2,
+#loader .fx-load-dots {
+  display: none !important;
+}
+
 #loader .loader-gif {
   position: absolute;
   top: 0;
