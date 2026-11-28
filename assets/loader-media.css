@@ -1,9 +1,9 @@
 /*!
- * loader-media.css — animated GIF as the homepage loader hero (v10.2)
+ * loader-media.css — video as the homepage loader hero (v10.3)
  *
  * Loaded last in <head> so the background override wins over all theme
- * stylesheets. The GIF is 960x540 / 100 frames / 5s loop / 750 KB — small
- * enough to show its first frame almost instantly.
+ * stylesheets. The MP4 is 1080-wide / 5s / H.264 / silent — sharp on retina displays.
+ * The page waits for `ended` before leaving the loader.
  *
  * object-fit:contain keeps the landscape source intact on portrait phones;
  * the letterbox area uses the very same gradient as the page body, so there
@@ -25,7 +25,7 @@
 }
 
 /* aesthetic.js dynamically injects four decorative layers into #loader
-   (halo, two rings and a three-dot pulse). The GIF is now the only visual:
+   (halo, two rings and a three-dot pulse). The video is the only visual:
    hide all four without touching the enhancement script. */
 #loader .fx-load-halo,
 #loader .fx-load-ring,
@@ -34,7 +34,7 @@
   display: none !important;
 }
 
-#loader .loader-gif {
+#loader .loader-video {
   position: absolute;
   top: 0;
   right: 0;
@@ -51,9 +51,13 @@
   background: transparent;
 }
 
+/* Hide native controls on WebKit. */
+#loader .loader-video::-webkit-media-controls { display: none !important; }
+#loader .loader-video::-webkit-media-controls-enclosure { display: none !important; }
+
 /* IE11 has no object-fit: keep the source aspect ratio manually. */
 @media screen and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-  #loader .loader-gif {
+  #loader .loader-video {
     width: auto;
     height: auto;
     max-width: 100%;
