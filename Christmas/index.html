@@ -533,6 +533,46 @@
         #status-indicator .dot { animation: none; }
         #ui-layer > * { transition: none; }
     }
+
+    /* ---------------- iPhone 11+ safe area ----------------
+       index.html already declares viewport-fit=cover and handles the bottom
+       Home Indicator. iPhone 11 / 11 Pro / XR and later additionally have a
+       top notch (44~48px) and left/right insets in landscape; the original
+       fixed offsets (22px / 4vh) put the brand and status indicator under the
+       notch. These rules only add the measured inset — no visual redesign. */
+    @supports (padding-top: env(safe-area-inset-top, 0px)) {
+        :root {
+            --xmas-safe-top: env(safe-area-inset-top, 0px);
+            --xmas-safe-right: env(safe-area-inset-right, 0px);
+            --xmas-safe-bottom: env(safe-area-inset-bottom, 0px);
+            --xmas-safe-left: env(safe-area-inset-left, 0px);
+        }
+        .brand {
+            top: calc(clamp(24px, 5vh, 60px) + var(--xmas-safe-top));
+            left: max(clamp(20px, 4vw, 64px), calc(var(--xmas-safe-left) + 12px));
+        }
+        #status-indicator {
+            top: calc(clamp(24px, 5vh, 54px) + var(--xmas-safe-top));
+            right: max(clamp(20px, 4vw, 56px), calc(var(--xmas-safe-right) + 12px));
+        }
+        #toast { top: calc(92px + var(--xmas-safe-top)); }
+        .controls {
+            left: max(16px, calc(var(--xmas-safe-left) + 12px));
+            right: max(16px, calc(var(--xmas-safe-right) + 12px));
+        }
+        #dock, #filmstrip {
+            max-width: calc(100vw - var(--xmas-safe-left) - var(--xmas-safe-right) - 24px);
+        }
+    }
+    /* Touch devices: keep the original compact styling, only guarantee a
+       44px minimum tap target on iPhone 11+ (and other coarse pointers). */
+    @media (max-width: 760px) and (pointer: coarse) {
+        .brand { top: calc(22px + var(--xmas-safe-top, 0px)); }
+        #status-indicator { top: calc(clamp(20px, 4vh, 44px) + var(--xmas-safe-top, 0px)); }
+        #toast { top: calc(84px + var(--xmas-safe-top, 0px)); }
+        .dock-btn, .preset, .upload-btn, .ghost-btn { min-height: 44px; }
+        #dock { padding: 8px; }
+    }
 </style>
 
 <script type="importmap">
@@ -646,7 +686,7 @@
     <p class="panel-eyebrow">Greeting</p>
     <h2 class="panel-title" id="wish-title">点亮一句祝福</h2>
     <p class="panel-text">输入一句话，粒子会把它拼出来。</p>
-    <input id="wish-input" type="text" maxlength="20" placeholder="例如：圣诞快乐 Anx" autocomplete="off">
+    <input id="wish-input" type="text" maxlength="20" placeholder="例如：圣诞快乐 船" autocomplete="off">
     <div class="presets">
         <button class="preset" type="button">圣诞快乐</button>
         <button class="preset" type="button">Merry Christmas</button>
@@ -733,7 +773,7 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 const PARAMS = new URLSearchParams(location.search);
 
 const CONFIG = {
-    greeting: (PARAMS.get('text') || '圣诞快乐 宝贝').slice(0, 20),
+    greeting: (PARAMS.get('text') || '圣诞快乐 船').slice(0, 20),
 
     // 情书内容：改这里就能换成你自己想说的话
     letter: {
